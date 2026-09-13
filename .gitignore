@@ -1,0 +1,28 @@
+# --- SECRETS: never publish (providers.py reads these local key files) ---
+.anthropic_key
+.groq_key
+.openai_key
+.openrouter_key
+.deepseek_key
+.gemini_key
+.xai_key
+.nvidia_key
+*_key
+*.key
+.env
+token.txt
+# --- build artifacts / caches ---
+__pycache__/
+*.pyc
+*.bak
+node_modules/
+csast/bin/
+csast/obj/
+goast
+# --- local run/store data ---
+runs/
+store/
+atomstore_query.tasks/
+_backup_pretab/
+php2zfl/vendor/
+composer.lock
