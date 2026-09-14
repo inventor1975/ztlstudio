@@ -1,161 +1,365 @@
 # -*- coding: utf-8 -*-
 """
-ZTLStudio: the translator. The ONLY component allowed to hallucinate —
-which is why it never judges: it negotiates understanding in Russian,
-then emits ZFL, and repairs it against the validator's machine-readable
-errors. The human signs off on the meaning; the deterministic
-back-reading (zfl.py) audits the emission; the core judges.
+The AI side of studio v2: fills the table, and comments on the core's answer.
 
-Groq API, same conventions as the curator's other tools (UA header —
-Cloudflare 1010; GROQ_API_KEY from the environment).
+THE PROMPT IS GENERATED FROM THE SPEC. Every column, every allowed status,
+every kind of ground and every operator the model is told about is read out
+of `zfl.COLUMNS` and the parsers — so a column added there teaches the model
+about it without anyone remembering to edit a prompt. A hand-written prompt
+is a second description of the language, and this project has spent the whole
+day removing second descriptions.
+
+TABLE OR JSON, the curator's question: JSON, and not by taste. A model emits
+a structured object far more reliably than a bespoke table layout, the result
+can be validated precisely rather than by eye, and the validator's
+machine-readable issues feed straight back for one repair attempt. The human
+sees the table; the model writes the object that fills it. Same split as
+everywhere else here — surface for people, structure for machines.
+
+THE LANGUAGE IS TOLD, NOT GUESSED. v1 inferred the reply language from a
+sample of the user's own speech, which is a guess that fails whenever the
+question is short or the terms are English. The studio knows which language
+its interface is in, so it says so.
+
+WHAT THE MODEL IS NOT ALLOWED TO DO is decide anything. It fills cells and
+comments on a verdict that was computed without it. The core's answer is
+never routed through the model, and the commentary says so when it disagrees.
 """
-
 import json
 import os
+import sys
 
-import providers
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-ZFL_SPEC = """ZFL is the formal language of the ZTL core. Strict JSON:
-{"genre": "statement"|"system",
- "atoms": {"name": {"status": "T"|"F"|"Z", "note": "explanation"}},
- "assert": "formula",                  // statement genre only
- "sentences": {"name": "formula"},     // system genre only
- "ask": ["verdict","warranty","passport","stipulations"]}
-Formulas: not(x), and(x,y), or(x,y), imp(x,y), xor(x,y), xnor(x,y),
-constants T and F, atom names; in genre=system references to sentences
-go ONLY through Tr(name); bare atoms inside system formulas are
-forbidden. RESERVED — never use as atom/sentence names: T, F, Z, Tr,
-not, and, or, imp, xor, xnor (pick descriptive names like "eats",
-"child_truth"). status: T = verified-true, F = verified-false,
-Z = UNVERIFIED.
+import backread                                                  # noqa: E402
+import providers                                                # noqa: E402
+import zfl                                                      # noqa: E402
+import zfldoc                                                   # noqa: E402
 
-WHEN TO WRITE WHICH STATUS — the rule, not a preference. Default to "Z".
-Write "T" or "F" ONLY when the text itself reports that somebody CHECKED
-and what they found. A claim being obviously true, widely believed, stated
-confidently, or asserted by the speaker is NOT a check: "the sensor reports
-overheating" is Z (a report is not a verification), "the inspector confirmed
-the seal" is T. If the text does not say who established it, it is Z. When
-in doubt, Z — a refusal can be lifted by inquiry, an unearned verdict cannot
-be taken back.
-
-statement = a verdict question about a claim over
-(un)verified atoms. system = a self-referential system (paradoxes:
-sentences about the truth of each other and themselves)."""
-
-FEWSHOT = """Examples.
-1) "The liar: this sentence is false" ->
-{"genre":"system","sentences":{"L":"not(Tr(L))"},
- "ask":["passport"]}
-2) "The crocodile returns the child iff the mother guesses his action;
-the mother says: you will not return it" ->
-{"genre":"system","sentences":{"R":"Tr(M)","M":"not(Tr(R))"},
- "ask":["passport","stipulations"]}
-3) "An unverified sensor reports overheating; if overheating, the
-shutdown fires. Will it fire?" ->
-{"genre":"statement",
- "atoms":{"overheat":{"status":"Z","note":"sensor unverified"},
-          "shutdown":{"status":"Z","note":"consequence"}},
- "assert":"imp(overheat, shutdown)","ask":["verdict","warranty"]}
-4) "X is true if and only if X is false" (compressed Russell / the
-liar: encode the biconditional as the DEFINITION) ->
-{"genre":"system","sentences":{"X":"not(Tr(X))"},"ask":["passport"]}
-Never emit degenerate formulas like xor(A,A) or xnor(A,A) — if you are
-tempted, you have mis-encoded a biconditional definition.
-5) "Russell: the set R of all sets not containing themselves, over the
-universe a = empty, b = {b}" ->
-{"genre":"system","sentences":{
- "a_in_a":"F","a_in_b":"F","a_in_R":"not(Tr(a_in_a))",
- "b_in_a":"F","b_in_b":"T","b_in_R":"not(Tr(b_in_b))",
- "R_in_a":"F","R_in_b":"F","R_in_R":"not(Tr(R_in_R))"},
- "ask":["passport"]}"""
-
-UNDERSTAND_SYS = """You are the meaning translator for the ZTL logic
-studio (two-valued verdicts + the mark Z "unverified"; paradoxes go
-into quarantine instead of exploding). Your job is ONLY to understand
-the human, never to judge. ALWAYS reply in the language the user
-writes in.
-
-FIRST — THE BOUNDARY OF COMPETENCE. ZTL v1 formalizes only:
-(a) claims built from logical connectives over declarative atoms
-    (each atom verified-true / verified-false / UNVERIFIED);
-(b) self-referential systems — and ONLY when sentences speak about
-    the TRUTH of sentences (their own or others'). Conflicting
-    viewpoints, physics of motion, perception are NOT self-reference.
-EXPLICITLY IN SCOPE (do not refuse these): the classical
-self-reference paradoxes — the liar, the truth-teller, Jourdain's
-carousel, Curry, Yablo truncations, the crocodile dilemma (a deal
-about a future action reduces cleanly to sentences about truth —
-narrative time is NOT a temporal-logic essence), Russell's paradox
-over a small named universe (membership facts x_in_y as sentences,
-x_in_R defined as not(Tr(x_in_x))). Refuse ONLY when numbers,
-quantities or arithmetic are the POINT of the question — e.g. the
-SORITES/heap (induction over n grains IS arithmetic: refuse first and
-offer the coarsened shadow, do NOT silently formalize a few grain
-counts as atoms), Berry, Richard. In that case
-say HONESTLY: "This does not formalize into propositional ZTL without
-losing the point (here: …)", explain why in one line, and ask: stop,
-or agree on a coarsened logical shadow (listing explicitly what is
-lost). NEVER invent atoms
-for the sake of formalizability. An atom is a declarative statement;
-a question cannot be an atom.
-
-If within the boundary — reply with a structured summary:
-— ENTITIES/ATOMS: the elementary claims; what is verified, what is not;
-— ASSERTED: who/what asserts what (flag self-references to truth);
-— GENRE: a plain statement or a self-referential system;
-— ASKED: what the human wants to know.
-Ask a clarifying question ONLY if formalization is impossible without
-the answer. Do NOT offer to explain, resolve or analyze, and do NOT
-pre-announce what the core will decide (no verdict, passport or
-quarantine predictions in the understanding) — the core judges, not
-you, even when you are confident. If the understanding is complete, end with exactly
-this sentence (translated into the user's language, quoting the
-button name verbatim):
-"If the understanding is correct — press the \u00abAgree \u2192 ZFL\u00bb button." Be brief."""
-
-EMIT_SYS = ("You are the ZFL compiler. From the agreed understanding "
-            "emit ONLY valid ZFL JSON, no explanations, no markdown. "
-            "Atoms are declarative statements only; NEVER create an "
-            "atom for a question. The system genre only when sentences "
-            "speak about the truth of sentences.\n\n"
-            + ZFL_SPEC + "\n\n" + FEWSHOT)
-
-REPAIR_SYS = ("You repair ZFL against validator errors. Emit ONLY the "
-              "corrected ZFL JSON, no explanations.\n\n" + ZFL_SPEC)
-
-EXPLAIN_SYS = """You are the interpreter of the ZTL core's verdicts for
-a human. You receive the ZFL document, its deterministic back-reading
-and the core's formal report. THE REPORT IS THE AUTHORITY: never
-contradict it, never re-judge, never soften a PARADOX or promote a Z.
-Your job is to retell what the core established, in plain language.
-LANGUAGE RULE (strict): reply in the language of the MOST RECENT user
-message in the conversation; if there is none yet, use the language of
-the claim/notes inside the ZFL. Do not drift into the language of the
-technical context.
-
-Glossary you may rely on:
-- verdicts are always two-valued: T (truth was EARNED) / F (not earned);
-- warranty "stable" = no future verification can flip the verdict;
-  "until-verification" = it can flip when unverified inputs get checked;
-- passport kinds: PARADOX = no classical solutions, refusal permanent
-  (the oscillation period is diagnostics, not hope); UNDERDETERMINED =
-  several consistent solutions exist, an external choice (stipulation)
-  can ground it; INPUT = a plain unverified input, verification lifts
-  it; DOWNSTREAM = quarantine inherited from the listed culprits;
-- grounded sentences carry the same classical value in EVERY solution.
-
-If the user asks something the report does not answer, say honestly
-that the core was not asked that — and, when possible, show the EXACT
-ZFL change that would ask it. Any ZFL you show MUST be valid per the
-specification below: only the six connectives and Tr(name), nothing
-invented. NEVER predict what the core would say about a MODIFIED
-system — you are not the judge and you will guess wrong; show the
-edit and tell the user to run it: the core answers, not you.
-Be brief and concrete.
-
-""" + ZFL_SPEC
+# Built from the spec's own list rather than kept as a second copy. Before
+# 2026-08-16 this was a two-entry dict and every other language silently
+# resolved to "English", so a Hebrew studio had an English-speaking
+# assistant — the localisation gap you would notice first and find last.
+LANG_NAME = {c: e for c, _n, e in zfl.LANGS}
 
 
+def schema(lang="en"):
+    """The language, described to a model, from the spec itself."""
+    spec = zfl.form_spec(lang)
+    lines = ["A document is JSON: {\"rows\": [ ... ], \"claim\": \"...\"}.",
+             "Each row is an object with these keys:"]
+    for c in spec["columns"]:
+        req = ("REQUIRED" if c["required"]
+               else f"required when status is one of "
+                    f"{c['required_when']['status']}"
+               if c["required_when"] else "optional")
+        bit = f'  "{c["key"]}" ({req}) — {c["help"]}'
+        if c.get("options"):
+            bit += ("; one of: "
+                    + ", ".join(f'"{o["value"]}"' for o in c["options"]))
+        if c.get("eg"):
+            bit += "; e.g. " + ", ".join(str(e) for e in c["eg"])
+        lines.append(bit)
+    lines.append('"claim" (optional) — one formula over the row names.')
+    lines.append("Operators: " + " ".join(zfldoc.operators()))
+    lines.append("What they mean: "
+                 + "; ".join(f"{o} — {zfldoc.OP_HELP[o][0 if lang == 'en' else 1]}"
+                             for o in zfldoc.operators()
+                             if o in zfldoc.OP_HELP))
+    lines.append("Arithmetic: " + " ".join(zfldoc.arithmetic()))
+    lines.append("A value is a number, an interval like [0,10], or ? when it "
+                 "is the thing being asked for.")
+    # ЗАПРЕЩЁННЫЕ ИМЕНА — список берётся ИЗ ЯДРА, не переписывается здесь.
+    # Заведено 2026-09-03: форк назвал строку буквой T и получил ПУСТОЙ
+    # паспорт без единого замечания. В спеке первого поколения этот запрет
+    # стоял, при переходе на v2 потерялся, и промпт о нём молчал. Цитируем
+    # ядро, чтобы второе описание языка не завелось снова: изменится
+    # zfl.RESERVED_NAMES — изменится и то, что читает модель.
+    lines.append("RESERVED — never use as a row name: "
+                 + ", ".join(zfl.RESERVED_NAMES)
+                 + ". They are constants of the language; as a name each one "
+                   "silently changes the reading. Lower-case versions are free.")
+    # Связки — второй занятый разряд, и молчать о нём дороже: имя-связка
+    # роняет ядро, а не искажает чтение. Цитируем список из ядра по той же
+    # причине, что и константы.
+    lines.append("Also never use as a row name: "
+                 + ", ".join(zfl.OPERATOR_WORDS)
+                 + ". They are the connectives themselves; a row named after "
+                   "one can never be referred to in a formula.")
+    return "\n".join(lines)
+
+
+FILL_SYS = """You turn a person's question into one ZFL v2 document.
+
+{schema}
+
+RULES, and they are not stylistic:
+- Reply with the JSON object ALONE. No prose, no code fence.
+- NEVER INVENT A VERIFICATION, and this is the one rule the whole system
+  exists for. If the person did not say what backs a fact, its status is
+  "unverified" and its ground is EMPTY. Writing "verified" with a document
+  name they never mentioned is granting truth on credit, which is the
+  failure this machine was built to refuse.
+- THE EXAMPLES IN THE SCHEMA ARE FORMS, NOT CONTENT. `inv-17` and `order-4`
+  are shapes of a name; copying one into a story about sweets asserts an
+  invoice that does not exist. A ground must be a word the PERSON used. If
+  the fact comes from their own telling and nothing else, either leave the
+  status "unverified", or — when the story itself is the source — write
+  `the-story`, and nothing dressed up as a document.
+- "means" is not decoration. Write what it MEANS for the row to be TRUE, in
+  {language}, so a reader can catch a name that lies (a name like `fresh`
+  already means "not revoked").
+- Self-reference goes in "ground" with status "defined": the liar is
+  {{"name": "L", "status": "defined", "ground": "~Tr(L)"}}.
+- WHEN THE QUESTION IS "CHECK THIS SENTENCE", LEAVE THE CLAIM EMPTY. The row
+  already says what the sentence is; the passport office answers by itself,
+  and repeating the definition as a claim ("L == ~Tr(L)") asks the machine
+  to judge a definition rather than to classify a sentence. Both models
+  tried it, so it is written here in so many words.
+- A DERIVED NUMBER is not a "defined" row. "defined" is for propositional
+  self-reference only — the liar and its kin. A quantity you do not know,
+  including a total that follows from other rows, has status "unverified",
+  value "?", and the relation goes in "claim":
+  {{"name": "total", "status": "unverified", "value": "?"}} with
+  "claim": "sum(a,b) = total". Never put arithmetic in "ground".
+- THE CLAIM MAY HOLD SEVERAL RELATIONS, joined by `&`, and a word problem
+  needs them: one relation per fact the story states, and the machine solves
+  the system. "Masha had 3 sweets, gave 1 to Vasya, how many to Petya so they
+  are equal" is rows start=3, toV=1, give=?, M=?, P=? and the claim
+  "M = start - toV - give & P = give & M = P". Naming the quantities without
+  their relations leaves nothing to solve — the answer comes back OPEN and
+  the person is told to go and measure what they were asking you to compute.
+- If the person is asking for a number, give that row the value "?" and put
+  the relation in "claim".
+- Names must be usable in formulas: letters, digits, underscores.
+- A GROUND IS ONE WORD. `inv-17`, `the-story`, `contract`. It is an
+  identifier, not a sentence: two rows sharing a ground share a document and
+  fall together, so `the story` with a space is not a longer name, it is a
+  different one truncated.
+- SWEEP EVERY REGISTER before you finalise — a layout that stops at true/false
+  misses what the core can read. For each fact ask: (a) HIDDEN PREMISE — does
+  the conclusion need something the person left unsaid? make it its own
+  "unverified" row so the verdict rides it honestly, not silently. (b) TIME —
+  is a ground an ACT or permission that CEASES (thinking, a licence, a
+  clearance, a quote)? give it `expires_on` the event that ends it — "true
+  WHILE X" is not "true". (c) NUMBER — any quantity, limit or comparison? use
+  value and the claim, never prose. (d) SELF-REFERENCE — does a ground speak of
+  its own truth or another row's? status "defined". (e) PROVENANCE — is the
+  ground a word the PERSON used, or one you invented? The columns for all of
+  these already exist; the only failure is not sweeping them.
+"""
+
+def vocabulary(lang):
+    """The words the interface uses, handed to the model so it stops
+    inventing its own. Measured need: with only "reply in Russian" the
+    commentary came back saying "уневерифицированный", which is not a word.
+    The status names come from the spec, so they cannot drift from the
+    dropdown the reader is looking at."""
+    spec = zfl.form_spec(lang)
+    st = [c for c in spec["columns"] if c["key"] == "status"][0]
+    words = {o["value"]: o["label"] for o in st["options"]}
+    extra = {
+        "ru": {"EARNED": "заработано", "REFUTED": "опровергнуто",
+               "OPEN": "открыто", "ON CREDIT": "в кредит", "E": "E — "
+               "нечего читать", "PARADOX": "парадокс",
+               "UNDERDETERMINED": "недоопределено (нужна оговорка)",
+               "INTRINSIC": "вынужденно", "warranty": "гарантия",
+               "weak links": "слабые звенья", "passport": "паспорт",
+               "trust bracket": "вилка доверия", "ground": "основание"},
+        "en": {},
+    }[lang if lang in ("ru", "en") else "en"]
+    pairs = [f'"{k}" = "{v}"' for k, v in {**words, **extra}.items()]
+    return ("Use exactly these words, and invent none of your own:\n"
+            + "; ".join(pairs)) if pairs else ""
+
+
+COMMENT_SYS = """You explain what the ZTL core has already decided.
+
+{vocabulary}
+
+You did not compute this and you cannot change it. The verdict, the
+passports, the brackets and the weak links come from the instruments; your
+job is to say what they mean in plain {language}, in at most six sentences.
+
+- MENTION ONLY WHAT IS IN THE REPORT. If there is no passport section, say
+  nothing about passports; if no bracket, nothing about brackets. The
+  vocabulary below is for TRANSLATING what is there, not a list of things to
+  bring up. Naming an instrument that did not speak is a false report.
+- Lead with the answer, then why.
+- "Unverified" is not "false" and not "unknown": it means no verification was
+  produced. Say it that way.
+- A SOLVED VALUE ON CREDIT MEANS THE PREMISES WERE, NOT THE ARITHMETIC. The
+  derivation is exact; a derived value simply inherits the weakest ground it
+  came from. Never suggest the calculation lacked checking — say which
+  inputs are unverified and that documenting them would settle it.
+- Use the words from the vocabulary and no foreign ones: the ledger is
+  "{ledger}", not "ledger".
+- If the report names weak links or cures, say what would settle the matter.
+- If something in the report surprises you, say so plainly rather than
+  smoothing it over. You are a commentator, not an advocate.
+- Never restate the JSON. The reader can see the table.
+"""
+
+
+def _invented_grounds(doc, history):
+    """Grounds the person never mentioned.
+
+    The machine cannot know whether `inv-17` exists — but it can see that
+    nobody in the conversation ever said it. A model reaching for a document
+    name out of the schema's own examples is the exact failure this corpus
+    refuses, so it is flagged rather than trusted. A warning, not an error:
+    the person may genuinely have an invoice they did not name in so many
+    words, and that judgement is theirs."""
+    # the sanctioned label for "the person's own telling" is not an
+    # invention — the prompt asks for it by name, and flagging it would
+    # teach the model to dress the same thing up as a document instead
+    TOLD = {"the-story", "the_story", "story", "рассказ", "условие",
+            "со-слов", "stated"}
+    said = " ".join(m.get("content", "") for m in history).lower()
+    out = []
+    for i, r in enumerate((doc.get("rows") or []), 1):
+        g = str(r.get("ground") or "").strip()
+        if not g or r.get("status") == "defined":
+            continue
+        stem = g.lower().replace("-", " ").split()[0]
+        if g.lower() in TOLD:
+            continue
+        if len(stem) > 2 and stem not in said and g.lower() not in said:
+            out.append({"level": "warn", "code": "W_AI_INVENTED_GROUND",
+                        "where": f"row {i} / ground",
+                        "hint": f"'{g}' was never mentioned — the model "
+                                f"supplied it. If no such document exists, "
+                                f"this row is unverified."})
+    return out
+
+
+def fill(history, lang="en", cfg=None):
+    """A question in, a validated document out — with one repair attempt on
+    the validator's own machine-readable issues, which is what those codes
+    were built for."""
+    sysmsg = FILL_SYS.format(schema=schema(lang),
+                             language=LANG_NAME.get(lang, "English"))
+    msgs = [{"role": "system", "content": sysmsg}] + [dict(m) for m in history]
+    if msgs[-1]["role"] == "user":
+        msgs[-1]["content"] += (
+            f"\n\n[Write every \"means\" gloss in "
+            f"{LANG_NAME.get(lang, 'English')}.]")
+    raw = strip_fences(llm(msgs, cfg))
+    doc, issues = _parse(raw)
+    if doc is not None:
+        issues = zfl.validate(doc)
+        if not any(i["level"] == "error" for i in issues):
+            # ЗЕРКАЛО. Документ валиден — и этого мало: связь можно записать
+            # безупречно и положить в поле, которого нужный прибор не читает.
+            # Промерено: одна и та же связь «ровно один из двух» в claim идёт
+            # к судье и оставляет паспорт пустым, а в ground — к паспорту.
+            # Валидатор об этом молчит, потому что ошибки и нет.
+            #
+            # РАЗБОР ПОКАЗЫВАЕТСЯ ВСЕГДА, и заходов до трёх. Так было в том
+            # прогоне, где слепой форк дал 24 из 24 на семи языках: он смотрел
+            # разбор после КАЖДОГО документа и правил, пока ядро не читало то,
+            # что он имел в виду.
+            #
+            # ПРЕЖДЕ ЗДЕСЬ СТОЯЛО УЖЕ: заход давался, только если зеркало
+            # напечатало ВНИМАНИЕ, а печатает оно его на одном-единственном
+            # случае — отношение ушло в claim. На 24 кусках это сработало ОДИН
+            # раз, и прогон дал 17 из 24 вместо 24 из 24. Сузил это я, ради
+            # экономии одного обращения к модели, и вариант «показывать всегда»
+            # тогда не померил вовсе — мерил только «с ВНИМАНИЕМ» против «без
+            # зеркала» (20 из 21 против 15 из 21). Экономия вышла дороже.
+            #
+            # ВОПРОСЫ В ЭТОМ СООБЩЕНИИ — не сочинённые, а перенесённые дословно
+            # из задания, по которому слепой форк дал 24 из 24 (воспроизведено
+            # 2026-09-04 на свежем прогоне). Прежняя редакция спрашивала только
+            # «то ли ядро прочитало», и форк, увидев, что какой-то прибор
+            # сработал, останавливался — хотя сработал не тот. Прямой вопрос
+            # «не вышло ли, что НИ ОДИН прибор не сработал» и «все ли связи»
+            # заставляет посмотреть на разбор целиком.
+            #
+            # Выход из цикла — по НЕИЗМЕНЁННОМУ документу: модель, которой
+            # показали разбор и которая ничего не поправила, сказала «читается
+            # верно». Без этого условия качание туда-сюда шло бы все три круга
+            # и платили бы за него всегда.
+            зеркало = backread.прочитано(doc)
+            for _ in range(3):
+                msgs2 = msgs + [
+                    {"role": "assistant", "content": raw},
+                    {"role": "user", "content":
+                     "Вот что ядро прочитало из вашего документа:\n\n"
+                     + зеркало
+                     + "\n\nСверьте с задачей: ВСЕ ЛИ связи ядро увидело? Не "
+                       "вышло ли, что НИ ОДИН прибор не сработал? Если напечатан "
+                       "раздел ВНИМАНИЕ — прочтите и решите, то ли поле вы выбрали. "
+                       "Если ядро прочитало НЕ ТО, что вы имели в виду — верните "
+                       "исправленный JSON-объект, один, без пояснений. Если всё "
+                       "верно — верните тот же документ без изменений."}]
+                raw2 = strip_fences(llm(msgs2, cfg))
+                doc2, _ = _parse(raw2)
+                if doc2 is None:
+                    break            # не разобралось — остаёмся с последним годным
+                issues2 = zfl.validate(doc2)
+                if any(i["level"] == "error" for i in issues2):
+                    break            # правка хуже исходного — не берём
+                if doc2 == doc:
+                    break            # «читается верно» — платить за круг не за что
+                doc, raw, issues = doc2, raw2, issues2
+                зеркало = backread.прочитано(doc)
+            return {"ok": True, "doc": doc, "repaired": False,
+                    "mirrored": True, "back_reading": зеркало,
+                    "issues": issues + _invented_grounds(doc, history)}
+    msgs += [{"role": "assistant", "content": raw},
+             {"role": "user", "content":
+              "That document was rejected:\n"
+              + json.dumps(issues, ensure_ascii=False)
+              + "\nReturn a corrected JSON object, alone."}]
+    raw2 = strip_fences(llm(msgs, cfg))
+    doc2, parse_issues = _parse(raw2)
+    if doc2 is None:
+        return {"ok": False, "issues": parse_issues}
+    return {"ok": True, "doc": doc2, "repaired": True,
+            "issues": zfl.validate(doc2) + _invented_grounds(doc2, history)}
+
+
+def _parse(raw):
+    try:
+        doc = json.loads(raw)
+    except json.JSONDecodeError as exc:
+        return None, [{"level": "error", "code": "E_AI_JSON",
+                       "where": "model", "hint": f"not JSON: {exc}"}]
+    if not isinstance(doc, dict) or "rows" not in doc:
+        return None, [{"level": "error", "code": "E_AI_SHAPE",
+                       "where": "model", "hint": "no rows in the object"}]
+    return doc, []
+
+
+def _anchor(lang):
+    """A language instruction in the SYSTEM prompt loses to a wall of English
+    context — measured: with the interface in Russian and the report in
+    English JSON, the reply came back in English anyway. The instruction has
+    to sit in the last turn, where it is the most recent thing said."""
+    return (f"\n\n[Reply STRICTLY in {LANG_NAME.get(lang, 'English')}, "
+            f"whatever language the data above happens to be in.]")
+
+
+def comment(doc, result, lang="en", history=None, cfg=None):
+    """Plain-language commentary on a verdict the model did not produce."""
+    sysmsg = COMMENT_SYS.format(language=LANG_NAME.get(lang, "English"),
+                                vocabulary=vocabulary(lang),
+                                ledger="тетрадь" if lang == "ru" else "ledger")
+    context = ("The table:\n" + json.dumps(doc, ensure_ascii=False)
+               + "\n\nWhat the instruments answered:\n"
+               + json.dumps(result, ensure_ascii=False))
+    msgs = [{"role": "system", "content": sysmsg},
+            {"role": "user", "content": context + _anchor(lang)}]
+    for m in (history or []):
+        msgs.append(dict(m))
+    if msgs[-1]["role"] == "user":
+        msgs[-1]["content"] += _anchor(lang)
+    return llm(msgs, cfg)
+
+
+# ---- LLM plumbing (moved from v1 translator.py 2026-09-14; v1 deleted) ----
 class TranslatorError(Exception):
     pass
 
@@ -247,80 +451,6 @@ def llm(messages, cfg, temperature=0.2):
         raise TranslatorError(str(e))
 
 
-UNDERSTAND_SYS_HYP = """You are the meaning translator for the ZTL studio,
-HYPOTHESES mode. The user states a claimed LAW, RULE or INFERENCE and wants
-the core to check it. Your job is ONLY to understand and restate it, never
-to judge — the core judges. ALWAYS reply in the language the user writes in.
-
-WHAT THIS MODE CHECKS. A hypothesis is any claim built from logical
-connectives (not, and, or, if-then, xor, iff) over declarative atoms — e.g.
-modus ponens, De Morgan, excluded middle, distributivity, contraposition,
-an access or business rule. It is NOT a self-referential paradox: do NOT ask
-about self-reference, and NEVER say a claimed logical law or rule is
-"outside ZTL". Each atom is a declarative statement, treated as UNVERIFIED
-unless the user pins it true/false. The core checks the claim EXHAUSTIVELY
-over every combination of {verified-true, verified-false, UNVERIFIED}, so the
-real question it answers is: does the rule still hold when some inputs are
-UNVERIFIED?
-
-Refuse ONLY if the claim is not propositional at all — numbers, quantities
-or arithmetic are the point, or a vague predicate like "heap". Then say
-honestly in one line that it does not formalize into propositional ZTL
-without losing the point, and offer a coarsened shadow. Never invent atoms;
-a question is not an atom.
-
-Reply with a short structured summary:
-— ATOMS: the elementary declarative statements (all UNVERIFIED unless the
-  user fixed one);
-— CLAIM: the WHOLE rule as ONE implication — the premises together imply the
-  conclusion; the conclusion is PART of the claim, not the question. An
-  inference "from P1 and P2 conclude C" is (P1 and P2) → C; a premise
-  "X is true" is just the atom X;
-— ASKED: does this rule hold, and does it survive unverified inputs.
-Ask a clarifying question ONLY if formalization is impossible without it. Do
-NOT predict the verdict. If the understanding is complete, end with exactly
-this sentence (translated into the user's language, quoting the button name):
-"If the understanding is correct — press the «Agree → ZFL» button." Be brief."""
-
-HYP_FEWSHOT = (
-    "Examples (emit exactly this shape). KEY RULE: every premise stated as "
-    "TRUE becomes a CONJUNCT in the antecedent — never drop it.\n"
-    '"if A→B and A is true, then B is true" (modus ponens) ->\n'
-    '{"genre":"statement","atoms":{"A":{"status":"Z"},"B":{"status":"Z"}},'
-    '"assert":"imp(and(imp(A,B),A),B)"}\n'
-    '"if A and B are true, and (A and B) implies C, then C is true" ->\n'
-    '{"genre":"statement","atoms":{"A":{"status":"Z"},"B":{"status":"Z"},'
-    '"C":{"status":"Z"}},'
-    '"assert":"imp(and(and(A,B),imp(and(A,B),C)),C)"}\n'
-    '   (WRONG here would be imp(imp(and(A,B),C),C) — it drops the premise '
-    '"A and B are true".)\n'
-    '"p or not p is always true" (excluded middle) ->\n'
-    '{"genre":"statement","atoms":{"p":{"status":"Z"}},'
-    '"assert":"or(p,not(p))"}')
-
-EMIT_SYS_HYP = (
-    "You are the ZFL compiler, HYPOTHESES mode. From the agreed "
-    "understanding emit ONLY valid ZFL JSON, no explanations, no markdown. "
-    "ALWAYS use genre \"statement\". The \"assert\" is the WHOLE claimed "
-    "rule as ONE formula, INCLUDING its conclusion: an inference 'from "
-    "premises P1,P2,... conclude C' is imp(and(P1,P2,...),C); a premise 'X "
-    "is true' is just the atom X. Never drop a premise or the conclusion, "
-    "and never encode a premise as an atom status — put it in the formula. "
-    "Declare EVERY atom with status \"Z\". Never emit a self-referential "
-    "\"system\". Atoms are declarative; never an atom for a question. "
-    "CRITICAL: the atom names inside \"assert\" MUST be EXACTLY the keys of "
-    "\"atoms\" — same letters and SAME SCRIPT. If the user wrote Cyrillic "
-    "А, Б, use А, Б in the formula too (never silently switch to Latin "
-    "A, B). Pick ASCII-safe names only if the user did.\n\n"
-    + ZFL_SPEC + "\n\n" + HYP_FEWSHOT)
-
-
-def understand(history, cfg=None, mode="par"):
-    """history: [{'role': 'user'|'assistant', 'content': str}, ...]"""
-    sys = UNDERSTAND_SYS_HYP if mode in ("hyp", "ast") else UNDERSTAND_SYS
-    return llm([{"role": "system", "content": sys}] + history, cfg)
-
-
 def strip_fences(s):
     s = s.strip()
     if s.startswith("```"):
@@ -329,63 +459,3 @@ def strip_fences(s):
             s = s.rstrip()[:-3]
     return s.strip()
 
-
-def emit(understanding, cfg=None, mode="par"):
-    if mode in ("hyp", "ast"):
-        sys = EMIT_SYS_HYP
-        user = (f"The agreed understanding:\n{understanding}\n\n"
-                "Emit the ZFL statement for the claimed rule: the WHOLE rule "
-                "as one \"assert\" (premises AND conclusion), every atom "
-                "status \"Z\".")
-    else:
-        sys = EMIT_SYS
-        user = (f"The agreed understanding:\n{understanding}\n\n"
-                "Emit the ZFL. [Sentences are DEFINITIONS: a claim "
-                "'X holds iff PHI' becomes \"X\": \"PHI-formula\"; in "
-                "particular 'X iff not X' is {\"X\": \"not(Tr(X))\"}. "
-                "Never emit xor(A,A) or xnor(A,A).]")
-    out = llm([{"role": "system", "content": sys},
-               {"role": "user", "content": user}], cfg)
-    return strip_fences(out)
-
-
-LANG_ANCHOR = ("\n\n[Reply strictly in the language of THIS message; "
-               "for the initial explanation — in the language of the "
-               "claim/notes inside the ZFL. If this question asks what "
-               "would happen if the system or its inputs were CHANGED, "
-               "do NOT answer from your head — you would be guessing: "
-               "show the exact ZFL edit and say the core must be re-run; "
-               "the core answers, not you.]")
-
-
-def explain(zfl_text, back_reading, report, history, lang_hint="", cfg=None):
-    """history: follow-up chat about the result (may be empty);
-    lang_hint: a sample of the user's own speech — the language anchor
-    for the INITIAL explanation (the ZFL context is all-English and
-    would otherwise drag the reply into English)."""
-    context = (f"ZFL:\n{zfl_text}\n\nBack-reading:\n{back_reading}\n\n"
-               f"The core's report (JSON):\n{json.dumps(report, ensure_ascii=False)}")
-    if lang_hint:
-        first_anchor = (f"\n\n[The user speaks the language of this "
-                        f"phrase: \u201c{lang_hint[:200]}\u201d. Reply "
-                        f"STRICTLY in that language.]")
-    else:
-        first_anchor = LANG_ANCHOR
-    msgs = [{"role": "system", "content": EXPLAIN_SYS},
-            {"role": "user", "content": context +
-             "\n\nExplain the result in plain language." + first_anchor}]
-    for m in history:
-        msgs.append(dict(m))
-    if msgs[-1]["role"] == "user":
-        msgs[-1]["content"] = msgs[-1]["content"] + LANG_ANCHOR
-    return llm(msgs, cfg, temperature=0.3)
-
-
-def repair(zfl_text, issues, cfg=None):
-    errs = "\n".join(f"- [{i['level']}] {i['code']} @ {i['where']}: {i['hint']}"
-                     for i in issues)
-    out = llm([{"role": "system", "content": REPAIR_SYS},
-                {"role": "user", "content":
-                 f"ZFL:\n{zfl_text}\n\nValidator errors:\n{errs}\n\n"
-                 "Fix it and emit the ZFL."}], cfg)
-    return strip_fences(out)

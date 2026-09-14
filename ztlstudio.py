@@ -396,7 +396,7 @@ def api_savekey(payload):
 # module. So the whole chain is watched by file mtime and reloaded bottom-up
 # when it moves.
 _V2_CHAIN = ["ztl", "znum", "znumjudge", "znumsolve", "zpassport", "zbook",
-             "zfl", "zflexamples", "zfldoc", "translator", "translator2"]
+             "zfl", "zflexamples", "zfldoc", "translator"]
 _MTIMES = {}
 _RELOAD_LOCK = threading.Lock()   # never reload a module under two threads
 
@@ -464,9 +464,9 @@ def api_v2run(payload):
 def api_v2fill(payload):
     """A question in plain language becomes a filled table. The model never
     decides anything — it fills cells, and the core judges them after."""
-    translator2 = _v2("translator2")
+    translator = _v2("translator")
     try:
-        return translator2.fill(payload.get("history", []),
+        return translator.fill(payload.get("history", []),
                                 payload.get("lang", "en"),
                                 payload.get("cfg"))
     except translator.TranslatorError as e:
@@ -475,9 +475,9 @@ def api_v2fill(payload):
 
 def api_v2comment(payload):
     """Commentary on a verdict the model did not produce."""
-    translator2 = _v2("translator2")
+    translator = _v2("translator")
     try:
-        return {"ok": True, "reply": translator2.comment(
+        return {"ok": True, "reply": translator.comment(
             payload.get("doc") or {}, payload.get("result") or {},
             payload.get("lang", "en"), payload.get("history", []),
             payload.get("cfg"))}
