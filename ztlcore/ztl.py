@@ -80,26 +80,82 @@ OP_SIGNS = {"not": "¬", "and": "∧", "or": "∨", "imp": "→", "xor": "⊕", 
 
 
 # --- formulas: atom = string; compound = tuple (op, ...) ---
-def ev(phi, env):
-    """Value of a formula. Constants 'T'/'F'/'Z' are their own value."""
+def _ev_rec(phi, env):
+    """Value of a formula, by recursion. The fast path, and the one that
+    runs on every ordinary claim."""
     if isinstance(phi, str):
         return phi if phi in VALUES else env[phi]
     op = phi[0]
     if op == "not":
-        return NOT(ev(phi[1], env))
-    return OPS2[op](ev(phi[1], env), ev(phi[2], env))
+        return NOT(_ev_rec(phi[1], env))
+    return OPS2[op](_ev_rec(phi[1], env), _ev_rec(phi[2], env))
+
+
+def _ev_iter(phi, env):
+    """Тот же обход, но со СВОИМ стеком — на цепях, где кончается стек
+    Python. Порядок разбора тот же (слева направо, снизу вверх), поэтому
+    и значение то же; проверено согласием на 3000 случайных формул."""
+    stack, vals = [(phi, False)], []
+    while stack:
+        node, done = stack.pop()
+        if isinstance(node, str):
+            vals.append(node if node in VALUES else env[node])
+        elif not done:
+            stack.append((node, True))
+            for child in reversed(node[1:]):
+                stack.append((child, False))
+        elif node[0] == "not":
+            vals.append(NOT(vals.pop()))
+        else:
+            right = vals.pop()
+            left = vals.pop()
+            vals.append(OPS2[node[0]](left, right))
+    return vals[0]
+
+
+def ev(phi, env):
+    """Value of a formula. Constants 'T'/'F'/'Z' are their own value.
+
+    ГИБРИД, 2026-09-21. Рекурсия остаётся боевым путём, потому что `ev`
+    зовут миллионами раз внутри переборов: промерено на типичных формулах
+    глубины 3 — рекурсия 0,104 с, чистая итерация 0,161 с на 40 000
+    вычислений. Платить 60% всюду ради редкого случая — плохая сделка.
+
+    Но цепь из двух тысяч «и» кладёт стек Python, и до сегодня это был
+    молчаливый отказ прибора, а не ответ. Запасной путь стоит НОЛЬ, пока
+    не нужен (гибрид 0,101 с — в пределах шума от голой рекурсии), и
+    считает 10 000 звеньев за 0,007 с.
+
+    ЧЕГО ЭТА ЛОВУШКА НЕ ЛОВИТ, и это надо знать: RecursionError по другой
+    причине — например, если в `phi` окажется цикл. Формулы у нас деревья,
+    и на цикле итеративный путь просто зациклится вместо падения. Обменяли
+    быстрый отказ на медленный; на дереве разницы нет."""
+    try:
+        return _ev_rec(phi, env)
+    except RecursionError:
+        return _ev_iter(phi, env)
 
 
 def atoms(phi, acc=None):
-    """Set of atoms of a formula (constants T/F/Z do not count as atoms)."""
-    if acc is None:
-        acc = set()
-    if isinstance(phi, str):
-        if phi not in VALUES:
-            acc.add(phi)
-    else:
-        for part in phi[1:]:
-            atoms(part, acc)
+    """Set of atoms of a formula (constants T/F/Z do not count as atoms).
+
+    ИТЕРАТИВНА С 2026-09-21, и вот почему это не украшение. Утром я снабдил
+    запасным путём `ev` — и счёл глубокие цепи закрытыми. Они не были
+    закрыты: `grade` зовёт `atoms` ПЕРВОЙ, и цепь из тысячи звеньев валила
+    стек здесь, на шаг раньше. Починка была ЧАСТИЧНОЙ, а выглядела полной.
+
+    Здесь взят прямой итеративный обход, без гибрида: промерено, `atoms`
+    это 0,0107 с из 0,6006 с в `grade` (1,8%), то есть не горячий путь, и
+    платить за второй путь нечем."""
+    acc = set() if acc is None else acc
+    stack = [phi]
+    while stack:
+        node = stack.pop()
+        if isinstance(node, str):
+            if node not in VALUES:
+                acc.add(node)
+        else:
+            stack.extend(node[1:])
     return acc
 
 
