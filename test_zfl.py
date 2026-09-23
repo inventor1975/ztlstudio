@@ -252,6 +252,38 @@ def sec7_the_ground_gate_demotes_phantom_words():
     print("   with one: the phantom is demoted BY NAME and the verdict")
     print("   honestly falls OPEN; a registered ground still earns.")
 
+def sec7b_the_receipt_tells_what_was_said_from_what_was_done():
+    """The tier travels into the receipt (2026-09-24). Until then run() issued
+    its receipt BEFORE computing the stipulation tag, and hashed a tiered
+    registry by its names alone — so the same table under "log:story" and
+    under "log:act" gave receipts equal to the byte."""
+    import warrant_receipt as wr
+    print("\n### 7b. The receipt tells what was said from what was done")
+    doc = {"rows": [
+        {"name": "done", "means": "the agent's own log says it did it",
+         "status": "verified", "ground": "log"},
+        {"name": "ok", "means": "the grant verifies", "status": "verified",
+         "ground": "grant"}],
+        "claim": "done & ok"}
+    said_reg, acted_reg = {"log": "story", "grant": "place"}, {"log": "act", "grant": "place"}
+    said, acted = zfl.run(doc, ground_registry=said_reg), zfl.run(doc, ground_registry=acted_reg)
+    rs, ra = said["report"]["receipt"], acted["report"]["receipt"]
+    assert [x["name"] for x in said["report"]["on_stipulation"]] == ["done"]
+    assert rs["on_stipulation"] == ["done"], rs["on_stipulation"]
+    assert ra["on_stipulation"] is None
+    assert rs["registry"]["digest"] != ra["registry"]["digest"]
+    assert rs["digest"] != ra["digest"]
+    assert wr.verify(rs) and wr.verify(ra)
+    # the receipt run() issues is the one anybody issues from its report
+    assert rs == wr.receipt(said, doc, "", ground_registry=said_reg)
+    # a plain set carries no tiers and hashes exactly as before
+    flat = zfl.run(doc, ground_registry={"log", "grant"})["report"]["receipt"]
+    assert flat["registry"]["digest"] == wr._sha(wr._canon(["grant", "log"]))
+    assert flat["on_stipulation"] is None
+    print("   story and act give different receipts; the tag is in the one")
+    print("   run() issues, equal to a receipt issued from outside; a registry")
+    print("   without tiers hashes as it always did.")
+
 def sec8_the_credit_that_cannot_be_redeemed():
     """The judge and the passport stop contradicting each other.
 
@@ -359,6 +391,7 @@ if __name__ == "__main__":
     sec3b_what_the_ground_column_is_actually_for()
     sec4_an_unknown_is_a_question_not_a_gap()
     sec7_the_ground_gate_demotes_phantom_words()
+    sec7b_the_receipt_tells_what_was_said_from_what_was_done()
     sec8_the_credit_that_cannot_be_redeemed()
     sec9_the_world_has_a_clock_too()
     sec4b_every_example_runs_and_json_types_are_taken_as_they_come()
