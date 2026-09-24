@@ -89,6 +89,7 @@
 <tr><td><code>E_SCALE</code></td><td>a scale that is not empty/int/decimalK/fracM, or out of bounds</td></tr>
 <tr><td><code>E_STATUS</code></td><td>a status outside the four</td></tr>
 <tr><td><code>E_TOOBIG</code></td><td>more ATOMS in the formulas than the cost allows — a reading costs 3**atoms (2.9 s at twelve, 29.6 s at fourteen, measured 2026-09-18). Rows are not capped: a hundred-row table whose formulas each speak of six atoms reads in 0.003 s. Split the question, not the table</td></tr>
+<tr><td><code>E_TOOLONG</code></td><td>a formula longer than 4096 characters — the readers cost the square of the length (4.6 s at 39 KB, 0.21 s at 4 KB, measured 2026-09-24); split the question</td></tr>
 <tr><td><code>E_UNIT</code></td><td>a unit that cannot be read — a word, optionally with a power (m2), joined by · or /</td></tr>
 <tr><td><code>E_UNKNOWN_NAME</code></td><td>a formula names a row that does not exist</td></tr>
 <tr><td><code>E_UNREADABLE</code></td><td>the instruments could not read the claim — the message says what they choked on</td></tr>
@@ -173,6 +174,7 @@
 <tr><td><code>E_SCALE</code></td><td>шкала не пустая/int/decimalK/fracM либо вне границ</td></tr>
 <tr><td><code>E_STATUS</code></td><td>статус вне четырёх</td></tr>
 <tr><td><code>E_TOOBIG</code></td><td>атомов В ФОРМУЛАХ больше, чем позволяет стоимость: разбор стоит 3**атомов — двенадцать 2,9 с, четырнадцать 29,6 с (промерено 18.09.2026). Строки НЕ ограничены: таблица в сто строк, где каждая формула о шести атомах, читается за 0,003 с. Делить надо вопрос, а не таблицу</td></tr>
+<tr><td><code>E_TOOLONG</code></td><td>формула длиннее 4096 знаков — чтение стоит квадрат длины (4,6 с на 39 КБ, 0,21 с на 4 КБ, промерено 24.09.2026); разделите вопрос</td></tr>
 <tr><td><code>E_UNIT</code></td><td>единица, которую нельзя прочесть — слово, при желании со степенью (m2), соединяется через · или /</td></tr>
 <tr><td><code>E_UNKNOWN_NAME</code></td><td>формула называет несуществующую строку</td></tr>
 <tr><td><code>E_UNREADABLE</code></td><td>приборы не смогли прочесть утверждение — в сообщении сказано, на чём именно</td></tr>
@@ -257,6 +259,7 @@
 <tr><td><code>E_SCALE</code></td><td>a scale that is not empty/int/decimalK/fracM, or out of bounds</td></tr>
 <tr><td><code>E_STATUS</code></td><td>a status outside the four</td></tr>
 <tr><td><code>E_TOOBIG</code></td><td>more ATOMS in the formulas than the cost allows — a reading costs 3**atoms (2.9 s at twelve, 29.6 s at fourteen, measured 2026-09-18). Rows are not capped: a hundred-row table whose formulas each speak of six atoms reads in 0.003 s. Split the question, not the table</td></tr>
+<tr><td><code>E_TOOLONG</code></td><td>a formula longer than 4096 characters — the readers cost the square of the length (4.6 s at 39 KB, 0.21 s at 4 KB, measured 2026-09-24); split the question</td></tr>
 <tr><td><code>E_UNIT</code></td><td>a unit that cannot be read — a word, optionally with a power (m2), joined by · or /</td></tr>
 <tr><td><code>E_UNKNOWN_NAME</code></td><td>a formula names a row that does not exist</td></tr>
 <tr><td><code>E_UNREADABLE</code></td><td>the instruments could not read the claim — the message says what they choked on</td></tr>
@@ -341,6 +344,7 @@
 <tr><td><code>E_SCALE</code></td><td>a scale that is not empty/int/decimalK/fracM, or out of bounds</td></tr>
 <tr><td><code>E_STATUS</code></td><td>a status outside the four</td></tr>
 <tr><td><code>E_TOOBIG</code></td><td>more ATOMS in the formulas than the cost allows — a reading costs 3**atoms (2.9 s at twelve, 29.6 s at fourteen, measured 2026-09-18). Rows are not capped: a hundred-row table whose formulas each speak of six atoms reads in 0.003 s. Split the question, not the table</td></tr>
+<tr><td><code>E_TOOLONG</code></td><td>a formula longer than 4096 characters — the readers cost the square of the length (4.6 s at 39 KB, 0.21 s at 4 KB, measured 2026-09-24); split the question</td></tr>
 <tr><td><code>E_UNIT</code></td><td>a unit that cannot be read — a word, optionally with a power (m2), joined by · or /</td></tr>
 <tr><td><code>E_UNKNOWN_NAME</code></td><td>a formula names a row that does not exist</td></tr>
 <tr><td><code>E_UNREADABLE</code></td><td>the instruments could not read the claim — the message says what they choked on</td></tr>
@@ -425,6 +429,7 @@
 <tr><td><code>E_SCALE</code></td><td>a scale that is not empty/int/decimalK/fracM, or out of bounds</td></tr>
 <tr><td><code>E_STATUS</code></td><td>a status outside the four</td></tr>
 <tr><td><code>E_TOOBIG</code></td><td>more ATOMS in the formulas than the cost allows — a reading costs 3**atoms (2.9 s at twelve, 29.6 s at fourteen, measured 2026-09-18). Rows are not capped: a hundred-row table whose formulas each speak of six atoms reads in 0.003 s. Split the question, not the table</td></tr>
+<tr><td><code>E_TOOLONG</code></td><td>a formula longer than 4096 characters — the readers cost the square of the length (4.6 s at 39 KB, 0.21 s at 4 KB, measured 2026-09-24); split the question</td></tr>
 <tr><td><code>E_UNIT</code></td><td>a unit that cannot be read — a word, optionally with a power (m2), joined by · or /</td></tr>
 <tr><td><code>E_UNKNOWN_NAME</code></td><td>a formula names a row that does not exist</td></tr>
 <tr><td><code>E_UNREADABLE</code></td><td>the instruments could not read the claim — the message says what they choked on</td></tr>
@@ -509,6 +514,7 @@
 <tr><td><code>E_SCALE</code></td><td>a scale that is not empty/int/decimalK/fracM, or out of bounds</td></tr>
 <tr><td><code>E_STATUS</code></td><td>a status outside the four</td></tr>
 <tr><td><code>E_TOOBIG</code></td><td>more ATOMS in the formulas than the cost allows — a reading costs 3**atoms (2.9 s at twelve, 29.6 s at fourteen, measured 2026-09-18). Rows are not capped: a hundred-row table whose formulas each speak of six atoms reads in 0.003 s. Split the question, not the table</td></tr>
+<tr><td><code>E_TOOLONG</code></td><td>a formula longer than 4096 characters — the readers cost the square of the length (4.6 s at 39 KB, 0.21 s at 4 KB, measured 2026-09-24); split the question</td></tr>
 <tr><td><code>E_UNIT</code></td><td>a unit that cannot be read — a word, optionally with a power (m2), joined by · or /</td></tr>
 <tr><td><code>E_UNKNOWN_NAME</code></td><td>a formula names a row that does not exist</td></tr>
 <tr><td><code>E_UNREADABLE</code></td><td>the instruments could not read the claim — the message says what they choked on</td></tr>
@@ -593,6 +599,7 @@
 <tr><td><code>E_SCALE</code></td><td>a scale that is not empty/int/decimalK/fracM, or out of bounds</td></tr>
 <tr><td><code>E_STATUS</code></td><td>a status outside the four</td></tr>
 <tr><td><code>E_TOOBIG</code></td><td>more ATOMS in the formulas than the cost allows — a reading costs 3**atoms (2.9 s at twelve, 29.6 s at fourteen, measured 2026-09-18). Rows are not capped: a hundred-row table whose formulas each speak of six atoms reads in 0.003 s. Split the question, not the table</td></tr>
+<tr><td><code>E_TOOLONG</code></td><td>a formula longer than 4096 characters — the readers cost the square of the length (4.6 s at 39 KB, 0.21 s at 4 KB, measured 2026-09-24); split the question</td></tr>
 <tr><td><code>E_UNIT</code></td><td>a unit that cannot be read — a word, optionally with a power (m2), joined by · or /</td></tr>
 <tr><td><code>E_UNKNOWN_NAME</code></td><td>a formula names a row that does not exist</td></tr>
 <tr><td><code>E_UNREADABLE</code></td><td>the instruments could not read the claim — the message says what they choked on</td></tr>
