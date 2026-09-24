@@ -249,7 +249,7 @@ def fill(history, lang="en", cfg=None):
     raw = strip_fences(llm(msgs, cfg))
     doc, issues = _parse(raw)
     if doc is not None:
-        issues = zfl.validate(doc)
+        issues = _refusal(doc)
         if not any(i["level"] == "error" for i in issues):
             # ЗЕРКАЛО. Документ валиден — и этого мало: связь можно записать
             # безупречно и положить в поле, которого нужный прибор не читает.
@@ -299,7 +299,7 @@ def fill(history, lang="en", cfg=None):
                 doc2, _ = _parse(raw2)
                 if doc2 is None:
                     break            # не разобралось — остаёмся с последним годным
-                issues2 = zfl.validate(doc2)
+                issues2 = _refusal(doc2)
                 if any(i["level"] == "error" for i in issues2):
                     break            # правка хуже исходного — не берём
                 if doc2 == doc:
@@ -319,7 +319,27 @@ def fill(history, lang="en", cfg=None):
     if doc2 is None:
         return {"ok": False, "issues": parse_issues}
     return {"ok": True, "doc": doc2, "repaired": True,
-            "issues": zfl.validate(doc2) + _invented_grounds(doc2, history)}
+            "issues": _refusal(doc2) + _invented_grounds(doc2, history)}
+
+
+def _refusal(doc):
+    """What stands between a document and a verdict: the validator's errors
+    and, when the validator lets it through, the run's own refusal.
+
+    The repair turn used to hear only the validator. MEASURED 2026-09-24 with
+    a live model: a question in prose came back as a VALID document whose
+    claim compared propositions with `==` (`eq0 == (x*x - 2*x + 5 == 0)`); the
+    validator had nothing to say, the loop kept the document, and the person
+    got E_UNREADABLE. The run is what the page calls next anyway, so asking
+    it here costs one reading and lets the loop repair what only it refuses."""
+    issues = zfl.validate(doc)
+    if any(i["level"] == "error" for i in issues):
+        return issues
+    try:
+        r = zfl.run(doc)
+    except Exception:        # run() does not raise on a valid document; if it
+        return issues        # ever does, the page reports it, not the loop
+    return r["issues"] if r.get("ok") is False else issues
 
 
 def _parse(raw):

@@ -180,7 +180,7 @@ def sec4c_a_number_without_a_value_goes_back_to_the_translator():
 
     def model(messages, cfg, temperature=0.2):
         heard.append(messages[-1]["content"])
-        return replies[len(heard) - 1]
+        return replies[min(len(heard), len(replies)) - 1]      # repeats its last word
 
     real, translator.llm = translator.llm, model
     try:
@@ -195,12 +195,49 @@ def sec4c_a_number_without_a_value_goes_back_to_the_translator():
     assert out["doc"]["rows"][0]["value"] == "?", out["doc"]
     r = zfl.run(out["doc"])
     assert r["ok"] and r["report"]["numeric"]["disposition"], r
+    # A VALID document the run refuses (the same day's live model): the loop
+    # must hear the run too, and hear it in words, not as a Python error.
+    odd = {"rows": [dict(fixed["rows"][0]),
+                    {"name": "eq0", "means": "the equation holds", "status": "unverified"}],
+           "claim": "eq0 == (x*x - 2*x + 5 == 0)"}
+    assert zfl.validate(odd) == [] or not any(
+        i["level"] == "error" for i in zfl.validate(odd)), zfl.validate(odd)
+    heard2, replies2 = [], [json.dumps(odd), json.dumps(fixed)]
+
+    def model2(messages, cfg, temperature=0.2):
+        heard2.append(messages[-1]["content"])
+        return replies2[min(len(heard2), len(replies2)) - 1]      # repeats its last word
+
+    real, translator.llm = translator.llm, model2
+    try:
+        out2 = translator.fill([{"role": "user", "content": "Is there such an x?"}], "en")
+    finally:
+        translator.llm = real
+    assert len(heard2) == 2 and "E_UNREADABLE" in heard2[1], heard2
+    assert "not arithmetic" in heard2[1] and "NoneType" not in heard2[1], heard2[1]
+    assert out2["ok"] and out2["repaired"] and zfl.run(out2["doc"])["ok"], out2
+    # and a document the run reads goes the mirror's way, not the repair's
+    heard3, replies3 = [], [json.dumps(fixed), json.dumps(fixed)]
+
+    def model3(messages, cfg, temperature=0.2):
+        heard3.append(messages[-1]["content"])
+        return replies3[min(len(heard3), len(replies3)) - 1]      # repeats its last word
+
+    real, translator.llm = translator.llm, model3
+    try:
+        out3 = translator.fill([{"role": "user", "content": "Is there such an x?"}], "en")
+    finally:
+        translator.llm = real
+    assert out3["ok"] and out3.get("mirrored") and not out3["repaired"], out3
     print("   x*x - 2*x + 5 == 0 with x left empty -> E_NO_VALUE at row 1 / value")
     print("   the repair turn carried it to the model; the returned x = ?,")
     print(f"   and the numeric floor answered: {r['report']['numeric']['disposition']}.")
     print("   The rule the translator was already told (a sought number gets ?)")
     print("   is now also what the validator enforces, so a model that forgets")
     print("   it is corrected by the loop instead of by the person.")
+    print("   A document the validator passes and the run refuses (propositions")
+    print("   compared with ==) goes back too, with the refusal in words; one the")
+    print("   run reads still takes the mirror's path.")
 
 def sec4b_every_example_runs_and_json_types_are_taken_as_they_come():
     print("-" * 72)

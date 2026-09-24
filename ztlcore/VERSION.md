@@ -3,7 +3,8 @@
 These 12 files are the ZTL logic kernel (the judge), vendored from the ZTL repository so introspect
 clones and runs self-contained. **Source of truth: https://github.com/inventor1975/ZTL**
 
-Vendored: 2026-09-24 from inventor1975/ZTL @ 0ecd108 (wording: E is the judge's stop, not a value;
+Vendored: 2026-09-24 from inventor1975/ZTL @ 773e917 (a side that is not arithmetic is refused in words;
+before it 0ecd108, wording: E is the judge's stop, not a value;
 before it aa0eaf4, a name is one number across the whole claim, 1/inf an exact zero, negative intervals read;
 before it cc6cc28, formula length cap; before it 9056479, zbackward; before it 1dc81f6, znumjudge reads sqrt).
 Earlier: 2026-09-13 @ f0a2f50; refreshed 2026-09-21 to 9fde0fd and 383ffb4 (this line
