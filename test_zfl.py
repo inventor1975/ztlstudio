@@ -216,6 +216,24 @@ def sec4c_a_number_without_a_value_goes_back_to_the_translator():
     assert len(heard2) == 2 and "E_UNREADABLE" in heard2[1], heard2
     assert "not arithmetic" in heard2[1] and "NoneType" not in heard2[1], heard2[1]
     assert out2["ok"] and out2["repaired"] and zfl.run(out2["doc"])["ok"], out2
+    # a POWER written as `^` (XOR): a number where a statement goes goes back
+    power = json.loads(json.dumps(fixed))
+    power["claim"] = "x^2 - 2*x + 5 == 0"
+    got = [(i["code"], i["where"]) for i in zfl.validate(power) if i["level"] == "error"]
+    assert got == [("E_NUMBER_AS_STATEMENT", "claim")], got
+    heard4, replies4 = [], [json.dumps(power), json.dumps(fixed)]
+
+    def model4(messages, cfg, temperature=0.2):
+        heard4.append(messages[-1]["content"])
+        return replies4[min(len(heard4), len(replies4)) - 1]      # repeats its last word
+
+    real, translator.llm = translator.llm, model4
+    try:
+        out4 = translator.fill([{"role": "user", "content": "Is there such an x?"}], "en")
+    finally:
+        translator.llm = real
+    assert len(heard4) == 2 and "E_NUMBER_AS_STATEMENT" in heard4[1] and "x*x" in heard4[1], heard4
+    assert out4["ok"] and out4["repaired"] and out4["doc"]["claim"] == fixed["claim"], out4
     # and a document the run reads goes the mirror's way, not the repair's
     heard3, replies3 = [], [json.dumps(fixed), json.dumps(fixed)]
 

@@ -3,7 +3,8 @@
 These 12 files are the ZTL logic kernel (the judge), vendored from the ZTL repository so introspect
 clones and runs self-contained. **Source of truth: https://github.com/inventor1975/ZTL**
 
-Vendored: 2026-09-24 from inventor1975/ZTL @ 4185023 (parabolas read exactly, roots from the discriminant;
+Vendored: 2026-09-24 from inventor1975/ZTL @ b91d1ec (the splitter can find comparisons without reading them;
+before it 4185023, parabolas read exactly, roots from the discriminant;
 before it 773e917, a side that is not arithmetic is refused in words;
 before it 0ecd108, wording: E is the judge's stop, not a value;
 before it aa0eaf4, a name is one number across the whole claim, 1/inf an exact zero, negative intervals read;

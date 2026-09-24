@@ -85,6 +85,7 @@
 <tr><td><code>E_NOGROUND</code></td><td>verified, refuted or defined, with nothing backing it</td></tr>
 <tr><td><code>E_NONAME</code></td><td>a row without a name</td></tr>
 <tr><td><code>E_NO_VALUE</code></td><td>a name the claim reads as a number has no value — give it a number, an interval, or ? if it is what the question asks for</td></tr>
+<tr><td><code>E_NUMBER_AS_STATEMENT</code></td><td>a name with a value is a number, and it stands where a statement goes — compare it (x &gt; 0); a square is x*x, since ^ is XOR</td></tr>
 <tr><td><code>E_OPEN_INTERVAL</code></td><td>an open bound like (0,10) — put the strictness in the claim instead</td></tr>
 <tr><td><code>E_RESERVED</code></td><td>a constant of the language used as a row name — it silently changes the reading</td></tr>
 <tr><td><code>E_SCALE</code></td><td>a scale that is not empty/int/decimalK/fracM, or out of bounds</td></tr>
@@ -171,6 +172,7 @@
 <tr><td><code>E_NOGROUND</code></td><td>проверено, опровергнуто или определено — но без основания</td></tr>
 <tr><td><code>E_NONAME</code></td><td>строка без имени</td></tr>
 <tr><td><code>E_NO_VALUE</code></td><td>имя, которое утверждение читает как число, без величины — дайте число, интервал или ?, если его и ищут</td></tr>
+<tr><td><code>E_NUMBER_AS_STATEMENT</code></td><td>имя со значением — число, а стоит на месте утверждения — сравните его (x &gt; 0); квадрат — x*x, потому что ^ это XOR</td></tr>
 <tr><td><code>E_OPEN_INTERVAL</code></td><td>открытая граница вроде (0,10) — строгость пишется в утверждении</td></tr>
 <tr><td><code>E_RESERVED</code></td><td>константа языка в роли имени строки — молча меняет разбор</td></tr>
 <tr><td><code>E_SCALE</code></td><td>шкала не пустая/int/decimalK/fracM либо вне границ</td></tr>
@@ -257,6 +259,7 @@
 <tr><td><code>E_NOGROUND</code></td><td>verified, refuted or defined, with nothing backing it</td></tr>
 <tr><td><code>E_NONAME</code></td><td>a row without a name</td></tr>
 <tr><td><code>E_NO_VALUE</code></td><td>a name the claim reads as a number has no value — give it a number, an interval, or ? if it is what the question asks for</td></tr>
+<tr><td><code>E_NUMBER_AS_STATEMENT</code></td><td>a name with a value is a number, and it stands where a statement goes — compare it (x &gt; 0); a square is x*x, since ^ is XOR</td></tr>
 <tr><td><code>E_OPEN_INTERVAL</code></td><td>an open bound like (0,10) — put the strictness in the claim instead</td></tr>
 <tr><td><code>E_RESERVED</code></td><td>a constant of the language used as a row name — it silently changes the reading</td></tr>
 <tr><td><code>E_SCALE</code></td><td>a scale that is not empty/int/decimalK/fracM, or out of bounds</td></tr>
@@ -343,6 +346,7 @@
 <tr><td><code>E_NOGROUND</code></td><td>verified, refuted or defined, with nothing backing it</td></tr>
 <tr><td><code>E_NONAME</code></td><td>a row without a name</td></tr>
 <tr><td><code>E_NO_VALUE</code></td><td>a name the claim reads as a number has no value — give it a number, an interval, or ? if it is what the question asks for</td></tr>
+<tr><td><code>E_NUMBER_AS_STATEMENT</code></td><td>a name with a value is a number, and it stands where a statement goes — compare it (x &gt; 0); a square is x*x, since ^ is XOR</td></tr>
 <tr><td><code>E_OPEN_INTERVAL</code></td><td>an open bound like (0,10) — put the strictness in the claim instead</td></tr>
 <tr><td><code>E_RESERVED</code></td><td>a constant of the language used as a row name — it silently changes the reading</td></tr>
 <tr><td><code>E_SCALE</code></td><td>a scale that is not empty/int/decimalK/fracM, or out of bounds</td></tr>
@@ -429,6 +433,7 @@
 <tr><td><code>E_NOGROUND</code></td><td>verified, refuted or defined, with nothing backing it</td></tr>
 <tr><td><code>E_NONAME</code></td><td>a row without a name</td></tr>
 <tr><td><code>E_NO_VALUE</code></td><td>a name the claim reads as a number has no value — give it a number, an interval, or ? if it is what the question asks for</td></tr>
+<tr><td><code>E_NUMBER_AS_STATEMENT</code></td><td>a name with a value is a number, and it stands where a statement goes — compare it (x &gt; 0); a square is x*x, since ^ is XOR</td></tr>
 <tr><td><code>E_OPEN_INTERVAL</code></td><td>an open bound like (0,10) — put the strictness in the claim instead</td></tr>
 <tr><td><code>E_RESERVED</code></td><td>a constant of the language used as a row name — it silently changes the reading</td></tr>
 <tr><td><code>E_SCALE</code></td><td>a scale that is not empty/int/decimalK/fracM, or out of bounds</td></tr>
@@ -515,6 +520,7 @@
 <tr><td><code>E_NOGROUND</code></td><td>verified, refuted or defined, with nothing backing it</td></tr>
 <tr><td><code>E_NONAME</code></td><td>a row without a name</td></tr>
 <tr><td><code>E_NO_VALUE</code></td><td>a name the claim reads as a number has no value — give it a number, an interval, or ? if it is what the question asks for</td></tr>
+<tr><td><code>E_NUMBER_AS_STATEMENT</code></td><td>a name with a value is a number, and it stands where a statement goes — compare it (x &gt; 0); a square is x*x, since ^ is XOR</td></tr>
 <tr><td><code>E_OPEN_INTERVAL</code></td><td>an open bound like (0,10) — put the strictness in the claim instead</td></tr>
 <tr><td><code>E_RESERVED</code></td><td>a constant of the language used as a row name — it silently changes the reading</td></tr>
 <tr><td><code>E_SCALE</code></td><td>a scale that is not empty/int/decimalK/fracM, or out of bounds</td></tr>
@@ -601,6 +607,7 @@
 <tr><td><code>E_NOGROUND</code></td><td>verified, refuted or defined, with nothing backing it</td></tr>
 <tr><td><code>E_NONAME</code></td><td>a row without a name</td></tr>
 <tr><td><code>E_NO_VALUE</code></td><td>a name the claim reads as a number has no value — give it a number, an interval, or ? if it is what the question asks for</td></tr>
+<tr><td><code>E_NUMBER_AS_STATEMENT</code></td><td>a name with a value is a number, and it stands where a statement goes — compare it (x &gt; 0); a square is x*x, since ^ is XOR</td></tr>
 <tr><td><code>E_OPEN_INTERVAL</code></td><td>an open bound like (0,10) — put the strictness in the claim instead</td></tr>
 <tr><td><code>E_RESERVED</code></td><td>a constant of the language used as a row name — it silently changes the reading</td></tr>
 <tr><td><code>E_SCALE</code></td><td>a scale that is not empty/int/decimalK/fracM, or out of bounds</td></tr>
