@@ -268,15 +268,15 @@ def sec4d_a_name_that_multiplies_itself_is_one_number():
     n = zfl.run({"rows": [q], "claim": "x*x - 5*x + 6 = 0"})["report"]["numeric"]
     assert n["disposition"] == "EARNED" and n["solved"]["x"]["roots"] == ["2", "3"], n
     n = zfl.run({"rows": [q], "claim": "x*x == 2"})["report"]["numeric"]
-    assert n["solved"]["x"]["roots"] == ["≈-1.41421356237", "≈1.41421356237"], n
+    assert n["disposition"] == "EARNED" and n["solved"]["x"]["roots"] == ["-√2", "√2"], n
     assert not any("still a box" in c for c in n["next_check"]), n["next_check"]
     m = {"name": "X", "means": "a measured number", "status": "verified",
          "ground": "doc-1", "value": "[-inf,inf]"}
     n = zfl.run({"rows": [m], "claim": "(X-1)*(X-1) + 4 == 0"})["report"]["numeric"]
     assert n["disposition"] == "REFUTED", n
     print("   x = ?: x*x - 2*x + 5 = 0 -> REFUTED (D = -16), and no 'needs a fact'")
-    print("   x*x - 5*x + 6 = 0 -> EARNED, x = 2 or 3; x*x == 2 -> x ≈ ±1.41421356237,")
-    print("   OPEN: the rational floor encloses √2 and does not pretend to hold it.")
+    print("   x*x - 5*x + 6 = 0 -> EARNED, x = 2 or 3; x*x == 2 -> EARNED, x = ±√2 exactly:")
+    print("   the root is held as p + q·√d, not only as its 12-digit clamp.")
     plot = {"rows": [dict(q, name="s"), dict(q, name="area")],
             "claim": "(area == s*s) & (area - 2*s + 5 == 0)"}
     n = zfl.run(plot)["report"]["numeric"]
