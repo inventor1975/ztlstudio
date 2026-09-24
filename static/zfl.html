@@ -55,6 +55,7 @@
 <tr><td><code>-</code></td><td>minus</td></tr>
 <tr><td><code>/</code></td><td>divided by</td></tr>
 <tr><td><code>sum(a,b,…)</code></td><td>the sum of several — the same as a + b + …</td></tr>
+<tr><td><code>sqrt(x)</code></td><td>the square root — a proved enclosure, exact where the root is rational; a negative quantity has no reading; the solver does not solve for a quantity under a root</td></tr>
 <tr><td><code>( )</code></td><td>brackets, to say what goes first</td></tr>
 <tr><td><code>-x</code></td><td>a leading minus: the sign of a term, not the operation between two — `-x + 100 = 70` is a fair question and was not accepted until 2026-08-13</td></tr>
 </table>
@@ -87,6 +88,7 @@
 <tr><td><code>E_RESERVED</code></td><td>a constant of the language used as a row name — it silently changes the reading</td></tr>
 <tr><td><code>E_SCALE</code></td><td>a scale that is not empty/int/decimalK/fracM, or out of bounds</td></tr>
 <tr><td><code>E_STATUS</code></td><td>a status outside the four</td></tr>
+<tr><td><code>E_TOOBIG</code></td><td>more ATOMS in the formulas than the cost allows — a reading costs 3**atoms (2.9 s at twelve, 29.6 s at fourteen, measured 2026-09-18). Rows are not capped: a hundred-row table whose formulas each speak of six atoms reads in 0.003 s. Split the question, not the table</td></tr>
 <tr><td><code>E_UNIT</code></td><td>a unit that cannot be read — a word, optionally with a power (m2), joined by · or /</td></tr>
 <tr><td><code>E_UNKNOWN_NAME</code></td><td>a formula names a row that does not exist</td></tr>
 <tr><td><code>E_UNREADABLE</code></td><td>the instruments could not read the claim — the message says what they choked on</td></tr>
@@ -137,6 +139,7 @@
 <tr><td><code>-</code></td><td>минус</td></tr>
 <tr><td><code>/</code></td><td>разделить</td></tr>
 <tr><td><code>sum(a,b,…)</code></td><td>сумма нескольких — то же, что a + b + …</td></tr>
+<tr><td><code>sqrt(x)</code></td><td>квадратный корень — доказанная вилка, точная там, где корень рационален; у отрицательной величины прочтения нет; неизвестное под корнем решатель не ищет</td></tr>
 <tr><td><code>( )</code></td><td>скобки — чтобы сказать, что раньше</td></tr>
 <tr><td><code>-x</code></td><td>минус в начале: знак самого члена, а не действие между двумя — `-x + 100 = 70` законный вопрос, и до 2026-08-13 он не принимался</td></tr>
 </table>
@@ -169,6 +172,7 @@
 <tr><td><code>E_RESERVED</code></td><td>константа языка в роли имени строки — молча меняет разбор</td></tr>
 <tr><td><code>E_SCALE</code></td><td>шкала не пустая/int/decimalK/fracM либо вне границ</td></tr>
 <tr><td><code>E_STATUS</code></td><td>статус вне четырёх</td></tr>
+<tr><td><code>E_TOOBIG</code></td><td>атомов В ФОРМУЛАХ больше, чем позволяет стоимость: разбор стоит 3**атомов — двенадцать 2,9 с, четырнадцать 29,6 с (промерено 18.09.2026). Строки НЕ ограничены: таблица в сто строк, где каждая формула о шести атомах, читается за 0,003 с. Делить надо вопрос, а не таблицу</td></tr>
 <tr><td><code>E_UNIT</code></td><td>единица, которую нельзя прочесть — слово, при желании со степенью (m2), соединяется через · или /</td></tr>
 <tr><td><code>E_UNKNOWN_NAME</code></td><td>формула называет несуществующую строку</td></tr>
 <tr><td><code>E_UNREADABLE</code></td><td>приборы не смогли прочесть утверждение — в сообщении сказано, на чём именно</td></tr>
@@ -219,6 +223,7 @@
 <tr><td><code>-</code></td><td>minus</td></tr>
 <tr><td><code>/</code></td><td>divided by</td></tr>
 <tr><td><code>sum(a,b,…)</code></td><td>the sum of several — the same as a + b + …</td></tr>
+<tr><td><code>sqrt(x)</code></td><td>the square root — a proved enclosure, exact where the root is rational; a negative quantity has no reading; the solver does not solve for a quantity under a root</td></tr>
 <tr><td><code>( )</code></td><td>brackets, to say what goes first</td></tr>
 <tr><td><code>-x</code></td><td>a leading minus: the sign of a term, not the operation between two — `-x + 100 = 70` is a fair question and was not accepted until 2026-08-13</td></tr>
 </table>
@@ -251,6 +256,7 @@
 <tr><td><code>E_RESERVED</code></td><td>a constant of the language used as a row name — it silently changes the reading</td></tr>
 <tr><td><code>E_SCALE</code></td><td>a scale that is not empty/int/decimalK/fracM, or out of bounds</td></tr>
 <tr><td><code>E_STATUS</code></td><td>a status outside the four</td></tr>
+<tr><td><code>E_TOOBIG</code></td><td>more ATOMS in the formulas than the cost allows — a reading costs 3**atoms (2.9 s at twelve, 29.6 s at fourteen, measured 2026-09-18). Rows are not capped: a hundred-row table whose formulas each speak of six atoms reads in 0.003 s. Split the question, not the table</td></tr>
 <tr><td><code>E_UNIT</code></td><td>a unit that cannot be read — a word, optionally with a power (m2), joined by · or /</td></tr>
 <tr><td><code>E_UNKNOWN_NAME</code></td><td>a formula names a row that does not exist</td></tr>
 <tr><td><code>E_UNREADABLE</code></td><td>the instruments could not read the claim — the message says what they choked on</td></tr>
@@ -301,6 +307,7 @@
 <tr><td><code>-</code></td><td>minus</td></tr>
 <tr><td><code>/</code></td><td>divided by</td></tr>
 <tr><td><code>sum(a,b,…)</code></td><td>the sum of several — the same as a + b + …</td></tr>
+<tr><td><code>sqrt(x)</code></td><td>the square root — a proved enclosure, exact where the root is rational; a negative quantity has no reading; the solver does not solve for a quantity under a root</td></tr>
 <tr><td><code>( )</code></td><td>brackets, to say what goes first</td></tr>
 <tr><td><code>-x</code></td><td>a leading minus: the sign of a term, not the operation between two — `-x + 100 = 70` is a fair question and was not accepted until 2026-08-13</td></tr>
 </table>
@@ -333,6 +340,7 @@
 <tr><td><code>E_RESERVED</code></td><td>a constant of the language used as a row name — it silently changes the reading</td></tr>
 <tr><td><code>E_SCALE</code></td><td>a scale that is not empty/int/decimalK/fracM, or out of bounds</td></tr>
 <tr><td><code>E_STATUS</code></td><td>a status outside the four</td></tr>
+<tr><td><code>E_TOOBIG</code></td><td>more ATOMS in the formulas than the cost allows — a reading costs 3**atoms (2.9 s at twelve, 29.6 s at fourteen, measured 2026-09-18). Rows are not capped: a hundred-row table whose formulas each speak of six atoms reads in 0.003 s. Split the question, not the table</td></tr>
 <tr><td><code>E_UNIT</code></td><td>a unit that cannot be read — a word, optionally with a power (m2), joined by · or /</td></tr>
 <tr><td><code>E_UNKNOWN_NAME</code></td><td>a formula names a row that does not exist</td></tr>
 <tr><td><code>E_UNREADABLE</code></td><td>the instruments could not read the claim — the message says what they choked on</td></tr>
@@ -383,6 +391,7 @@
 <tr><td><code>-</code></td><td>minus</td></tr>
 <tr><td><code>/</code></td><td>divided by</td></tr>
 <tr><td><code>sum(a,b,…)</code></td><td>the sum of several — the same as a + b + …</td></tr>
+<tr><td><code>sqrt(x)</code></td><td>the square root — a proved enclosure, exact where the root is rational; a negative quantity has no reading; the solver does not solve for a quantity under a root</td></tr>
 <tr><td><code>( )</code></td><td>brackets, to say what goes first</td></tr>
 <tr><td><code>-x</code></td><td>a leading minus: the sign of a term, not the operation between two — `-x + 100 = 70` is a fair question and was not accepted until 2026-08-13</td></tr>
 </table>
@@ -415,6 +424,7 @@
 <tr><td><code>E_RESERVED</code></td><td>a constant of the language used as a row name — it silently changes the reading</td></tr>
 <tr><td><code>E_SCALE</code></td><td>a scale that is not empty/int/decimalK/fracM, or out of bounds</td></tr>
 <tr><td><code>E_STATUS</code></td><td>a status outside the four</td></tr>
+<tr><td><code>E_TOOBIG</code></td><td>more ATOMS in the formulas than the cost allows — a reading costs 3**atoms (2.9 s at twelve, 29.6 s at fourteen, measured 2026-09-18). Rows are not capped: a hundred-row table whose formulas each speak of six atoms reads in 0.003 s. Split the question, not the table</td></tr>
 <tr><td><code>E_UNIT</code></td><td>a unit that cannot be read — a word, optionally with a power (m2), joined by · or /</td></tr>
 <tr><td><code>E_UNKNOWN_NAME</code></td><td>a formula names a row that does not exist</td></tr>
 <tr><td><code>E_UNREADABLE</code></td><td>the instruments could not read the claim — the message says what they choked on</td></tr>
@@ -465,6 +475,7 @@
 <tr><td><code>-</code></td><td>minus</td></tr>
 <tr><td><code>/</code></td><td>divided by</td></tr>
 <tr><td><code>sum(a,b,…)</code></td><td>the sum of several — the same as a + b + …</td></tr>
+<tr><td><code>sqrt(x)</code></td><td>the square root — a proved enclosure, exact where the root is rational; a negative quantity has no reading; the solver does not solve for a quantity under a root</td></tr>
 <tr><td><code>( )</code></td><td>brackets, to say what goes first</td></tr>
 <tr><td><code>-x</code></td><td>a leading minus: the sign of a term, not the operation between two — `-x + 100 = 70` is a fair question and was not accepted until 2026-08-13</td></tr>
 </table>
@@ -497,6 +508,7 @@
 <tr><td><code>E_RESERVED</code></td><td>a constant of the language used as a row name — it silently changes the reading</td></tr>
 <tr><td><code>E_SCALE</code></td><td>a scale that is not empty/int/decimalK/fracM, or out of bounds</td></tr>
 <tr><td><code>E_STATUS</code></td><td>a status outside the four</td></tr>
+<tr><td><code>E_TOOBIG</code></td><td>more ATOMS in the formulas than the cost allows — a reading costs 3**atoms (2.9 s at twelve, 29.6 s at fourteen, measured 2026-09-18). Rows are not capped: a hundred-row table whose formulas each speak of six atoms reads in 0.003 s. Split the question, not the table</td></tr>
 <tr><td><code>E_UNIT</code></td><td>a unit that cannot be read — a word, optionally with a power (m2), joined by · or /</td></tr>
 <tr><td><code>E_UNKNOWN_NAME</code></td><td>a formula names a row that does not exist</td></tr>
 <tr><td><code>E_UNREADABLE</code></td><td>the instruments could not read the claim — the message says what they choked on</td></tr>
@@ -547,6 +559,7 @@
 <tr><td><code>-</code></td><td>minus</td></tr>
 <tr><td><code>/</code></td><td>divided by</td></tr>
 <tr><td><code>sum(a,b,…)</code></td><td>the sum of several — the same as a + b + …</td></tr>
+<tr><td><code>sqrt(x)</code></td><td>the square root — a proved enclosure, exact where the root is rational; a negative quantity has no reading; the solver does not solve for a quantity under a root</td></tr>
 <tr><td><code>( )</code></td><td>brackets, to say what goes first</td></tr>
 <tr><td><code>-x</code></td><td>a leading minus: the sign of a term, not the operation between two — `-x + 100 = 70` is a fair question and was not accepted until 2026-08-13</td></tr>
 </table>
@@ -579,6 +592,7 @@
 <tr><td><code>E_RESERVED</code></td><td>a constant of the language used as a row name — it silently changes the reading</td></tr>
 <tr><td><code>E_SCALE</code></td><td>a scale that is not empty/int/decimalK/fracM, or out of bounds</td></tr>
 <tr><td><code>E_STATUS</code></td><td>a status outside the four</td></tr>
+<tr><td><code>E_TOOBIG</code></td><td>more ATOMS in the formulas than the cost allows — a reading costs 3**atoms (2.9 s at twelve, 29.6 s at fourteen, measured 2026-09-18). Rows are not capped: a hundred-row table whose formulas each speak of six atoms reads in 0.003 s. Split the question, not the table</td></tr>
 <tr><td><code>E_UNIT</code></td><td>a unit that cannot be read — a word, optionally with a power (m2), joined by · or /</td></tr>
 <tr><td><code>E_UNKNOWN_NAME</code></td><td>a formula names a row that does not exist</td></tr>
 <tr><td><code>E_UNREADABLE</code></td><td>the instruments could not read the claim — the message says what they choked on</td></tr>

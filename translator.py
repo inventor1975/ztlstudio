@@ -122,6 +122,8 @@ RULES, and they are not stylistic:
   value "?", and the relation goes in "claim":
   {{"name": "total", "status": "unverified", "value": "?"}} with
   "claim": "sum(a,b) = total". Never put arithmetic in "ground".
+- A SQUARE ROOT is `sqrt(x)` inside the claim: "sqrt(area) > 1.41". The
+  judge reads it; the solver does not solve for a quantity under a root.
 - THE CLAIM MAY HOLD SEVERAL RELATIONS, joined by `&`, and a word problem
   needs them: one relation per fact the story states, and the machine solves
   the system. "Masha had 3 sweets, gave 1 to Vasya, how many to Petya so they

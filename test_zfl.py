@@ -284,6 +284,30 @@ def sec7b_the_receipt_tells_what_was_said_from_what_was_done():
     print("   run() issues, equal to a receipt issued from outside; a registry")
     print("   without tiers hashes as it always did.")
 
+def sec7c_number_claims_carry_their_verdict_and_the_root_is_read():
+    """Two organs that were built and not reached (2026-09-24): the receipt
+    of a number claim carried no verdict at all, and `sqrt` — in the core
+    since 2026-09-21 — was refused by the language as an undeclared row."""
+    print("\n### 7c. A number claim's receipt carries its verdict; the root is read")
+    sheet = {"claim": "paid <= fee", "rows": [
+        {"name": "fee", "means": "the fee", "status": "verified", "ground": "inv-1", "value": "100"},
+        {"name": "paid", "means": "what was paid", "status": "verified", "ground": "bank-2", "value": "80"}]}
+    v = zfl.run(sheet)["report"]["receipt"]["verdict"]
+    assert (v["value"], v["disposition"], v["grade"]) == ("T", "EARNED", "hereditary"), v
+    credit = {"claim": "paid <= fee", "rows": [
+        {"name": "fee", "means": "the fee", "status": "verified", "ground": "inv-1", "value": "100"},
+        {"name": "paid", "means": "not documented", "status": "unverified", "value": "120"}]}
+    v = zfl.run(credit)["report"]["receipt"]["verdict"]
+    assert (v["value"], v["disposition"], v.get("polarity")) == ("F", "ON CREDIT", "toward F"), v
+    root = {"claim": "sqrt(a) > 1.41", "rows": [
+        {"name": "a", "means": "the side", "status": "verified", "ground": "m1", "value": "2"}]}
+    r = zfl.run(root)
+    assert r["ok"] and r["report"]["numeric"]["disposition"] == "EARNED", r
+    r = zfl.run(dict(root, claim="sqrt(a) > 1.42"))
+    assert r["report"]["numeric"]["disposition"] == "REFUTED", r
+    print("   a number claim's receipt says T/F, its disposition and grade, and on")
+    print("   credit its side; sqrt(a) > 1.41 is read, EARNED, and > 1.42 REFUTED.")
+
 def sec8_the_credit_that_cannot_be_redeemed():
     """The judge and the passport stop contradicting each other.
 
@@ -392,6 +416,7 @@ if __name__ == "__main__":
     sec4_an_unknown_is_a_question_not_a_gap()
     sec7_the_ground_gate_demotes_phantom_words()
     sec7b_the_receipt_tells_what_was_said_from_what_was_done()
+    sec7c_number_claims_carry_their_verdict_and_the_root_is_read()
     sec8_the_credit_that_cannot_be_redeemed()
     sec9_the_world_has_a_clock_too()
     sec4b_every_example_runs_and_json_types_are_taken_as_they_come()

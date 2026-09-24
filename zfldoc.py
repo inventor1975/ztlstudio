@@ -44,6 +44,16 @@ CODE_HELP = {
     "E_BADNAME": ("a name a formula could not use",
                   "имя, непригодное для формулы"),
     "E_DUPNAME": ("the same name twice", "имя повторяется"),
+    "E_TOOBIG": ("more ATOMS in the formulas than the cost allows — a reading "
+                 "costs 3**atoms (2.9 s at twelve, 29.6 s at fourteen, measured "
+                 "2026-09-18). Rows are not capped: a hundred-row table whose "
+                 "formulas each speak of six atoms reads in 0.003 s. Split the "
+                 "question, not the table",
+                 "атомов В ФОРМУЛАХ больше, чем позволяет стоимость: разбор стоит "
+                 "3**атомов — двенадцать 2,9 с, четырнадцать 29,6 с (промерено "
+                 "18.09.2026). Строки НЕ ограничены: таблица в сто строк, где "
+                 "каждая формула о шести атомах, читается за 0,003 с. Делить надо "
+                 "вопрос, а не таблицу"),
     "E_RESERVED": ("a constant of the language used as a row name — it silently "
                    "changes the reading",
                    "константа языка в роли имени строки — молча меняет разбор"),
@@ -392,6 +402,12 @@ ARITH_HELP = {
     "*": ("times", "умножить"), "/": ("divided by", "разделить"),
     "sum(a,b,…)": ("the sum of several — the same as a + b + …",
                    "сумма нескольких — то же, что a + b + …"),
+    "sqrt(x)": ("the square root — a proved enclosure, exact where the root is "
+                "rational; a negative quantity has no reading; the solver does not "
+                "solve for a quantity under a root",
+                "квадратный корень — доказанная вилка, точная там, где корень "
+                "рационален; у отрицательной величины прочтения нет; неизвестное "
+                "под корнем решатель не ищет"),
     "( )": ("brackets, to say what goes first",
             "скобки — чтобы сказать, что раньше"),
     "-x": ("a leading minus: the sign of a term, not the operation between "
@@ -409,7 +425,12 @@ def arithmetic():
     src = open(znumjudge.__file__, encoding="utf-8").read()
     m = re.search(r'_TAG = \{([^}]*)\}', src)
     ops = re.findall(r'"([^"]+)":', m.group(1)) if m else []
-    return sorted(ops) + ["sum(a,b,…)", "( )", "-x"]
+    # THE CALLS, like the symbols, come from the reader: a function is listed
+    # only if the reader has its branch (sqrt was in the core five days before
+    # any reader produced it, 2026-09-24).
+    calls = [c for c, probe in (("sum(a,b,…)", "^sum\\("), ("sqrt(x)", 'startswith("sqrt(")'))
+             if probe in src]
+    return sorted(ops) + calls + ["( )", "-x"]
 
 
 def operators():
