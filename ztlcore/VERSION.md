@@ -3,7 +3,8 @@
 These 12 files are the ZTL logic kernel (the judge), vendored from the ZTL repository so introspect
 clones and runs self-contained. **Source of truth: https://github.com/inventor1975/ZTL**
 
-Vendored: 2026-09-24 from inventor1975/ZTL @ b98ebe7 (the solver uses only what the claim commits to;
+Vendored: 2026-09-24 from inventor1975/ZTL @ 42b607a (an unknown is the question, not a source: provenance over grounds;
+before it b98ebe7, the solver uses only what the claim commits to;
 before it c83ee54, systems: each power of a name its own column;
 before it b91d1ec, the splitter can find comparisons without reading them;
 before it 4185023, parabolas read exactly, roots from the discriminant;
