@@ -20,7 +20,7 @@ const UI = {
         demoted: "demoted to unverified — ground outside the document's list:", 
         receipt: "receipt", epoch: "epoch", registryf: "registry (names)", ancestors: "ancestors", undeclared: "not declared", 
         stipulated: "earned on a declared ground, not a producible one:", 
-        judge: "the judge", ledger: "the ledger",
+        judge: "the judge", ledger: "the ledger", groundsheld: "what each ground holds", reads: "reads", tocheck: "what to check", guarantee: "check together — it comes whatever they show", possible: "possible, if the check goes the right way", noset: "no set of checks will do", why: "why", settles: "settles it — the verdict becomes final whatever they show", already: "nothing to check — already so",
         component: "component", kind: "passport", detail: "details",
         disposition: "disposition", cures: "what would settle it",
         sheet: "assembled sheet", verdict: "verdict", grade: "warranty",
@@ -62,7 +62,7 @@ const UI = {
         demoted: "разжаловано в непроверенное — основание вне списка документа:", 
         receipt: "квитанция", epoch: "эпоха", registryf: "реестр (имён)", ancestors: "предки", undeclared: "не объявлено", 
         stipulated: "заработано на объявленном основании, а не на предъявимом:", 
-        judge: "судья", ledger: "тетрадь",
+        judge: "судья", ledger: "тетрадь", groundsheld: "что держит каждое основание", reads: "опирается на", tocheck: "что проверить", guarantee: "проверить вместе — наступит при любом исходе", possible: "возможно, если проверка ляжет удачно", noset: "никакая проверка к этому не приведёт", why: "почему", settles: "решит вопрос — вердикт станет окончательным при любом исходе", already: "проверять нечего — уже так",
         component: "компонент", kind: "паспорт", detail: "подробности",
         disposition: "диспозиция", cures: "что это решит",
         sheet: "собранный лист", verdict: "вердикт", grade: "гарантия",
@@ -103,7 +103,7 @@ const UI = {
         demoted: "розжаловано в неперевірене — підстава поза списком документа:", 
         receipt: "квитанція", epoch: "епоха", registryf: "реєстр (імен)", ancestors: "предки", undeclared: "не оголошено", 
         stipulated: "зароблено на оголошеній підставі, а не на пред'явній:", 
-        judge: "суддя", ledger: "зошит",
+        judge: "суддя", ledger: "зошит", groundsheld: "що тримає кожна підстава", reads: "спирається на", tocheck: "що перевірити", guarantee: "перевірити разом — настане за будь-якого результату", possible: "можливо, якщо перевірка ляже вдало", noset: "жодна перевірка до цього не приведе", why: "чому", settles: "вирішить питання — вердикт стане остаточним за будь-якого результату", already: "перевіряти нічого — вже так",
         component: "компонент", kind: "паспорт", detail: "подробиці",
         disposition: "диспозиція", cures: "що це вирішить",
         sheet: "зібраний аркуш", verdict: "вердикт", grade: "гарантія",
@@ -144,7 +144,7 @@ const UI = {
         demoted: "הורד ללא־מאומת — אסמכתא מחוץ לרשימת המסמך:", 
         receipt: "קבלה", epoch: "תקופה", registryf: "מרשם (שמות)", ancestors: "אבות", undeclared: "לא הוצהר", 
         stipulated: "הושג על סמך אסמכתא מוצהרת, לא ניתנת להצגה:", 
-        judge: "השופט", ledger: "הפנקס",
+        judge: "השופט", ledger: "הפנקס", groundsheld: "מה כל בסיס מחזיק", reads: "נשען על", tocheck: "מה לבדוק", guarantee: "לבדוק יחד — יתקיים בכל תוצאה", possible: "אפשרי, אם הבדיקה תצא כך", noset: "שום בדיקה לא תביא לכך", why: "למה", settles: "יכריע — הפסק יהיה סופי בכל תוצאה", already: "אין מה לבדוק — כבר כך",
         component: "רכיב", kind: "דרכון", detail: "פרטים",
         disposition: "מצב", cures: "מה יכריע את זה",
         sheet: "הגיליון שהורכב", verdict: "פסק", grade: "ערובה",
@@ -183,7 +183,7 @@ const UI = {
         demoted: "auf ungeprüft herabgestuft — Grundlage nicht in der Liste:", 
         receipt: "Quittung", epoch: "Epoche", registryf: "Register (Namen)", ancestors: "Vorfahren", undeclared: "nicht angegeben", 
         stipulated: "auf einer erklärten, nicht vorweisbaren Grundlage erworben:", 
-        judge: "der Richter", ledger: "das Buch",
+        judge: "der Richter", ledger: "das Buch", groundsheld: "was jede Grundlage trägt", reads: "stützt sich auf", tocheck: "was zu prüfen ist", guarantee: "gemeinsam prüfen — tritt bei jedem Ergebnis ein", possible: "möglich, wenn die Prüfung günstig ausgeht", noset: "keine Prüfung führt dahin", why: "warum", settles: "entscheidet es — das Urteil wird endgültig, was auch herauskommt", already: "nichts zu prüfen — schon so",
         component: "Komponente", kind: "Pass", detail: "Einzelheiten",
         disposition: "Befund", cures: "was es entscheiden würde",
         sheet: "zusammengesetztes Blatt", verdict: "Urteil", grade: "Gewähr",
@@ -225,7 +225,7 @@ const UI = {
         demoted: "rétrogradé en non vérifié — fondement hors de la liste :", 
         receipt: "reçu", epoch: "époque", registryf: "registre (noms)", ancestors: "ancêtres", undeclared: "non déclaré", 
         stipulated: "acquis sur un fondement déclaré, non produisible :", 
-        judge: "le juge", ledger: "le registre",
+        judge: "le juge", ledger: "le registre", groundsheld: "ce que tient chaque fondement", reads: "s'appuie sur", tocheck: "que vérifier", guarantee: "vérifier ensemble — cela arrive quel que soit le résultat", possible: "possible, si la vérification tombe bien", noset: "aucune vérification n'y mène", why: "pourquoi", settles: "tranche la question — le verdict devient définitif quel que soit le résultat", already: "rien à vérifier — c'est déjà ainsi",
         component: "composant", kind: "passeport", detail: "détails",
         disposition: "disposition", cures: "ce qui trancherait",
         sheet: "feuille assemblée", verdict: "verdict", grade: "garantie",
@@ -267,7 +267,7 @@ const UI = {
         demoted: "degradado a no verificado — fundamento fuera de la lista:", 
         receipt: "recibo", epoch: "época", registryf: "registro (nombres)", ancestors: "ancestros", undeclared: "no declarado", 
         stipulated: "ganado sobre un fundamento declarado, no exhibible:", 
-        judge: "el juez", ledger: "el registro",
+        judge: "el juez", ledger: "el registro", groundsheld: "lo que sostiene cada fundamento", reads: "se apoya en", tocheck: "qué verificar", guarantee: "verificar juntos — llega sea cual sea el resultado", possible: "posible, si la verificación sale bien", noset: "ninguna verificación lleva a ello", why: "por qué", settles: "lo zanja — el veredicto queda firme sea cual sea el resultado", already: "nada que verificar — ya es así",
         component: "componente", kind: "pasaporte", detail: "detalles",
         disposition: "disposición", cures: "qué lo resolvería",
         sheet: "hoja compuesta", verdict: "veredicto", grade: "garantía",
@@ -453,10 +453,19 @@ function showReport(r) {
   const out = [];
   const rep = r.report || {};
   if (rep.passport) {
-    out.push(panel(t("passport"), table(
-      [t("component"), t("kind"), t("detail")],
-      rep.passport.map(p => [esc(p.component.join(", ")),
-                             verdictSpan(p.kind), esc(p.detail)]))));
+    // EVERY ROW THE PASSPORT READ, not only the troubled ones (2026-09-24):
+    // a table grounded whole used to show an empty panel — truncated Yablo
+    // came out s2 = T, s1 = F, s0 = F and the page said nothing at all.
+    const rows = Object.entries(rep.passport_rows || {});
+    out.push(panel(t("passport"),
+      (rows.length ? `<p class="muted">${esc(t("groundsheld"))}</p>` + table(
+        [t("component"), t("kind"), t("value"), t("reads")],
+        rows.map(([n, v]) => [esc(n), verdictSpan(v.kind), verdictSpan(v.value || "—"),
+                              esc((v.reads || []).join(", ") || "—")])) : "") +
+      (rep.passport.length ? table(
+        [t("component"), t("kind"), t("detail")],
+        rep.passport.map(p => [esc(p.component.join(", ")),
+                               verdictSpan(p.kind), esc(p.detail)])) : "")));
   }
   if (rep.numeric) {
     const sv = Object.entries(rep.numeric.solved || {});
@@ -495,7 +504,26 @@ function showReport(r) {
       `${t("grade")}: ${esc(rep.judge.grade)}</p>` + dead +
       (rep.judge.unverified.length
         ? `<p class="muted">${t("weak")}: ` +
-          esc(rep.judge.unverified.join(", ")) + "</p>" : "")));
+          esc(rep.judge.unverified.join(", ")) + "</p>" : "") +
+      (rep.judge.why ? `<p class="muted">${esc(t("why"))}: ${esc(rep.judge.why)}</p>` : "")));
+  }
+  if (rep.what_to_check) {
+    // THE REVERSE PASS: which unverified inputs to check, and how. A work
+    // order is written only from the GUARANTEE; POSSIBILITY is named as such.
+    const w = rep.what_to_check;
+    const sets = xs => xs.map(S => `<b>${esc(S.join(" + "))}</b>`).join(" · ");
+    const line = (target, x) => {
+      if (x.already) return `<p>${verdictSpan(target)} ${esc(t("already"))}</p>`;
+      return `<p>${verdictSpan(target)}</p>` +
+        (x.guaranteed.length ? `<p>${esc(t("guarantee"))}: ${sets(x.guaranteed)}</p>` : "") +
+        (x.possible.length && !x.guaranteed.length
+          ? `<p class="muted">${esc(t("possible"))}: ${sets(x.possible)}</p>` : "") +
+        (x.no_possible_set ? `<p class="muted">${esc(t("noset"))}</p>` : "");
+    };
+    const settle = w.SETTLED && !w.SETTLED.already && w.SETTLED.guaranteed.length
+      ? `<p><b>${esc(t("settles"))}</b>: ${sets(w.SETTLED.guaranteed)}</p>` : "";
+    out.push(panel(t("tocheck"), w.refused ? `<p class="muted">${esc(w.refused)}</p>`
+      : settle + line("EARNED", w.EARNED) + line("REFUTED", w.REFUTED)));
   }
   // ЗЕРКАЛО. Не вердикт и не совет, а отчёт о прочитанном: что ядро взяло из
   // таблицы и какие приборы за это взялись. Строится из ФАКТОВ, а слова берутся
