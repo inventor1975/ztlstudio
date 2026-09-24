@@ -277,7 +277,16 @@ def sec4d_a_name_that_multiplies_itself_is_one_number():
     print("   x = ?: x*x - 2*x + 5 = 0 -> REFUTED (D = -16), and no 'needs a fact'")
     print("   x*x - 5*x + 6 = 0 -> EARNED, x = 2 or 3; x*x == 2 -> x ≈ ±1.41421356237,")
     print("   OPEN: the rational floor encloses √2 and does not pretend to hold it.")
+    plot = {"rows": [dict(q, name="s"), dict(q, name="area")],
+            "claim": "(area == s*s) & (area - 2*s + 5 == 0)"}
+    n = zfl.run(plot)["report"]["numeric"]
+    assert n["disposition"] == "REFUTED" and not n.get("missing"), n
+    plot["claim"] = "area == s*s & area - 5*s + 6 == 0"
+    n = zfl.run(plot)["report"]["numeric"]
+    assert n["solved"]["s"]["roots"] == ["2", "3"] and n["solved"]["area"]["roots"] == ["4", "9"], n
     print("   X measured over the reals: (X-1)*(X-1) + 4 == 0 -> REFUTED.")
+    print("   The plot as a system, area == s*s & area - 2*s + 5 == 0 -> REFUTED;")
+    print("   with area - 5*s + 6: s = 2 or 3 and area = 4 or 9, never the box [4, 9].")
 
 def sec4b_every_example_runs_and_json_types_are_taken_as_they_come():
     print("-" * 72)
