@@ -155,6 +155,53 @@ def sec4_an_unknown_is_a_question_not_a_gap():
     print("   type `==` would be the machine's convenience charged to them.")
 
 
+
+def sec4c_a_number_without_a_value_goes_back_to_the_translator():
+    print("-" * 72)
+    print("4c. A NAME READ AS A NUMBER NEEDS A VALUE — AND THE REPAIR LOOP HEARS IT")
+    # MEASURED 2026-09-24 on the live studio: three questions in prose, the
+    # formula translated right every time, the sought x left without a value
+    # every time. The validator said nothing, so the repair loop never ran,
+    # and the run answered "stray character '*'".
+    import json
+    import translator
+    bad = {"rows": [{"name": "x", "means": "the number sought",
+                     "status": "unverified"}],
+           "claim": "x*x - 2*x + 5 == 0"}
+    got = [(i["code"], i["where"]) for i in zfl.validate(bad)
+           if i["level"] == "error"]
+    assert got == [("E_NO_VALUE", "row 1 / value")], got
+    r = zfl.run(bad)
+    assert not r["ok"] and {i["code"] for i in r["issues"]
+                            if i["level"] == "error"} == {"E_NO_VALUE"}, r
+    fixed = json.loads(json.dumps(bad))
+    fixed["rows"][0]["value"] = "?"
+    heard, replies = [], [json.dumps(bad), json.dumps(fixed)]
+
+    def model(messages, cfg, temperature=0.2):
+        heard.append(messages[-1]["content"])
+        return replies[len(heard) - 1]
+
+    real, translator.llm = translator.llm, model
+    try:
+        out = translator.fill([{"role": "user", "content":
+                                "Is there a number x such that x squared "
+                                "minus 2x plus 5 equals zero?"}], "en")
+    finally:
+        translator.llm = real
+    assert len(heard) == 2, heard
+    assert "E_NO_VALUE" in heard[1] and "row 1 / value" in heard[1], heard[1]
+    assert out["ok"] and out["repaired"], out
+    assert out["doc"]["rows"][0]["value"] == "?", out["doc"]
+    r = zfl.run(out["doc"])
+    assert r["ok"] and r["report"]["numeric"]["disposition"], r
+    print("   x*x - 2*x + 5 == 0 with x left empty -> E_NO_VALUE at row 1 / value")
+    print("   the repair turn carried it to the model; the returned x = ?,")
+    print(f"   and the numeric floor answered: {r['report']['numeric']['disposition']}.")
+    print("   The rule the translator was already told (a sought number gets ?)")
+    print("   is now also what the validator enforces, so a model that forgets")
+    print("   it is corrected by the loop instead of by the person.")
+
 def sec4b_every_example_runs_and_json_types_are_taken_as_they_come():
     print("-" * 72)
     print("4b. THE CATALOGUE, AND WHAT ARRIVES FROM A MODEL")
@@ -469,6 +516,12 @@ def sec11_a_public_service_cannot_be_made_to_raise_or_to_stall():
     t0 = time.time()
     r = zfl.run({"claim": near, "rows": rows})
     assert "E_TOOLONG" not in [i["code"] for i in r.get("issues", [])] and time.time() - t0 < 2.0, r
+    # the same claim with `a` left WITHOUT a value: the value check parses the
+    # claim once more before refusing it. MEASURED 2026-09-24: the refusal
+    # went from 0.25 s to 0.50 s under load 16; a valid claim pays nothing.
+    t0 = time.time()
+    r = zfl.run({"claim": near, "rows": [dict(rows[0], value=""), rows[1]]})
+    assert r["ok"] is False and time.time() - t0 < 2.0, (time.time() - t0, r["issues"])
     print("   a value past float range is an issue, not a traceback; a formula")
     print("   over 4096 characters is refused by name; one under it reads fast.")
 
@@ -482,6 +535,7 @@ if __name__ == "__main__":
     sec3_the_ledger_appears_when_it_is_wanted()
     sec3b_what_the_ground_column_is_actually_for()
     sec4_an_unknown_is_a_question_not_a_gap()
+    sec4c_a_number_without_a_value_goes_back_to_the_translator()
     sec7_the_ground_gate_demotes_phantom_words()
     sec7b_the_receipt_tells_what_was_said_from_what_was_done()
     sec7c_number_claims_carry_their_verdict_and_the_root_is_read()
