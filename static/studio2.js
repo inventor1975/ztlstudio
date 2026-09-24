@@ -26,7 +26,7 @@ const UI = {
         sheet: "assembled sheet", verdict: "verdict", grade: "warranty",
         weak: "weak links", claims: "claims", brackets: "trust brackets",
         assumed: "assumed and unverifiable", eg: "e.g. ",
-        solved: "solved", value: "value", from: "derived from",
+        solved: "solved", or: "or", value: "value", from: "derived from",
         prov: "provenance", still: "still a box",
         needone: "the question does not fix a number: say any ONE of these "
                  + "and the rest follow —",
@@ -68,7 +68,7 @@ const UI = {
         sheet: "собранный лист", verdict: "вердикт", grade: "гарантия",
         weak: "слабые звенья", claims: "притязания", brackets: "вилки доверия",
         assumed: "принято на веру и непроверяемо", eg: "напр. ",
-        solved: "решено", value: "величина", from: "выведено из",
+        solved: "решено", or: "или", value: "величина", from: "выведено из",
         prov: "происхождение", still: "ещё коробка",
         needone: "вопрос не определяет числа: назовите ЛЮБОЕ одно из этих — "
                  + "остальные встанут сами:",
@@ -109,7 +109,7 @@ const UI = {
         sheet: "зібраний аркуш", verdict: "вердикт", grade: "гарантія",
         weak: "слабкі ланки", claims: "домагання", brackets: "вилки довіри",
         assumed: "прийнято на віру і неперевірне", eg: "напр. ",
-        solved: "розв'язано", value: "величина", from: "виведено з",
+        solved: "розв'язано", or: "або", value: "величина", from: "виведено з",
         prov: "походження", still: "ще коробка",
         needone: "питання не визначає числа: назвіть БУДЬ-ЯКЕ одне з цих — "
                  + "решта стане сама:",
@@ -150,7 +150,7 @@ const UI = {
         sheet: "הגיליון שהורכב", verdict: "פסק", grade: "ערובה",
         weak: "חוליות חלשות", claims: "תביעות", brackets: "תחומי אמון",
         assumed: "נלקח באמון ואינו ניתן לאימות", eg: "לדוגמה ",
-        solved: "נפתר", value: "ערך", from: "נגזר מ־",
+        solved: "נפתר", or: "או", value: "ערך", from: "נגזר מ־",
         prov: "מקור", still: "עדיין קופסה",
         needone: "השאלה אינה קובעת מספר: אמרו אחד כלשהו מאלה — "
                  + "והשאר ייקבע מעצמו:",
@@ -189,7 +189,7 @@ const UI = {
         sheet: "zusammengesetztes Blatt", verdict: "Urteil", grade: "Gewähr",
         weak: "schwache Glieder", claims: "Ansprüche", brackets: "Vertrauensspannen",
         assumed: "auf Treu und Glauben, nicht prüfbar", eg: "z. B. ",
-        solved: "gelöst", value: "Wert", from: "abgeleitet aus",
+        solved: "gelöst", or: "oder", value: "Wert", from: "abgeleitet aus",
         prov: "Herkunft", still: "noch eine Schachtel",
         needone: "die Frage legt keine Zahl fest: nennen Sie IRGENDEINE davon — "
                  + "der Rest folgt:",
@@ -231,7 +231,7 @@ const UI = {
         sheet: "feuille assemblée", verdict: "verdict", grade: "garantie",
         weak: "maillons faibles", claims: "prétentions", brackets: "fourchettes de confiance",
         assumed: "admis sur parole et invérifiable", eg: "p. ex. ",
-        solved: "résolu", value: "valeur", from: "dérivé de",
+        solved: "résolu", or: "ou", value: "valeur", from: "dérivé de",
         prov: "provenance", still: "encore une boîte",
         needone: "la question ne fixe aucun nombre : donnez N'IMPORTE LEQUEL "
                  + "de ceux-ci — le reste suivra :",
@@ -273,7 +273,7 @@ const UI = {
         sheet: "hoja compuesta", verdict: "veredicto", grade: "garantía",
         weak: "eslabones débiles", claims: "pretensiones", brackets: "horquillas de confianza",
         assumed: "aceptado de palabra y no verificable", eg: "p. ej. ",
-        solved: "resuelto", value: "valor", from: "derivado de",
+        solved: "resuelto", or: "o", value: "valor", from: "derivado de",
         prov: "procedencia", still: "todavía una caja",
         needone: "la pregunta no fija ningún número: diga CUALQUIERA de "
                  + "estos — el resto se sigue:",
@@ -472,8 +472,9 @@ function showReport(r) {
     const solvedTable = sv.length ? table(
       [t("solved"), t("value"), t("prov"), t("from")],
       sv.map(([n, v]) => [esc(n),
-        `<b>${esc(v.lo === v.hi ? v.lo : `[${v.lo}, ${v.hi}]`)}</b>` +
-        (v.pinned ? "" : ` <span class="muted">${esc(t("still"))}</span>`),
+        `<b>${esc(v.roots ? v.roots.join(` ${t("or")} `)
+                          : v.lo === v.hi ? v.lo : `[${v.lo}, ${v.hi}]`)}</b>` +
+        (v.pinned || v.roots ? "" : ` <span class="muted">${esc(t("still"))}</span>`),
         verdictSpan(v.prov === "earned" ? "EARNED" : v.prov),
         esc((v.from || []).join(", ") || "—")])) : "";
     const miss = rep.numeric.missing;

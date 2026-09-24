@@ -239,6 +239,28 @@ def sec4c_a_number_without_a_value_goes_back_to_the_translator():
     print("   compared with ==) goes back too, with the refusal in words; one the")
     print("   run reads still takes the mirror's path.")
 
+
+def sec4d_a_name_that_multiplies_itself_is_one_number():
+    print("-" * 72)
+    print("4d. THE CURATOR'S X*X-2X+5=0: REFUTED, AND TWO ROOTS ARE TWO ANSWERS")
+    q = {"name": "x", "means": "the number sought", "status": "unverified", "value": "?"}
+    r = zfl.run({"rows": [q], "claim": "x*x - 2*x + 5 = 0"})
+    n = r["report"]["numeric"]
+    assert n["disposition"] == "REFUTED" and not n.get("missing"), n
+    n = zfl.run({"rows": [q], "claim": "x*x - 5*x + 6 = 0"})["report"]["numeric"]
+    assert n["disposition"] == "EARNED" and n["solved"]["x"]["roots"] == ["2", "3"], n
+    n = zfl.run({"rows": [q], "claim": "x*x == 2"})["report"]["numeric"]
+    assert n["solved"]["x"]["roots"] == ["≈-1.41421356237", "≈1.41421356237"], n
+    assert not any("still a box" in c for c in n["next_check"]), n["next_check"]
+    m = {"name": "X", "means": "a measured number", "status": "verified",
+         "ground": "doc-1", "value": "[-inf,inf]"}
+    n = zfl.run({"rows": [m], "claim": "(X-1)*(X-1) + 4 == 0"})["report"]["numeric"]
+    assert n["disposition"] == "REFUTED", n
+    print("   x = ?: x*x - 2*x + 5 = 0 -> REFUTED (D = -16), and no 'needs a fact'")
+    print("   x*x - 5*x + 6 = 0 -> EARNED, x = 2 or 3; x*x == 2 -> x ≈ ±1.41421356237,")
+    print("   OPEN: the rational floor encloses √2 and does not pretend to hold it.")
+    print("   X measured over the reals: (X-1)*(X-1) + 4 == 0 -> REFUTED.")
+
 def sec4b_every_example_runs_and_json_types_are_taken_as_they_come():
     print("-" * 72)
     print("4b. THE CATALOGUE, AND WHAT ARRIVES FROM A MODEL")
@@ -573,6 +595,7 @@ if __name__ == "__main__":
     sec3b_what_the_ground_column_is_actually_for()
     sec4_an_unknown_is_a_question_not_a_gap()
     sec4c_a_number_without_a_value_goes_back_to_the_translator()
+    sec4d_a_name_that_multiplies_itself_is_one_number()
     sec7_the_ground_gate_demotes_phantom_words()
     sec7b_the_receipt_tells_what_was_said_from_what_was_done()
     sec7c_number_claims_carry_their_verdict_and_the_root_is_read()
