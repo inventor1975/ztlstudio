@@ -1103,6 +1103,282 @@ def _ev_mlin(expr, quantities):
     return (lo, hi), ped, set(seen), None, unit
 
 
+# ------------------------------------------- the integer lattice, read exactly
+# WHY (2026-09-25, a dataset of bounded-integer claims with enumerated gold,
+# ztl-private/datasets/bounded-int-claims): on 69 696 claims with bounds up to
+# ±1000 the judge said OPEN on 1 364 that the integers decide — never a wrong
+# verdict, but `x == 1 - x` and `x <= x * x` on [0, 1000] stayed open, because
+# the bounds were read as a CONTINUOUS box: 1/2 solves the first, and x*x dips
+# under x between 0 and 1. With int-typed quantities there is no 1/2 to read.
+# Forecast frozen first: inventory/probes/FORECAST-INTEGER-REFINE-2026-09-25.md.
+#
+# This runs ONLY where compare would say Z, and decides ONLY by exact integer
+# arithmetic over the whole box — never by listing its points, so ±10^9 costs
+# what ±1 does. Three shapes; anything else keeps Z:
+#   (1) one free name, degree <= 2;
+#   (2) two free names, one of them only linear with a constant coefficient;
+#   (3) two free names, bilinear, under ==;
+#   (4) two free names coupled at degree 2 — through the edges of the box.
+
+def _ipoly(expr, quantities):
+    """Exact polynomial {((name, power), ...): Fraction} of an expression over
+    int-typed, finite, non-sample names (pinned ones become constants) — or
+    raise _NotLinear. Only +, -, *, sum and numbers."""
+    if isinstance(expr, (int, float, Fraction)):
+        v = num(expr)
+        if isinstance(v, float):
+            raise _NotLinear()
+        return {(): v} if v else {}
+    if isinstance(expr, str):
+        q = quantities[expr]
+        if q.get("no_readings") or q.get("sample") or _step(q.get("discrete")) != 1:
+            raise _NotLinear()
+        lo, hi = q["lo"], q["hi"]
+        if isinstance(lo, float) or isinstance(hi, float):
+            raise _NotLinear()
+        if lo == hi:
+            return {(): Fraction(lo)} if lo else {}
+        return {((expr, 1),): Fraction(1)}
+    op, *args = expr
+    if op == "sum":
+        out = {}
+        for a in args[0]:
+            for m, c in _ipoly(a, quantities).items():
+                out[m] = out.get(m, 0) + c
+        return {m: c for m, c in out.items() if c}
+    if op in ("add", "sub"):
+        a, b = _ipoly(args[0], quantities), _ipoly(args[1], quantities)
+        sg = 1 if op == "add" else -1
+        out = dict(a)
+        for m, c in b.items():
+            out[m] = out.get(m, 0) + sg * c
+        return {m: c for m, c in out.items() if c}
+    if op == "mul":
+        a, b = _ipoly(args[0], quantities), _ipoly(args[1], quantities)
+        out = {}
+        for m1, c1 in a.items():
+            for m2, c2 in b.items():
+                pw = {}
+                for n, k in m1 + m2:
+                    pw[n] = pw.get(n, 0) + k
+                m = tuple(sorted(pw.items()))
+                out[m] = out.get(m, 0) + c1 * c2
+        return {m: c for m, c in out.items() if c}
+    raise _NotLinear()
+
+
+def _cdiv(a, b):
+    return -((-a) // b)
+
+
+def _q_at(a, b, c, m):
+    return a * m * m + b * m + c
+
+
+def _q_extremes(a, b, c, lo, hi):
+    """Integer min and max of a*m^2 + b*m + c over the integers of [lo, hi]:
+    they lie at the ends or at the integers next to the vertex."""
+    cand = {lo, hi}
+    if a:
+        for v in ((-b) // (2 * a), _cdiv(-b, 2 * a)):
+            if lo <= v <= hi:
+                cand.add(v)
+    vals = [_q_at(a, b, c, m) for m in cand]
+    return min(vals), max(vals)
+
+
+def _q_le_interval(a, b, c, U):
+    """{integer m : a*m^2 + b*m + c <= U} for a > 0 — one integer interval
+    (lo, hi), or None when empty. Found by isqrt, then made exact by testing
+    the neighbours (the isqrt estimate is off by at most one step)."""
+    D = b * b - 4 * a * (c - U)
+    if D < 0:
+        return None
+    s = math.isqrt(D)
+    m_lo, m_hi = _cdiv(-b - s, 2 * a), (-b + s) // (2 * a)
+    while _q_at(a, b, c, m_lo - 1) <= U:
+        m_lo -= 1
+    while m_lo <= m_hi and _q_at(a, b, c, m_lo) > U:
+        m_lo += 1
+    while _q_at(a, b, c, m_hi + 1) <= U:
+        m_hi += 1
+    while m_hi >= m_lo and _q_at(a, b, c, m_hi) > U:
+        m_hi -= 1
+    return (m_lo, m_hi) if m_lo <= m_hi else None
+
+
+def _q_hits(a, b, c, L, U, lo, hi):
+    """Is there an integer m in [lo, hi] with L <= a*m^2 + b*m + c <= U?"""
+    if lo > hi or L > U:
+        return False
+    if a == 0:
+        if b == 0:
+            return L <= c <= U
+        if b < 0:
+            a, b, c, L, U = 0, -b, -c, -U, -L
+        return max(lo, _cdiv(L - c, b)) <= min(hi, (U - c) // b)
+    if a < 0:
+        a, b, c, L, U = -a, -b, -c, -U, -L
+    top = _q_le_interval(a, b, c, U)            # value <= U
+    if top is None:
+        return False
+    t_lo, t_hi = max(lo, top[0]), min(hi, top[1])
+    if t_lo > t_hi:
+        return False
+    low = _q_le_interval(a, b, c, L - 1)        # value <= L - 1: the part to cut
+    if low is None:
+        return True
+    return t_lo < low[0] or t_hi > low[1]
+
+
+def _q_roots(a, b, c, lo, hi):
+    """Integer roots of a*m^2 + b*m + c in [lo, hi] (not identically zero)."""
+    if a == 0:
+        if b == 0:
+            return set()
+        return {-c // b} if (-c) % b == 0 and lo <= -c // b <= hi else set()
+    D = b * b - 4 * a * c
+    if D < 0:
+        return set()
+    s = math.isqrt(D)
+    if s * s != D:
+        return set()
+    return {(-b + sg * s) // (2 * a) for sg in (1, -1)
+            if (-b + sg * s) % (2 * a) == 0 and lo <= (-b + sg * s) // (2 * a) <= hi}
+
+
+def _divisors(n):
+    n, out, d = abs(n), set(), 1
+    while d * d <= n:
+        if n % d == 0:
+            out |= {d, n // d}
+        d += 1
+    return out
+
+
+def _int_refine(kind, e1, e2, quantities):
+    """'T' / 'F' decided over the integer box, or None (keep Z). See above."""
+    try:
+        p = _ipoly(("sub", e1, e2), quantities)
+    except (_NotLinear, KeyError):
+        return None
+    den = 1
+    for c in p.values():
+        den = den * c.denominator // math.gcd(den, c.denominator)
+    p = {m: int(c * den) for m, c in p.items()}          # same sign, integer
+    free = sorted({n for m in p for n, _ in m})
+    box = {n: (int(quantities[n]["lo"]), int(quantities[n]["hi"])) for n in free}
+    if any(k > 2 for m in p for _, k in m) or len(free) > 2 or not free:
+        return None
+    cf = lambda *pw: p.get(tuple(sorted((n, k) for n, k in pw if k)), 0)
+    if len(free) == 1:                                   # (1)
+        x = free[0]; lo, hi = box[x]
+        a, b, c = cf((x, 2)), cf((x, 1)), cf()
+        if kind == "eq":
+            if a == b == 0:
+                return "T" if c == 0 else "F"
+            r = _q_roots(a, b, c, lo, hi)
+            return "F" if not r else ("T" if len(r) == hi - lo + 1 else None)
+        mn, mx = _q_extremes(a, b, c, lo, hi)
+        if kind == "le":
+            return "T" if mx <= 0 else ("F" if mn > 0 else None)
+        return "T" if mx < 0 else ("F" if mn >= 0 else None)
+    x, y = free
+    if any(sum(k for _, k in m) > 2 for m in p):
+        # TOTAL degree, not each name's: x*x*y is degree 3. MEASURED 2026-09-25:
+        # the first version of (4) checked powers per name only, read x*x*y as
+        # absent, and returned F where the truth was open — a WRONG verdict,
+        # caught by this stand's brute-force check before anything shipped.
+        return None
+    # (4) the COUPLED tail (2026-09-25, «не люблю хвосты»): f = a x^2 + e xy +
+    # b y^2 + d x + g y + c. Where f is convex or linear in y (b >= 0) its max
+    # over the box lies on the edges y = ylo, y = yhi; else where convex in x
+    # (a >= 0) on x = xlo, x = xhi; where e = 0 it splits into two one-name
+    # maxima. The min mirrors it. Each edge is a one-name quadratic, exact.
+    a2, e2, b2 = cf((x, 2)), cf((x, 1), (y, 1)), cf((y, 2))
+    d1, g1, c0 = cf((x, 1)), cf((y, 1)), cf()
+    (xlo, xhi), (ylo, yhi) = box[x], box[y]
+    on_y = lambda y0: (a2, e2 * y0 + d1, b2 * y0 * y0 + g1 * y0 + c0, xlo, xhi)
+    on_x = lambda x0: (b2, e2 * x0 + g1, a2 * x0 * x0 + d1 * x0 + c0, ylo, yhi)
+
+    def _edge(want, pick):                   # want 1 = max, 0 = min
+        sgn = 1 if want else -1
+        if sgn * b2 >= 0:
+            return pick(_q_extremes(*on_y(y0))[want] for y0 in (ylo, yhi))
+        if sgn * a2 >= 0:
+            return pick(_q_extremes(*on_x(x0))[want] for x0 in (xlo, xhi))
+        if e2 == 0:
+            return (_q_extremes(a2, d1, 0, xlo, xhi)[want]
+                    + _q_extremes(b2, g1, 0, ylo, yhi)[want] + c0)
+        return None
+    mx, mn = _edge(1, max), _edge(0, min)
+    if kind == "le":
+        if mx is not None and mx <= 0:
+            return "T"
+        if mn is not None and mn > 0:
+            return "F"
+    elif kind == "lt":
+        if mx is not None and mx < 0:
+            return "T"
+        if mn is not None and mn >= 0:
+            return "F"
+    elif (mn is not None and mn > 0) or (mx is not None and mx < 0):
+        return "F"
+    elif mn == 0 and mx == 0:
+        return "T"
+    for u, v in ((x, y), (y, x)):                        # (2): v only linear
+        if any(n == v and (k != 1 or len(m) > 1) for m in p for n, k in m):
+            continue
+        k = cf((v, 1))
+        a, b, c = cf((u, 2)), cf((u, 1)), cf()
+        if any(len(m) > 1 or (m and m[0][0] not in (u, v)) for m in p):
+            continue
+        (ulo, uhi), (vlo, vhi) = box[u], box[v]
+        if kind in ("le", "lt"):
+            mn, mx = _q_extremes(a, b, c, ulo, uhi)
+            ky = sorted((k * vlo, k * vhi))
+            mn, mx = mn + ky[0], mx + ky[1]
+            if kind == "le":
+                return "T" if mx <= 0 else ("F" if mn > 0 else None)
+            return "T" if mx < 0 else ("F" if mn >= 0 else None)
+        K = abs(k)
+        if K > 10 ** 4:                                  # the same load ceiling:
+            return None                                  # at most 10^4 residues
+        L, U = sorted((-k * vlo, -k * vhi))              # h(u) = -k*v in [L, U]
+        for r in range(K):
+            if _q_at(a, b, c, r) % K:
+                continue
+            # u = r + K*m: h is a quadratic in m
+            A, B, C = a * K * K, (2 * a * r + b) * K, _q_at(a, b, c, r)
+            if _q_hits(A, B, C, L, U, _cdiv(ulo - r, K), (uhi - r) // K):
+                return None                              # a solution exists
+        return "F"
+    if kind != "eq" or any(k > 1 for m in p for _, k in m):
+        return None
+    a, b, c, d = cf((x, 1), (y, 1)), cf((x, 1)), cf((y, 1)), cf()   # (3)
+    if not a:
+        return None
+    (xlo, xhi), (ylo, yhi) = box[x], box[y]
+    N = b * c - a * d                                    # (a x + c)(a y + b) = N
+    if N == 0:
+        hit = ((-c) % a == 0 and xlo <= -c // a <= xhi) or \
+              ((-b) % a == 0 and ylo <= -b // a <= yhi)
+        return None if hit else "F"
+    if abs(N) > 10 ** 10:
+        # LOAD CEILING (the curator, 2026-09-25: «перебор не приемлем, так как
+        # нагрузка»). The divisors of N are found by trial division up to
+        # sqrt|N|; MEASURED: |N| ~ 10^12 (a prime) cost 40 ms on one request —
+        # too much for a public judge. 10^10 caps it near 4 ms; beyond, Z.
+        return None
+    for dv in _divisors(N):
+        for u in (dv, -dv):
+            w = N // u
+            if (u - c) % a == 0 and (w - b) % a == 0 \
+                    and xlo <= (u - c) // a <= xhi and ylo <= (w - b) // a <= yhi:
+                return None
+    return "F"
+
+
 def _ev(expr, quantities):
     """Rich evaluator: (interval|None, pedigree, used, lattice_step, unit).
     Discreteness is tracked exactly through +, -, *, sum (integer lattices
@@ -1282,6 +1558,8 @@ def compare(kind, e1, e2, quantities):
             if sa is not None and rb[0] == rb[1] \
                     and not _on_lattice(rb[0], sa):
                 v = "F"                    # off the lattice: forced false
+    if v == "Z":                           # the integers may still decide it
+        v = _int_refine(kind, e1, e2, quantities) or v
     return v, ped, used, None
 
 

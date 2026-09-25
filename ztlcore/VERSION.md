@@ -3,7 +3,8 @@
 These 12 files are the ZTL logic kernel (the judge), vendored from the ZTL repository so introspect
 clones and runs self-contained. **Source of truth: https://github.com/inventor1975/ZTL**
 
-Vendored: 2026-09-24 from inventor1975/ZTL @ c3f3514 (one name to a higher degree: critical points, Sturm roots;
+Vendored: 2026-09-25 from inventor1975/ZTL @ 4cc5504 (integer-typed quantities read on the integers, exactly, no listing;
+before it c3f3514, one name to a higher degree: critical points, Sturm roots;
 before it f843cce, products of names at the corners; irrational roots exactly;
 before it 1fee1fe, one of several equalities of one unknown is a set of roots;
 before it 86266ea, the exact root of a known number is a constant;
