@@ -69,9 +69,13 @@ def main():
     pid = proc.pid
     try:
         # ---- F1: deep JSON nesting -> the server should answer 400, not vanish
-        st, _, _ = status("{\"doc\":" + "[" * 2000 + "]" * 2000 + "}", timeout=6)
+        # The depth where json.loads gives up depends on the Python: the cloud's
+        # 3.11 raised at 2000, the production 3.12 parses 5000 and raises at 20000
+        # (40 KB, under the body cap). 20000 is the finding on both; the answer
+        # must be a response — 400 — never a vanished worker.
+        st, _, _ = status("{\"doc\":" + "[" * 20000 + "]" * 20000 + "}", timeout=6)
         check(isinstance(st, int) and st == 400,
-              f"F1 deep JSON nesting returns a clean 400 (got {st}); "
+              f"F1 deep JSON nesting (20000) returns a clean 400 (got {st}); "
               f"NO-RESPONSE means an uncaught RecursionError killed the worker")
         check(proc.poll() is None, "F1 server still alive")
 

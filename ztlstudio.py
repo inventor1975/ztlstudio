@@ -68,6 +68,32 @@ def _client_ip(handler):
     return xff.split(",")[-1].strip() if xff else handler.client_address[0]
 
 
+# THE JUDGE HAS A LIMIT TOO (2026-09-26, the cloud red team). Only the AI routes
+# were limited; /api/v2run was not, and on a 2-core server beside the blog a
+# stream of heavy-but-valid documents could keep a core busy. The API has
+# 30 a minute per visitor; the studio now has the same. The page asks the
+# judge on a button press, not on typing, so a person never meets it.
+_JL = defaultdict(deque)
+_JL_MAX, _JL_WINDOW = 30, 60
+_JUDGE_ROUTES = ("/api/v2run", "/api/v2validate")
+
+
+def _judge_rate_ok(ip):
+    with _RL_LOCK:
+        now = time.time()
+        if len(_JL) > 5000:
+            for k in [k for k, dq in _JL.items()
+                      if k != ip and (not dq or dq[-1] < now - _JL_WINDOW)]:
+                del _JL[k]
+        q = _JL[ip]
+        while q and q[0] < now - _JL_WINDOW:
+            q.popleft()
+        if len(q) >= _JL_MAX:
+            return False
+        q.append(now)
+        return True
+
+
 def _rate_ok(ip):
     with _RL_LOCK:
         now = time.time()
@@ -589,9 +615,20 @@ class Handler(BaseHTTPRequestHandler):
                 "own key in ⚙ Model for unlimited use — it stays this session "
                 "only. The core verdict never needs the AI."})
             return
+        if PUBLIC and self.path in _JUDGE_ROUTES and \
+                not _judge_rate_ok(_client_ip(self)):
+            self._send(429, {"ok": False, "error":
+                f"too many requests: at most {_JL_MAX} a minute per visitor"})
+            return
         try:
             n = int(self.headers.get("Content-Length", 0))
         except (TypeError, ValueError):     # присланный, но кривой заголовок
+            self._send(400, {"error": "bad content-length"})
+            return
+        if n < 0:
+            # F3 (2026-09-26, the cloud red team): -1 passed the size check
+            # and read(-1) read until EOF — the worker hung for as long as the
+            # sender held the socket, and the body cap was bypassed.
             self._send(400, {"error": "bad content-length"})
             return
         if n > 262144:                      # 256 KB body cap (DoS guard)
@@ -605,8 +642,17 @@ class Handler(BaseHTTPRequestHandler):
             return
         try:
             payload = json.loads(self.rfile.read(n).decode() or "{}")
-        except (json.JSONDecodeError, UnicodeDecodeError):  # не-UTF-8 тело тоже
+        except Exception:
+            # ANY failure to decode is a bad body, not a dead worker (F1, F2,
+            # 2026-09-26): deep nesting raises RecursionError and a number over
+            # 4300 digits raises ValueError — neither is a JSONDecodeError, so
+            # both escaped this handler and the client got no response at all.
             self._send(400, {"error": "bad json"})
+            return
+        if not isinstance(payload, dict):
+            # F6: `null`, `5`, `[1]` are JSON but not a request; they reached
+            # `payload.get` and came back as "internal studio error".
+            self._send(400, {"error": "the body must be a JSON object"})
             return
         try:
             self._send(200, fn(payload))
