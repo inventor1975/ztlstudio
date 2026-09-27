@@ -94,13 +94,13 @@ def main():
               f"TIMEOUT means read(-1) hung the worker and the body cap was bypassed")
 
         # ---- F4: many comparisons, one name -> the cap must bound the cost
-        claim = " ^ ".join(f"(x <= {j})" for j in range(1, 15))
+        claim = " ^ ".join(f"(x <= {j})" for j in range(1, 18))   # 17 > the cap of 16 (2026-09-27)
         import zfl
         codes = [i["code"] for i in zfl.validate(
             {"claim": claim, "rows": [{"name": "x", "means": "x",
              "status": "unverified", "value": "[0,50]"}]})]
         check("E_TOOBIG" in codes,
-              f"F4 a 14-comparison claim over one name is capped (validate codes "
+              f"F4 a 17-comparison claim over one name is capped (validate codes "
               f"{codes}); the completion table is 3**comparisons, unbounded by the "
               f"name-count cap")
 
