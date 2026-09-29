@@ -1,0 +1,1094 @@
+[
+ {
+  "id": "Q01",
+  "attempts": [
+   {
+    "document": {
+     "rows": [
+      {
+       "name": "lawyer",
+       "means": "our lawyer approved the contract",
+       "status": "verified",
+       "ground": "signed-memo"
+      },
+      {
+       "name": "paid",
+       "means": "the client payment is confirmed",
+       "status": "unverified"
+      }
+     ],
+     "claim": "lawyer & paid"
+    },
+    "judge": {
+     "ok": true,
+     "issues": [],
+     "verdict": "F",
+     "disposition": "OPEN",
+     "grade": "until-verification",
+     "unverified": [
+      "paid"
+     ],
+     "why": "not established — verify ['paid'] (it could still turn either way)"
+    }
+   }
+  ],
+  "used_attempt": 1,
+  "answer": "Not yet. The lawyer's approval is on file, but the payment is unconfirmed, so the condition for signing is not established (it is open, not refuted). Confirm the payment first."
+ },
+ {
+  "id": "Q02",
+  "attempts": [
+   {
+    "document": {
+     "rows": [
+      {
+       "name": "training",
+       "means": "сотрудник прошёл обучение",
+       "status": "verified",
+       "ground": "сертификат",
+       "ground_kind": "certificate"
+      },
+      {
+       "name": "clearance",
+       "means": "у сотрудника есть допуск службы безопасности",
+       "status": "verified",
+       "ground": "приказ-12",
+       "ground_kind": "act"
+      }
+     ],
+     "claim": "training & clearance"
+    },
+    "judge": {
+     "ok": true,
+     "issues": [],
+     "verdict": "T",
+     "disposition": "EARNED",
+     "grade": "hereditary",
+     "unverified": [],
+     "why": "grounded outright"
+    }
+   }
+  ],
+  "used_attempt": 1,
+  "answer": "Да, можно допустить: оба условия (обучение — сертификат, допуск СБ — приказ №12) подтверждены."
+ },
+ {
+  "id": "Q03",
+  "attempts": [
+   {
+    "document": {
+     "rows": [
+      {
+       "name": "tests",
+       "means": "the tests pass",
+       "status": "verified",
+       "ground": "ci-log"
+      },
+      {
+       "name": "qa",
+       "means": "a manual QA sign-off exists",
+       "status": "unverified"
+      }
+     ],
+     "claim": "tests | qa"
+    },
+    "judge": {
+     "ok": true,
+     "issues": [],
+     "verdict": "T",
+     "disposition": "EARNED",
+     "grade": "hereditary",
+     "unverified": [
+      "qa"
+     ],
+     "why": "grounded; the unverified ['qa'] do not matter"
+    }
+   }
+  ],
+  "used_attempt": 1,
+  "answer": "Yes. The passed tests (CI log) are enough on their own, so the missing QA sign-off doesn't matter."
+ },
+ {
+  "id": "Q04",
+  "attempts": [
+   {
+    "document": {
+     "rows": [
+      {
+       "name": "L",
+       "means": "this sentence is false",
+       "status": "defined",
+       "ground": "~(Tr(L))"
+      }
+     ]
+    },
+    "judge": {
+     "ok": true,
+     "issues": [],
+     "verdict": null,
+     "disposition": null,
+     "grade": null,
+     "unverified": null,
+     "why": null,
+     "passport_kinds": [
+      "PARADOX"
+     ],
+     "passport": [
+      {
+       "component": [
+        "L"
+       ],
+       "kind": "PARADOX",
+       "detail": "no classical models; oscillation period 2; refusal PERMANENT"
+      }
+     ]
+    }
+   },
+   {
+    "document": {
+     "rows": [
+      {
+       "name": "L",
+       "means": "this sentence is false",
+       "status": "defined",
+       "ground": "~(Tr(L))"
+      }
+     ],
+     "claim": "L"
+    },
+    "judge": {
+     "ok": true,
+     "issues": [],
+     "verdict": "Z",
+     "disposition": "OPEN",
+     "grade": "until-verification",
+     "unverified": [
+      "L"
+     ],
+     "why": "not established — verify ['L'] (it could still turn either way)",
+     "credit": "UNREDEEMABLE",
+     "unredeemable": [
+      "L"
+     ],
+     "passport_kinds": [
+      "PARADOX"
+     ],
+     "passport": [
+      {
+       "component": [
+        "L"
+       ],
+       "kind": "PARADOX",
+       "detail": "no classical models; oscillation period 2; refusal PERMANENT"
+      }
+     ]
+    }
+   }
+  ],
+  "used_attempt": 2,
+  "note": "First attempt without claim: only passport ran (PARADOX), judge not applied. Second attempt with claim 'L' per server instructions.",
+  "answer": "It has no consistent truth value. It is a paradox (the liar), so it can't be judged true or false, and checking won't change that."
+ },
+ {
+  "id": "Q05",
+  "attempts": [
+   {
+    "document": {
+     "rows": [
+      {
+       "name": "after",
+       "means": "сервер упал сразу после выкладки релиза",
+       "status": "verified",
+       "ground": "журнал"
+      },
+      {
+       "name": "caused",
+       "means": "причина падения — релиз",
+       "status": "unverified"
+      }
+     ],
+     "claim": "after -> caused"
+    },
+    "judge": {
+     "ok": true,
+     "issues": [],
+     "verdict": "F",
+     "disposition": "OPEN",
+     "grade": "until-verification",
+     "unverified": [
+      "caused"
+     ],
+     "why": "not established — verify ['caused'] (it could still turn either way)"
+    }
+   }
+  ],
+  "used_attempt": 1,
+  "note": "Encoded the colleague's inference as the claim 'after -> caused'.",
+  "answer": "Нет, вывод не обоснован. Журнал подтверждает только, что падение было после релиза. Что релиз его вызвал, не установлено, и это ещё может оказаться как так, так и иначе. Нужна проверка причины (например, откат или разбор логов)."
+ },
+ {
+  "id": "Q06",
+  "attempts": [
+   {
+    "document": {
+     "rows": [
+      {
+       "name": "on_time",
+       "means": "the shipment arrived on time",
+       "status": "refuted",
+       "ground": "tracking-record"
+      }
+     ],
+     "claim": "on_time"
+    },
+    "judge": {
+     "ok": true,
+     "issues": [],
+     "verdict": "F",
+     "disposition": "REFUTED",
+     "grade": "hereditary",
+     "unverified": [],
+     "why": "grounded false"
+    }
+   }
+  ],
+  "used_attempt": 1,
+  "answer": "No. The tracking record shows it arrived two days late, so 'on time' is refuted."
+ },
+ {
+  "id": "Q07",
+  "attempts": [
+   {
+    "document": {
+     "rows": [
+      {
+       "name": "trustworthy",
+       "means": "the vendor is trustworthy",
+       "status": "unverified"
+      }
+     ],
+     "claim": "trustworthy"
+    },
+    "judge": {
+     "ok": true,
+     "issues": [],
+     "verdict": "Z",
+     "disposition": "OPEN",
+     "grade": "until-verification",
+     "unverified": [
+      "trustworthy"
+     ],
+     "why": "not established — verify ['trustworthy'] (it could still turn either way)"
+    }
+   }
+  ],
+  "used_attempt": 1,
+  "answer": "Unknown. With no audit and no references, trustworthiness isn't established either way. Audit them or get references."
+ },
+ {
+  "id": "Q08",
+  "attempts": [
+   {
+    "document": {
+     "rows": [
+      {
+       "name": "paid",
+       "means": "оплата прошла",
+       "status": "unverified"
+      },
+      {
+       "name": "shipped",
+       "means": "товар отгружен",
+       "status": "verified",
+       "ground": "накладная"
+      }
+     ],
+     "claim": "paid -> shipped"
+    },
+    "judge": {
+     "ok": true,
+     "issues": [],
+     "verdict": "T",
+     "disposition": "EARNED",
+     "grade": "hereditary",
+     "unverified": [
+      "paid"
+     ],
+     "why": "grounded; the unverified ['paid'] do not matter"
+    }
+   }
+  ],
+  "used_attempt": 1,
+  "answer": "Да, формально правило соблюдено. Оно требует отгрузки после оплаты, но не запрещает отгружать без неё. Отгрузка подтверждена накладной, так что неизвестная оплата на ответ не влияет. Если на деле правило означало «отгружать ТОЛЬКО после оплаты», его нарушение пока не установлено: оплату нужно проверить."
+ },
+ {
+  "id": "Q09",
+  "attempts": [
+   {
+    "document": {
+     "rows": [
+      {
+       "name": "line",
+       "means": "the invoice line",
+       "status": "verified",
+       "ground": "signed-order",
+       "value": "1500",
+       "unit": "EUR"
+      },
+      {
+       "name": "budget",
+       "means": "the budget",
+       "status": "verified",
+       "ground": "signed-order",
+       "value": "2000",
+       "unit": "EUR"
+      }
+     ],
+     "claim": "line <= budget"
+    },
+    "judge": {
+     "ok": true,
+     "issues": [],
+     "verdict": null,
+     "disposition": null,
+     "grade": null,
+     "unverified": null,
+     "why": null,
+     "numeric": {
+      "verdict": "T",
+      "disposition": "EARNED",
+      "grade": "hereditary",
+      "unverified": [],
+      "solved": {},
+      "next_check": [],
+      "sheet": "line=1500 earned:signed-order EUR, budget=2000 earned:signed-order EUR"
+     }
+    }
+   }
+  ],
+  "used_attempt": 1,
+  "answer": "Yes. 1500 EUR ≤ 2000 EUR, both from the signed order."
+ },
+ {
+  "id": "Q10",
+  "attempts": [
+   {
+    "document": {
+     "rows": [
+      {
+       "name": "line",
+       "means": "the invoice line",
+       "status": "unverified",
+       "value": "?",
+       "unit": "EUR"
+      },
+      {
+       "name": "budget",
+       "means": "the budget",
+       "status": "verified",
+       "ground": "signed-order",
+       "value": "2000",
+       "unit": "EUR"
+      }
+     ],
+     "claim": "line <= budget"
+    },
+    "judge": {
+     "ok": true,
+     "issues": [],
+     "verdict": null,
+     "disposition": null,
+     "grade": null,
+     "unverified": null,
+     "why": null,
+     "numeric": {
+      "verdict": "T",
+      "disposition": "EARNED",
+      "grade": "hereditary",
+      "unverified": [],
+      "solved": {
+       "line": {
+        "lo": "-inf",
+        "hi": "2000",
+        "pinned": false,
+        "prov": "earned",
+        "from": [
+         "budget"
+        ],
+        "weak": []
+       }
+      },
+      "next_check": [
+       "narrow line further (still a box)"
+      ],
+      "sheet": "line=? credit EUR, budget=2000 earned:signed-order EUR"
+     }
+    }
+   },
+   {
+    "document": {
+     "rows": [
+      {
+       "name": "line",
+       "means": "the invoice line",
+       "status": "unverified",
+       "unit": "EUR"
+      },
+      {
+       "name": "budget",
+       "means": "the budget",
+       "status": "verified",
+       "ground": "signed-order",
+       "value": "2000",
+       "unit": "EUR"
+      }
+     ],
+     "claim": "line <= budget"
+    },
+    "judge": {
+     "ok": false,
+     "issues": [
+      {
+       "level": "warn",
+       "code": "W_UNIT_NO_VALUE",
+       "where": "row 1 / unit",
+       "hint": "a unit with no value says nothing"
+      },
+      {
+       "level": "error",
+       "code": "E_NO_VALUE",
+       "where": "row 1 / value",
+       "hint": "'line' is read as a number in the claim, and it has no value: give it a number, an interval [0,10], or ? if 'line' is what the question asks for"
+      }
+     ],
+     "verdict": null,
+     "disposition": null,
+     "grade": null,
+     "unverified": null,
+     "why": null
+    }
+   },
+   {
+    "document": {
+     "rows": [
+      {
+       "name": "line",
+       "means": "the invoice line (amount not known yet)",
+       "status": "unverified",
+       "value": "[0,inf]",
+       "unit": "EUR"
+      },
+      {
+       "name": "budget",
+       "means": "the budget",
+       "status": "verified",
+       "ground": "signed-order",
+       "value": "2000",
+       "unit": "EUR"
+      }
+     ],
+     "claim": "line <= budget"
+    },
+    "judge": {
+     "ok": true,
+     "issues": [],
+     "verdict": null,
+     "disposition": null,
+     "grade": null,
+     "unverified": null,
+     "why": null,
+     "numeric": {
+      "verdict": "Z",
+      "disposition": "OPEN",
+      "grade": "until-verification",
+      "unverified": [
+       "nc1"
+      ],
+      "solved": {},
+      "next_check": [
+       "measure line",
+       "document line"
+      ],
+      "sheet": "line=[0,inf] credit EUR, budget=2000 earned:signed-order EUR"
+     }
+    }
+   }
+  ],
+  "used_attempt": 3,
+  "note": "Attempt 1 value '?' -> judge SOLVED for line (line<=2000) and returned T EARNED, which answers a different question. Attempt 2 without value -> E_NO_VALUE. Attempt 3 interval [0,inf] -> Z OPEN (used).",
+  "answer": "Unknown. Without the amount it can't be said whether the line fits the 2000 EUR budget. It fits only if it's at most 2000 EUR. Get the amount."
+ },
+ {
+  "id": "Q11",
+  "attempts": [
+   {
+    "document": {
+     "rows": [
+      {
+       "name": "loss",
+       "means": "the vendor system lost data (last March)",
+       "status": "verified",
+       "ground": "incident-report-march"
+      }
+     ],
+     "claim": "~loss"
+    },
+    "judge": {
+     "ok": true,
+     "issues": [],
+     "verdict": "F",
+     "disposition": "REFUTED",
+     "grade": "hereditary",
+     "unverified": [],
+     "why": "grounded false"
+    }
+   }
+  ],
+  "used_attempt": 1,
+  "answer": "No. The March incident report documents a data loss, so 'never loses data' is refuted."
+ },
+ {
+  "id": "Q12",
+  "attempts": [
+   {
+    "document": {
+     "rows": [
+      {
+       "name": "build",
+       "means": "сборка пройдена",
+       "status": "verified",
+       "ground": "журнал"
+      },
+      {
+       "name": "unit",
+       "means": "юнит-тесты пройдены",
+       "status": "verified",
+       "ground": "журнал"
+      },
+      {
+       "name": "integ",
+       "means": "интеграция пройдена",
+       "status": "verified",
+       "ground": "журнал"
+      },
+      {
+       "name": "lint",
+       "means": "линтер пройден",
+       "status": "verified",
+       "ground": "журнал"
+      },
+      {
+       "name": "types",
+       "means": "проверка типов пройдена",
+       "status": "verified",
+       "ground": "журнал"
+      },
+      {
+       "name": "sec",
+       "means": "безопасность пройдена",
+       "status": "verified",
+       "ground": "журнал"
+      },
+      {
+       "name": "lic",
+       "means": "лицензии пройдены",
+       "status": "verified",
+       "ground": "журнал"
+      },
+      {
+       "name": "migr",
+       "means": "миграции пройдены",
+       "status": "verified",
+       "ground": "журнал"
+      },
+      {
+       "name": "docs",
+       "means": "документация пройдена",
+       "status": "verified",
+       "ground": "журнал"
+      },
+      {
+       "name": "rollback",
+       "means": "откат пройден",
+       "status": "verified",
+       "ground": "журнал"
+      },
+      {
+       "name": "monitor",
+       "means": "мониторинг пройден",
+       "status": "verified",
+       "ground": "журнал"
+      },
+      {
+       "name": "load",
+       "means": "нагрузочный тест пройден",
+       "status": "refuted",
+       "ground": "журнал"
+      }
+     ],
+     "claim": "build & unit & integ & lint & types & sec & lic & migr & docs & rollback & monitor & load"
+    },
+    "judge": {
+     "ok": false,
+     "issues": [
+      {
+       "level": "error",
+       "code": "E_TOOBIG",
+       "where": "table",
+       "hint": "12 plain atoms in the formulas: a reading costs 3**atoms, so it is capped at 10 (rows are NOT capped — split the question instead)"
+      }
+     ],
+     "verdict": null,
+     "disposition": null,
+     "grade": null,
+     "unverified": null,
+     "why": null
+    }
+   },
+   {
+    "document": {
+     "rows": [
+      {
+       "name": "build",
+       "means": "сборка пройдена",
+       "status": "verified",
+       "ground": "журнал"
+      },
+      {
+       "name": "unit",
+       "means": "юнит-тесты пройдена",
+       "status": "verified",
+       "ground": "журнал"
+      },
+      {
+       "name": "integ",
+       "means": "интеграция пройдена",
+       "status": "verified",
+       "ground": "журнал"
+      },
+      {
+       "name": "lint",
+       "means": "линтер пройдена",
+       "status": "verified",
+       "ground": "журнал"
+      },
+      {
+       "name": "types",
+       "means": "проверка типов пройдена",
+       "status": "verified",
+       "ground": "журнал"
+      },
+      {
+       "name": "sec",
+       "means": "безопасность пройдена",
+       "status": "verified",
+       "ground": "журнал"
+      },
+      {
+       "name": "lic",
+       "means": "лицензии пройдена",
+       "status": "verified",
+       "ground": "журнал"
+      },
+      {
+       "name": "migr",
+       "means": "миграции пройдена",
+       "status": "verified",
+       "ground": "журнал"
+      },
+      {
+       "name": "docs",
+       "means": "документация пройдена",
+       "status": "verified",
+       "ground": "журнал"
+      },
+      {
+       "name": "rollback",
+       "means": "откат пройдена",
+       "status": "verified",
+       "ground": "журнал"
+      },
+      {
+       "name": "monitor",
+       "means": "мониторинг пройдена",
+       "status": "verified",
+       "ground": "журнал"
+      },
+      {
+       "name": "load",
+       "means": "нагрузочный тест пройден",
+       "status": "refuted",
+       "ground": "журнал"
+      },
+      {
+       "name": "launch",
+       "means": "пройдены все 12 проверок — запуск разрешён",
+       "status": "defined",
+       "ground": "Tr(build) & Tr(unit) & Tr(integ) & Tr(lint) & Tr(types) & Tr(sec) & Tr(lic) & Tr(migr) & Tr(docs) & Tr(rollback) & Tr(monitor) & Tr(load)"
+      }
+     ],
+     "claim": "launch"
+    },
+    "judge": {
+     "ok": false,
+     "issues": [
+      {
+       "level": "error",
+       "code": "E_TOOBIG",
+       "where": "table",
+       "hint": "13 plain atoms in the formulas: a reading costs 3**atoms, so it is capped at 10 (rows are NOT capped — split the question instead)"
+      }
+     ],
+     "verdict": null,
+     "disposition": null,
+     "grade": null,
+     "unverified": null,
+     "why": null
+    }
+   },
+   {
+    "document": {
+     "rows": [
+      {
+       "name": "checks11",
+       "means": "пройдены 11 проверок: сборка, юнит-тесты, интеграция, линтер, типы, безопасность, лицензии, миграции, документация, откат, мониторинг",
+       "status": "verified",
+       "ground": "журнал"
+      },
+      {
+       "name": "load",
+       "means": "нагрузочный тест пройден",
+       "status": "refuted",
+       "ground": "журнал"
+      }
+     ],
+     "claim": "checks11 & load"
+    },
+    "judge": {
+     "ok": true,
+     "issues": [],
+     "verdict": "F",
+     "disposition": "REFUTED",
+     "grade": "hereditary",
+     "unverified": [],
+     "why": "grounded false"
+    }
+   }
+  ],
+  "used_attempt": 3,
+  "note": "Attempt 1 (12 atoms) and 2 (defined row reading 12 names) -> E_TOOBIG. Attempt 3 aggregates the 11 logged checks into one verified row.",
+  "answer": "Нет, запускать нельзя: нагрузочный тест не пройден (по журналу его не делали), а правило требует все 12 проверок."
+ },
+ {
+  "id": "Q13",
+  "attempts": [
+   {
+    "document": {
+     "rows": [
+      {
+       "name": "locked",
+       "means": "the door is locked",
+       "status": "verified",
+       "ground": "guard-check",
+       "ground_kind": "act"
+      }
+     ],
+     "claim": "locked & ~locked"
+    },
+    "judge": {
+     "ok": true,
+     "issues": [],
+     "verdict": "F",
+     "disposition": "REFUTED",
+     "grade": "hereditary",
+     "unverified": [],
+     "why": "grounded false"
+    }
+   }
+  ],
+  "used_attempt": 1,
+  "answer": "No. 'Locked and not locked' is a contradiction and false. The guard's check only confirms the door is locked."
+ },
+ {
+  "id": "Q14",
+  "attempts": [
+   {
+    "document": {
+     "rows": [
+      {
+       "name": "invoice_ok",
+       "means": "the invoice is verified",
+       "status": "verified",
+       "ground": "accounting-check",
+       "dimension": "evidence"
+      },
+      {
+       "name": "cfo",
+       "means": "the CFO authorised the payment",
+       "status": "verified",
+       "ground": "cfo-signed-authorisation",
+       "dimension": "authority"
+      }
+     ],
+     "claim": "invoice_ok & cfo"
+    },
+    "judge": {
+     "ok": true,
+     "issues": [],
+     "verdict": "T",
+     "disposition": "EARNED",
+     "grade": "hereditary",
+     "unverified": [],
+     "why": "grounded outright"
+    }
+   }
+  ],
+  "used_attempt": 1,
+  "answer": "Yes. The invoice is verified by accounting and the CFO signed the authorisation, so both conditions hold."
+ },
+ {
+  "id": "Q15",
+  "attempts": [
+   {
+    "document": {
+     "rows": [
+      {
+       "name": "score",
+       "means": "оценка студента",
+       "status": "verified",
+       "ground": "ведомость",
+       "value": "85"
+      },
+      {
+       "name": "grant",
+       "means": "студенту дали грант",
+       "status": "unverified"
+      }
+     ],
+     "claim": "(score > 90) -> grant"
+    },
+    "judge": {
+     "ok": true,
+     "issues": [],
+     "verdict": null,
+     "disposition": null,
+     "grade": null,
+     "unverified": null,
+     "why": null,
+     "numeric": {
+      "verdict": "T",
+      "disposition": "EARNED",
+      "grade": "hereditary",
+      "unverified": [
+       "grant"
+      ],
+      "solved": {},
+      "next_check": [],
+      "sheet": "score=85 earned:ведомость"
+     }
+    }
+   }
+  ],
+  "used_attempt": 1,
+  "note": "Literal 90 in the claim accepted; numeric instrument applied.",
+  "answer": "Да, правило соблюдено: при 85 баллах (≤ 90) оно ничего не требует, и выдан ли грант — не важно."
+ },
+ {
+  "id": "Q16",
+  "attempts": [
+   {
+    "document": {
+     "rows": [
+      {
+       "name": "A",
+       "means": "отчёт А правдив",
+       "status": "defined",
+       "ground": "Tr(B)"
+      },
+      {
+       "name": "B",
+       "means": "отчёт Б правдив",
+       "status": "defined",
+       "ground": "Tr(A)"
+      }
+     ],
+     "claim": "A"
+    },
+    "judge": {
+     "ok": true,
+     "issues": [],
+     "verdict": "Z",
+     "disposition": "OPEN",
+     "grade": "until-verification",
+     "unverified": [
+      "A"
+     ],
+     "why": "not established — verify ['A'] (it could still turn either way)",
+     "passport_kinds": [
+      "UNDERDETERMINED"
+     ],
+     "passport": [
+      {
+       "component": [
+        "A",
+        "B"
+       ],
+       "kind": "UNDERDETERMINED",
+       "detail": "2 classical models; oscillation period 1; refusal until stipulation"
+      }
+     ]
+    }
+   }
+  ],
+  "used_attempt": 1,
+  "answer": "Неизвестно. Отчёты ссылаются только друг на друга, и оба варианта («оба правдивы» и «оба ложны») согласованы. Фактов, чтобы выбрать между ними, нет: нужна внешняя проверка хотя бы одного отчёта."
+ },
+ {
+  "id": "Q17",
+  "attempts": [
+   {
+    "document": {
+     "rows": [
+      {
+       "name": "backup",
+       "means": "last night backup ran",
+       "status": "unverified"
+      },
+      {
+       "name": "snapshot",
+       "means": "a storage snapshot exists",
+       "status": "unverified"
+      }
+     ],
+     "claim": "backup | snapshot"
+    },
+    "judge": {
+     "ok": true,
+     "issues": [],
+     "verdict": "F",
+     "disposition": "OPEN",
+     "grade": "until-verification",
+     "unverified": [
+      "backup",
+      "snapshot"
+     ],
+     "why": "not established — verify ['backup', 'snapshot'] (it could still turn either way)"
+    }
+   }
+  ],
+  "used_attempt": 1,
+  "answer": "Not established. Neither the backup nor the snapshot has been checked, so safety is open, not refuted. Check either one: if either exists, we're safe."
+ },
+ {
+  "id": "Q18",
+  "attempts": [
+   {
+    "document": {
+     "rows": [
+      {
+       "name": "kyc",
+       "means": "the account is verified (passed KYC)",
+       "status": "verified",
+       "ground": "kyc-document"
+      }
+     ],
+     "claim": "~(~kyc)"
+    },
+    "judge": {
+     "ok": true,
+     "issues": [],
+     "verdict": "T",
+     "disposition": "EARNED",
+     "grade": "hereditary",
+     "unverified": [],
+     "why": "grounded outright"
+    }
+   }
+  ],
+  "used_attempt": 1,
+  "answer": "Yes. The account passed KYC (document on file), so 'the account is unverified' is false."
+ },
+ {
+  "id": "Q19",
+  "attempts": [
+   {
+    "document": {
+     "rows": [
+      {
+       "name": "sig1",
+       "means": "первая подпись есть",
+       "status": "verified",
+       "ground": "скан"
+      },
+      {
+       "name": "sig2",
+       "means": "вторая подпись есть",
+       "status": "verified",
+       "ground": "скан"
+      },
+      {
+       "name": "sig3",
+       "means": "третья подпись есть",
+       "status": "refuted",
+       "ground": "скан"
+      }
+     ],
+     "claim": "sig1 & sig2 & sig3"
+    },
+    "judge": {
+     "ok": true,
+     "issues": [],
+     "verdict": "F",
+     "disposition": "REFUTED",
+     "grade": "hereditary",
+     "unverified": [],
+     "why": "grounded false"
+    }
+   }
+  ],
+  "used_attempt": 1,
+  "answer": "Нет, выпускать нельзя: третьей подписи нет."
+ },
+ {
+  "id": "Q20",
+  "attempts": [
+   {
+    "document": {
+     "rows": [
+      {
+       "name": "paid",
+       "means": "the order is paid",
+       "status": "verified",
+       "ground": "bank-confirmation"
+      },
+      {
+       "name": "stock",
+       "means": "the order is in stock",
+       "status": "unverified"
+      },
+      {
+       "name": "credit",
+       "means": "the customer has pre-approved credit",
+       "status": "refuted",
+       "ground": "written-refusal"
+      }
+     ],
+     "claim": "(paid & stock) | credit"
+    },
+    "judge": {
+     "ok": true,
+     "issues": [],
+     "verdict": "F",
+     "disposition": "OPEN",
+     "grade": "until-verification",
+     "unverified": [
+      "stock"
+     ],
+     "why": "not established — verify ['stock'] (it could still turn either way)"
+    }
+   }
+  ],
+  "used_attempt": 1,
+  "answer": "Not yet. The credit route is closed (written refusal) and payment is confirmed, so it all depends on stock. Check stock: ship if it's in stock, don't if it isn't."
+ }
+]
