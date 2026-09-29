@@ -91,7 +91,7 @@
 <tr><td><code>E_RESERVED</code></td><td>a constant of the language used as a row name — it silently changes the reading</td></tr>
 <tr><td><code>E_SCALE</code></td><td>a scale that is not empty/int/decimalK/fracM, or out of bounds</td></tr>
 <tr><td><code>E_STATUS</code></td><td>a status outside the four</td></tr>
-<tr><td><code>E_TOOBIG</code></td><td>more ATOMS in the formulas than the cost allows — a reading costs 3**atoms (2.9 s at twelve, 29.6 s at fourteen, measured 2026-09-18). Rows are not capped: a hundred-row table whose formulas each speak of six atoms reads in 0.003 s. Split the question, not the table</td></tr>
+<tr><td><code>E_TOOBIG</code></td><td>more than 10 atoms NAMED MORE THAN ONCE in the formulas, or more than 64 atoms in all. The exact guarantee branches only on atoms that repeat; an atom named once costs almost nothing (40 read-once atoms: under 0.01 s; 30 repeated atoms in a pigeonhole witness: 0.66 s — measured 2026-09-29). Rows are not capped. Split the question, not the table</td></tr>
 <tr><td><code>E_TOOLONG</code></td><td>a formula longer than 2000 characters — the readers cost the square of the length (4.6 s at 39 KB, 0.21 s at 4 KB, measured 2026-09-24); split the question</td></tr>
 <tr><td><code>E_TOOMANYEVENTS</code></td><td>more than 6 expiry events in one document — the epoch floor reads the claim on both sides of each (800 events cost 76.7 s, measured 2026-09-27); split the question</td></tr>
 <tr><td><code>E_UNIT</code></td><td>a unit that cannot be read — a word, optionally with a power (m2), joined by · or /</td></tr>
@@ -181,7 +181,7 @@
 <tr><td><code>E_RESERVED</code></td><td>константа языка в роли имени строки — молча меняет разбор</td></tr>
 <tr><td><code>E_SCALE</code></td><td>шкала не пустая/int/decimalK/fracM либо вне границ</td></tr>
 <tr><td><code>E_STATUS</code></td><td>статус вне четырёх</td></tr>
-<tr><td><code>E_TOOBIG</code></td><td>атомов В ФОРМУЛАХ больше, чем позволяет стоимость: разбор стоит 3**атомов — двенадцать 2,9 с, четырнадцать 29,6 с (промерено 18.09.2026). Строки НЕ ограничены: таблица в сто строк, где каждая формула о шести атомах, читается за 0,003 с. Делить надо вопрос, а не таблицу</td></tr>
+<tr><td><code>E_TOOBIG</code></td><td>больше 10 атомов, НАЗВАННЫХ БОЛЕЕ ОДНОГО РАЗА, или больше 64 атомов всего. Точная гарантия ветвится только по повторным атомам; атом, названный один раз, почти бесплатен (40 таких — меньше 0,01 с; 30 повторных в формуле о голубях — 0,66 с, промерено 29.09.2026). Строки НЕ ограничены. Делить надо вопрос, а не таблицу</td></tr>
 <tr><td><code>E_TOOLONG</code></td><td>формула длиннее 2000 знаков — чтение стоит квадрат длины (4,6 с на 39 КБ, 0,21 с на 4 КБ, промерено 24.09.2026); разделите вопрос</td></tr>
 <tr><td><code>E_TOOMANYEVENTS</code></td><td>больше 6 событий истечения в одном документе — эпохальный пол читает утверждение по обе стороны каждого (800 событий — 76,7 с, промерено 27.09.2026); разделите вопрос</td></tr>
 <tr><td><code>E_UNIT</code></td><td>единица, которую нельзя прочесть — слово, при желании со степенью (m2), соединяется через · или /</td></tr>
@@ -271,7 +271,7 @@
 <tr><td><code>E_RESERVED</code></td><td>a constant of the language used as a row name — it silently changes the reading</td></tr>
 <tr><td><code>E_SCALE</code></td><td>a scale that is not empty/int/decimalK/fracM, or out of bounds</td></tr>
 <tr><td><code>E_STATUS</code></td><td>a status outside the four</td></tr>
-<tr><td><code>E_TOOBIG</code></td><td>more ATOMS in the formulas than the cost allows — a reading costs 3**atoms (2.9 s at twelve, 29.6 s at fourteen, measured 2026-09-18). Rows are not capped: a hundred-row table whose formulas each speak of six atoms reads in 0.003 s. Split the question, not the table</td></tr>
+<tr><td><code>E_TOOBIG</code></td><td>more than 10 atoms NAMED MORE THAN ONCE in the formulas, or more than 64 atoms in all. The exact guarantee branches only on atoms that repeat; an atom named once costs almost nothing (40 read-once atoms: under 0.01 s; 30 repeated atoms in a pigeonhole witness: 0.66 s — measured 2026-09-29). Rows are not capped. Split the question, not the table</td></tr>
 <tr><td><code>E_TOOLONG</code></td><td>a formula longer than 2000 characters — the readers cost the square of the length (4.6 s at 39 KB, 0.21 s at 4 KB, measured 2026-09-24); split the question</td></tr>
 <tr><td><code>E_TOOMANYEVENTS</code></td><td>more than 6 expiry events in one document — the epoch floor reads the claim on both sides of each (800 events cost 76.7 s, measured 2026-09-27); split the question</td></tr>
 <tr><td><code>E_UNIT</code></td><td>a unit that cannot be read — a word, optionally with a power (m2), joined by · or /</td></tr>
@@ -361,7 +361,7 @@
 <tr><td><code>E_RESERVED</code></td><td>a constant of the language used as a row name — it silently changes the reading</td></tr>
 <tr><td><code>E_SCALE</code></td><td>a scale that is not empty/int/decimalK/fracM, or out of bounds</td></tr>
 <tr><td><code>E_STATUS</code></td><td>a status outside the four</td></tr>
-<tr><td><code>E_TOOBIG</code></td><td>more ATOMS in the formulas than the cost allows — a reading costs 3**atoms (2.9 s at twelve, 29.6 s at fourteen, measured 2026-09-18). Rows are not capped: a hundred-row table whose formulas each speak of six atoms reads in 0.003 s. Split the question, not the table</td></tr>
+<tr><td><code>E_TOOBIG</code></td><td>more than 10 atoms NAMED MORE THAN ONCE in the formulas, or more than 64 atoms in all. The exact guarantee branches only on atoms that repeat; an atom named once costs almost nothing (40 read-once atoms: under 0.01 s; 30 repeated atoms in a pigeonhole witness: 0.66 s — measured 2026-09-29). Rows are not capped. Split the question, not the table</td></tr>
 <tr><td><code>E_TOOLONG</code></td><td>a formula longer than 2000 characters — the readers cost the square of the length (4.6 s at 39 KB, 0.21 s at 4 KB, measured 2026-09-24); split the question</td></tr>
 <tr><td><code>E_TOOMANYEVENTS</code></td><td>more than 6 expiry events in one document — the epoch floor reads the claim on both sides of each (800 events cost 76.7 s, measured 2026-09-27); split the question</td></tr>
 <tr><td><code>E_UNIT</code></td><td>a unit that cannot be read — a word, optionally with a power (m2), joined by · or /</td></tr>
@@ -451,7 +451,7 @@
 <tr><td><code>E_RESERVED</code></td><td>a constant of the language used as a row name — it silently changes the reading</td></tr>
 <tr><td><code>E_SCALE</code></td><td>a scale that is not empty/int/decimalK/fracM, or out of bounds</td></tr>
 <tr><td><code>E_STATUS</code></td><td>a status outside the four</td></tr>
-<tr><td><code>E_TOOBIG</code></td><td>more ATOMS in the formulas than the cost allows — a reading costs 3**atoms (2.9 s at twelve, 29.6 s at fourteen, measured 2026-09-18). Rows are not capped: a hundred-row table whose formulas each speak of six atoms reads in 0.003 s. Split the question, not the table</td></tr>
+<tr><td><code>E_TOOBIG</code></td><td>more than 10 atoms NAMED MORE THAN ONCE in the formulas, or more than 64 atoms in all. The exact guarantee branches only on atoms that repeat; an atom named once costs almost nothing (40 read-once atoms: under 0.01 s; 30 repeated atoms in a pigeonhole witness: 0.66 s — measured 2026-09-29). Rows are not capped. Split the question, not the table</td></tr>
 <tr><td><code>E_TOOLONG</code></td><td>a formula longer than 2000 characters — the readers cost the square of the length (4.6 s at 39 KB, 0.21 s at 4 KB, measured 2026-09-24); split the question</td></tr>
 <tr><td><code>E_TOOMANYEVENTS</code></td><td>more than 6 expiry events in one document — the epoch floor reads the claim on both sides of each (800 events cost 76.7 s, measured 2026-09-27); split the question</td></tr>
 <tr><td><code>E_UNIT</code></td><td>a unit that cannot be read — a word, optionally with a power (m2), joined by · or /</td></tr>
@@ -541,7 +541,7 @@
 <tr><td><code>E_RESERVED</code></td><td>a constant of the language used as a row name — it silently changes the reading</td></tr>
 <tr><td><code>E_SCALE</code></td><td>a scale that is not empty/int/decimalK/fracM, or out of bounds</td></tr>
 <tr><td><code>E_STATUS</code></td><td>a status outside the four</td></tr>
-<tr><td><code>E_TOOBIG</code></td><td>more ATOMS in the formulas than the cost allows — a reading costs 3**atoms (2.9 s at twelve, 29.6 s at fourteen, measured 2026-09-18). Rows are not capped: a hundred-row table whose formulas each speak of six atoms reads in 0.003 s. Split the question, not the table</td></tr>
+<tr><td><code>E_TOOBIG</code></td><td>more than 10 atoms NAMED MORE THAN ONCE in the formulas, or more than 64 atoms in all. The exact guarantee branches only on atoms that repeat; an atom named once costs almost nothing (40 read-once atoms: under 0.01 s; 30 repeated atoms in a pigeonhole witness: 0.66 s — measured 2026-09-29). Rows are not capped. Split the question, not the table</td></tr>
 <tr><td><code>E_TOOLONG</code></td><td>a formula longer than 2000 characters — the readers cost the square of the length (4.6 s at 39 KB, 0.21 s at 4 KB, measured 2026-09-24); split the question</td></tr>
 <tr><td><code>E_TOOMANYEVENTS</code></td><td>more than 6 expiry events in one document — the epoch floor reads the claim on both sides of each (800 events cost 76.7 s, measured 2026-09-27); split the question</td></tr>
 <tr><td><code>E_UNIT</code></td><td>a unit that cannot be read — a word, optionally with a power (m2), joined by · or /</td></tr>
@@ -631,7 +631,7 @@
 <tr><td><code>E_RESERVED</code></td><td>a constant of the language used as a row name — it silently changes the reading</td></tr>
 <tr><td><code>E_SCALE</code></td><td>a scale that is not empty/int/decimalK/fracM, or out of bounds</td></tr>
 <tr><td><code>E_STATUS</code></td><td>a status outside the four</td></tr>
-<tr><td><code>E_TOOBIG</code></td><td>more ATOMS in the formulas than the cost allows — a reading costs 3**atoms (2.9 s at twelve, 29.6 s at fourteen, measured 2026-09-18). Rows are not capped: a hundred-row table whose formulas each speak of six atoms reads in 0.003 s. Split the question, not the table</td></tr>
+<tr><td><code>E_TOOBIG</code></td><td>more than 10 atoms NAMED MORE THAN ONCE in the formulas, or more than 64 atoms in all. The exact guarantee branches only on atoms that repeat; an atom named once costs almost nothing (40 read-once atoms: under 0.01 s; 30 repeated atoms in a pigeonhole witness: 0.66 s — measured 2026-09-29). Rows are not capped. Split the question, not the table</td></tr>
 <tr><td><code>E_TOOLONG</code></td><td>a formula longer than 2000 characters — the readers cost the square of the length (4.6 s at 39 KB, 0.21 s at 4 KB, measured 2026-09-24); split the question</td></tr>
 <tr><td><code>E_TOOMANYEVENTS</code></td><td>more than 6 expiry events in one document — the epoch floor reads the claim on both sides of each (800 events cost 76.7 s, measured 2026-09-27); split the question</td></tr>
 <tr><td><code>E_UNIT</code></td><td>a unit that cannot be read — a word, optionally with a power (m2), joined by · or /</td></tr>

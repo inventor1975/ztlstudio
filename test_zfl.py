@@ -612,6 +612,54 @@ def sec11_a_public_service_cannot_be_made_to_raise_or_to_stall():
     print("   over 2000 characters is refused by name; one under it reads fast.")
 
 
+
+def sec11b_the_cap_counts_repeated_atoms():
+    """2026-09-29, the curator: fix the studio's cap. The exact guarantee branches
+    only on atoms named more than once (zverify._only, 27.09); E57 puts the hardness
+    exactly there. So repeated atoms are capped at 10, all atoms at 64."""
+    import random
+    import time
+    print("\n### 11b. The cap counts REPEATED atoms, not all of them")
+    def rows(names, seed=1):
+        rnd = random.Random(seed); out = []
+        for n in names:
+            s = rnd.choice(["verified", "unverified"])
+            out.append({"name": n, "means": n, "status": s, **({"ground": "doc"} if s == "verified" else {})})
+        return out
+    def codes(doc):
+        return [i["code"] for i in zfl.validate(doc)]
+    once = [f"a{i}" for i in range(40)]
+    ops = ["&", "|", "->", "^", "<->"]
+    claim = once[0]
+    for k, x in enumerate(once[1:]):
+        claim = f"({claim} {ops[k % 5]} {x})"
+    t0 = time.process_time()
+    r = zfl.run({"claim": claim, "rows": rows(once)})
+    assert r["ok"] and time.process_time() - t0 < 1.0, (r.get("issues"), time.process_time() - t0)
+    # a read-once formula of 40 atoms is judged, not refused (refused before today)
+    twice = [f"b{i}" for i in range(11)]
+    rep = " & ".join(f"({x} | ~{x})" for x in twice)
+    assert "E_TOOBIG" in codes({"claim": rep, "rows": rows(twice)})          # 11 repeated
+    assert "E_TOOBIG" not in codes({"claim": " & ".join(f"({x} | ~{x})" for x in twice[:10]),
+                                    "rows": rows(twice[:10])})              # 10 repeated
+    # repeated ACROSS formulas counts too: once in the claim, once in a defined row
+    split = {"claim": " & ".join(twice) + " & d",
+             "rows": rows(twice) + [{"name": "d", "means": "d", "status": "defined", "ground": " | ".join(twice)}]}
+    assert "E_TOOBIG" in codes(split), codes(split)
+    many = [f"c{i}" for i in range(65)]
+    assert "E_TOOBIG" in codes({"claim": " & ".join(many), "rows": rows(many)})   # 65 distinct
+    # the hardest honest case that fits the length cap — MEASURED 0.66 s
+    m = 5
+    V = lambda p, h: f"x{p}_{h}"
+    atoms = [V(p, h) for p in range(m + 1) for h in range(m)]
+    cl = ["(" + " | ".join(V(p, h) for h in range(m)) + ")" for p in range(m + 1)]
+    cl += [f"(~{V(p, h)} | ~{V(q, h)})" for h in range(m) for p in range(m + 1) for q in range(p + 1, m + 1)]
+    php = f"({' & '.join(f'({x} | ~{x})' for x in atoms)}) -> ~({' & '.join(cl)})"
+    c = codes({"claim": php, "rows": [{"name": x, "means": x, "status": "unverified"} for x in atoms]})
+    assert "E_TOOBIG" in c or "E_TOOLONG" in c, c      # 30 repeated atoms: refused, not judged
+    print("   40 atoms named once: judged; 11 named twice: refused; 10: judged;")
+    print("   a repeat across claim and defined row counts; 65 distinct: refused.")
+
 if __name__ == "__main__":
     print("=" * 72)
     print("ZFL v2 — the table, headless")
@@ -630,6 +678,7 @@ if __name__ == "__main__":
     sec9_the_world_has_a_clock_too()
     sec10_what_the_ground_holds_and_what_to_check()
     sec11_a_public_service_cannot_be_made_to_raise_or_to_stall()
+    sec11b_the_cap_counts_repeated_atoms()
     sec4b_every_example_runs_and_json_types_are_taken_as_they_come()
     sec5_the_spec_can_build_the_form_and_the_page()
     print("=" * 72)
