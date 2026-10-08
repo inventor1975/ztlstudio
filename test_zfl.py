@@ -288,6 +288,21 @@ def sec4d_a_name_that_multiplies_itself_is_one_number():
     print("   The plot as a system, area == s*s & area - 2*s + 5 == 0 -> REFUTED;")
     print("   with area - 5*s + 6: s = 2 or 3 and area = 4 or 9, never the box [4, 9].")
 
+def sec4e_a_system_whose_coefficients_are_known_within_tolerance():
+    print("-" * 72)
+    print("4e. A LINEAR SYSTEM WITH UNCERTAIN COEFFICIENTS (matrices, 2026-10-09)")
+    import zflexamples as X
+    ex = next(e for e in X.EXAMPLES if e["en"] == "a circuit whose parts are known within tolerance")
+    n = zfl.run(ex["doc"])["report"]["numeric"]
+    I, U = n["solved"]["I"], n["solved"]["U"]
+    # independent: series circuit, I = V/(R1+R2), U = V*R2/(R1+R2), extremes at the corners
+    assert (I["lo"], I["hi"]) == ("1/33", "1/27"), I
+    assert (U["lo"], U["hi"]) == ("180/29", "220/31"), U
+    assert I["prov"] == "earned" and sorted(I["from"]) == ["R1", "R2", "V"], I
+    print("   R1 in [90,110], R2 in [180,220] on 10 V: I in [1/33, 1/27], U in [180/29, 220/31] —")
+    print("   exactly the corner hull, earned from the two datasheets and the supply.")
+
+
 def sec4b_every_example_runs_and_json_types_are_taken_as_they_come():
     print("-" * 72)
     print("4b. THE CATALOGUE, AND WHAT ARRIVES FROM A MODEL")
@@ -671,6 +686,7 @@ if __name__ == "__main__":
     sec4_an_unknown_is_a_question_not_a_gap()
     sec4c_a_number_without_a_value_goes_back_to_the_translator()
     sec4d_a_name_that_multiplies_itself_is_one_number()
+    sec4e_a_system_whose_coefficients_are_known_within_tolerance()
     sec7_the_ground_gate_demotes_phantom_words()
     sec7b_the_receipt_tells_what_was_said_from_what_was_done()
     sec7c_number_claims_carry_their_verdict_and_the_root_is_read()
