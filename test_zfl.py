@@ -300,6 +300,14 @@ def sec4e_a_system_whose_coefficients_are_known_within_tolerance():
     assert (U["lo"], U["hi"]) == ("180/29", "220/31"), U
     assert I["prov"] == "earned" and sorted(I["from"]) == ["R1", "R2", "V"], I
     assert any("exact at the corners" in l for l in n["log"]), n["log"]
+    # stage two (ZTL 62b71ea): the laws hold at every reading by construction
+    assert n["disposition"] == "EARNED", n["disposition"]
+    # and a measured quantity is not narrowed by the claim it is judged against
+    sf = zfl.run({"rows": [{"name": "y", "means": "a measured length", "status": "verified",
+                            "ground": "m1", "value": "[1,2]"},
+                           {"name": "x", "means": "sought", "status": "unverified", "value": "?"}],
+                  "claim": "(y >= 3/2) & (x == 1)"})["report"]["numeric"]
+    assert sf["disposition"] == "OPEN", sf
     rk2 = zfl.run({"rows": [{"name": "p", "means": "a part", "status": "verified", "ground": "g",
                              "value": "[1/2,2]"},
                             {"name": "x", "means": "sought", "status": "unverified", "value": "?"},
@@ -308,7 +316,8 @@ def sec4e_a_system_whose_coefficients_are_known_within_tolerance():
     assert any("rank > 1" in l for l in rk2["log"]), rk2["log"]
     print("   R1 in [90,110], R2 in [180,220] on 10 V: I in [1/33, 1/27], U in [180/29, 220/31] —")
     print("   exactly the corner hull, earned from the two datasheets and the supply;")
-    print("   the report's log says so, and says why a rank-two system is not solved.")
+    print("   the report's log says so, and says why a rank-two system is not solved;")
+    print("   the laws come back EARNED, and (y >= 3/2) & (x == 1) with y measured in [1,2] is OPEN.")
 
 
 def sec4b_every_example_runs_and_json_types_are_taken_as_they_come():
