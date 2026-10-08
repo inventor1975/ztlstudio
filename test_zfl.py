@@ -299,8 +299,16 @@ def sec4e_a_system_whose_coefficients_are_known_within_tolerance():
     assert (I["lo"], I["hi"]) == ("1/33", "1/27"), I
     assert (U["lo"], U["hi"]) == ("180/29", "220/31"), U
     assert I["prov"] == "earned" and sorted(I["from"]) == ["R1", "R2", "V"], I
+    assert any("exact at the corners" in l for l in n["log"]), n["log"]
+    rk2 = zfl.run({"rows": [{"name": "p", "means": "a part", "status": "verified", "ground": "g",
+                             "value": "[1/2,2]"},
+                            {"name": "x", "means": "sought", "status": "unverified", "value": "?"},
+                            {"name": "y", "means": "sought", "status": "unverified", "value": "?"}],
+                   "claim": "(x - p*y == 0) & (p*x + y == 1)"})["report"]["numeric"]
+    assert any("rank > 1" in l for l in rk2["log"]), rk2["log"]
     print("   R1 in [90,110], R2 in [180,220] on 10 V: I in [1/33, 1/27], U in [180/29, 220/31] —")
-    print("   exactly the corner hull, earned from the two datasheets and the supply.")
+    print("   exactly the corner hull, earned from the two datasheets and the supply;")
+    print("   the report's log says so, and says why a rank-two system is not solved.")
 
 
 def sec4b_every_example_runs_and_json_types_are_taken_as_they_come():

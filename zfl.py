@@ -1478,7 +1478,13 @@ def run(doc, ground_registry=None):
                                  "lazy": r.get("lazy"),
                                  "next_check": r.get("next_check", []),
                                  "solved": solved, "claim": claim,
-                                 "sheet": sheet}
+                                 "sheet": sheet,
+                                 # THE SOLVER'S OWN WORDS (2026-10-09). Whether a
+                                 # range is exact, exact over the linear rows only,
+                                 # or why a system was not solved lived in the
+                                 # solver's log and never reached the reader; the
+                                 # page promised "the log names the condition".
+                                 "log": list(r.get("log") or [])}
             # THE ANSWER TRAVELS WITH ITS DISPOSITION. The numeric floor has
             # always known the two-valued answer (the core's verdict under
             # it) and, on credit, the side it leans to; this report kept
