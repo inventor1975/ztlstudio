@@ -467,6 +467,7 @@ from znumsolve import solve_claim                                # noqa: E402
 import zpassport                                                 # noqa: E402
 import zbook                                                     # noqa: E402
 import zbackward                                                 # noqa: E402
+import zbackward_tree                                            # noqa: E402
 
 NAME_RE = re.compile(r"^[A-Za-zА-Яа-яЁё_][\w А-Яа-яЁё-]*$")
 
@@ -1358,12 +1359,15 @@ def what_to_check(claim, marking, unverified):
     # one walk — no judge per filling, no size cut: "a & b & c & d & e & f & g" gets its
     # one set of seven instead of a refusal. Where an input repeats, the enumeration and
     # its cap stand.
+    # REPEATED INPUTS TOO (ZTL 6df2b38): the repeated ones are enumerated as worlds, the
+    # rest still read off the tables — the cap stands only past REPEAT_CAP repeated inputs.
     occ = _occurrences(phi, {})
-    read_once = all(occ.get(a, 0) == 1 for a in own)
+    repeated = [a for a in own if occ.get(a, 0) > 1]
+    read_once = len(repeated) <= zbackward_tree.REPEAT_CAP
     if len(own) > BACKWARD_CAP and not read_once:
-        return {"refused": f"{len(own)} unverified inputs, some used more than once; the reverse "
-                           f"pass is then computed up to {BACKWARD_CAP} (it calls the whole judge "
-                           f"up to 3·Σ C(u,k)·2^k times)"}
+        return {"refused": f"{len(own)} unverified inputs, {len(repeated)} of them used more than "
+                           f"once; the reverse pass is then computed up to {BACKWARD_CAP} (it calls the "
+                           f"whole judge up to 3·Σ C(u,k)·2^k times)"}
     m = {a: v for a, v in marking.items() if a in atoms}
     out, memo = {}, {}          # the three targets share one disposition per filling
     # SETTLED is the order a person can act on first: check these, and the

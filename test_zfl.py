@@ -618,7 +618,10 @@ def sec10_what_the_ground_holds_and_what_to_check():
     assert w["SETTLED"]["guaranteed"] == [list("abcdefg")], w
     assert w["EARNED"]["no_guaranteed_set"] and w["EARNED"]["possible"] == [list("abcdefg")], w
     w = zfl.run(unverified("(a & b) | (a & c) | (d & e)", *"abcde"))["report"]["what_to_check"]
-    assert "refused" in w and "up to 3" in w["refused"], w          # a repeats: the cap stands
+    assert "refused" not in w and w["SETTLED"]["guaranteed"], w     # a repeats: worlds (ZTL 6df2b38)
+    many = " & ".join(f"(r{i} | r{i})" for i in range(8))           # eight repeated inputs
+    w = zfl.run(unverified(many, *[f"r{i}" for i in range(8)]))["report"]["what_to_check"]
+    assert "refused" in w and "up to 3" in w["refused"], w          # past REPEAT_CAP the cap stands
     settle = {"claim": "signed & delivered", "rows": [
         {"name": "signed", "means": "signed", "status": "verified", "ground": "scan-12"},
         {"name": "delivered", "means": "arrived", "status": "unverified"}]}
@@ -630,7 +633,7 @@ def sec10_what_the_ground_holds_and_what_to_check():
     print("   every defined row reports its kind, value and what it reads;")
     print("   a claim on unverified inputs reports what to check, by guarantee")
     print("   and by possibility, says so when no set will do; read-once claims have")
-    print("   no cap (seven inputs answered), a repeated input keeps the cap of three.")
+    print("   no cap (seven inputs answered), repeated inputs too up to six of them.")
 
 
 def sec11_a_public_service_cannot_be_made_to_raise_or_to_stall():
