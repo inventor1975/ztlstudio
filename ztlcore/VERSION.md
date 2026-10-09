@@ -3,7 +3,8 @@
 These 12 files are the ZTL logic kernel (the judge), vendored from the ZTL repository so introspect
 clones and runs self-contained. **Source of truth: https://github.com/inventor1975/ZTL**
 
-Vendored: 2026-10-09 znumsolve.py from inventor1975/ZTL @ 3a296b5 (a name DEFINED by one equality is narrowed: by the exact corners when the expression is multilinear — tau == R*C, Tj == Ta + P*(R1+R2) — and by the interval reading otherwise — P == I*I*R, f == 1/(2*pi*tau) — sound, logged as such; both only for definitions, never inside a system);
+Vendored: 2026-10-09 znumsolve.py from inventor1975/ZTL @ ca17ad4 (ONE parameter of rank > 1 — one steel batch in every stiffness, x = p/(1+p^2) — solved exactly: the others at their corners, its ends and the real critical points of N(p)/D(p); two such parameters still refused);
+before it the same day znumsolve.py @ 3a296b5 (a name DEFINED by one equality is narrowed: by the exact corners when the expression is multilinear — tau == R*C, Tj == Ta + P*(R1+R2) — and by the interval reading otherwise — P == I*I*R, f == 1/(2*pi*tau) — sound, logged as such; both only for definitions, never inside a system);
 before it the same day znumsolve.py + znumjudge.py @ 62b71ea (the verdict reads the sheet as given — a measured quantity is no longer narrowed by the claim it is judged against; a solved unknown remembers its dependence);
 before it the same day znumsolve.py @ feacdd4 (linear systems with parameters in the coefficients — matrices, exact at the corners when each parameter is rank-one, an equality outside the linear rows named in the log; the other files unchanged since ea05959);
 before it 2026-09-27 from inventor1975/ZTL @ ea05959 (the judge's worst cases: nested -> no longer doubles, the reverse pass memoised;

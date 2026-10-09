@@ -313,10 +313,12 @@ def sec4e_a_system_whose_coefficients_are_known_within_tolerance():
                             {"name": "x", "means": "sought", "status": "unverified", "value": "?"},
                             {"name": "y", "means": "sought", "status": "unverified", "value": "?"}],
                    "claim": "(x - p*y == 0) & (p*x + y == 1)"})["report"]["numeric"]
-    assert any("rank > 1" in l for l in rk2["log"]), rk2["log"]
+    # since ZTL ca17ad4 one rank-two parameter is SOLVED (it used to be refused, and the old
+    # check matched the words "rank > 1", which the new log line also contains): read the range
+    assert (rk2["solved"]["x"]["lo"], rk2["solved"]["x"]["hi"]) == ("2/5", "1/2"), rk2["solved"].get("x")
     print("   R1 in [90,110], R2 in [180,220] on 10 V: I in [1/33, 1/27], U in [180/29, 220/31] —")
     print("   exactly the corner hull, earned from the two datasheets and the supply;")
-    print("   the report's log says so, and says why a rank-two system is not solved;")
+    print("   the report's log says so; a rank-two parameter is solved at its critical point;")
     print("   the laws come back EARNED, and (y >= 3/2) & (x == 1) with y measured in [1,2] is OPEN.")
     # 4f (ZTL 3a296b5): a name DEFINED by a product of toleranced quantities is narrowed — exactly
     # at the corners when multilinear, by the interval reading otherwise; never inside a system
@@ -331,6 +333,7 @@ def sec4e_a_system_whose_coefficients_are_known_within_tolerance():
                   "claim": "(V - U == I*R1) & (U == I*R2) & (P == I*I*R1)"})["report"]["numeric"]
     assert (pw["solved"]["P"]["lo"], pw["solved"]["P"]["hi"]) == ("12375/20402", "12625/19602"), pw["solved"]["P"]
     assert any("interval reading" in l for l in pw["log"]), pw["log"]
+    print("   4f. x = p/(1+p^2), p in [1/2, 2] (rank two, 4e): [2/5, 1/2], the interior peak at p = 1;")
     print("   4f. tau == R*C with R, C boxed: [1881/20, 2121/20], exact at the corners;")
     print("       P == I*I*R1 after the system bounds I: [12375/20402, 12625/19602], an interval reading.")
 
