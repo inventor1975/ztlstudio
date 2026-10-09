@@ -13,6 +13,10 @@ const UI = {
           mirrornone: "No instrument took this up. The table was parsed; nothing answered.",
           mirrorclaim: "The relation is written in the claim, and the judge reads it. The passport office reads only the grounds of rows. If you meant the passport to weigh this relation — loops, self-reference, decidability — its place is the ground, not the claim. The same relation in different fields goes to different instruments; that is a choice, not a typo.",
         run: "run", claim: "claim", remove: "remove this row",
+        certbound: "bound over the whole box", certlawsph: "linear laws for ? rows, separated by ;",
+        certificate: "a bound over the whole box — by certificate", certchecked: "the kernel checked it",
+        certfails: "fails at a point of the box", certnotfound: "no certificate within the studio's budget — nothing claimed",
+        certrefused: "refused", pieces: "pieces", foundby: "found by", at: "at", valuethere: "value there",
         nothing: "nothing to show yet — fill a row and press run",
         applies: "instruments that had something to say",
         passport: "passports", numeric: "the numeric floor",
@@ -54,6 +58,10 @@ const UI = {
           mirrornone: "Ни один прибор не взялся. Таблица разобрана; отвечать некому.",
           mirrorclaim: "Отношение записано в claim, и его читает судья. Паспортный прибор смотрит только основания строк. Если вы хотели, чтобы это отношение разбирал паспорт — петли, самоссылка, разрешимость — его место в ground, а не в claim. Одна и та же связь в разных полях уходит к разным приборам, и это выбор, а не опечатка.",
         addrow: "добавить строку", run: "запустить", claim: "утверждение",
+        certbound: "граница на всей коробке", certlawsph: "линейные законы для строк ?, через ;",
+        certificate: "граница на всей коробке — по сертификату", certchecked: "ядро проверило",
+        certfails: "нарушена в точке коробки", certnotfound: "в бюджете студии сертификат не найден — ничего не утверждается",
+        certrefused: "отказ", pieces: "кусков", foundby: "нашёл", at: "в точке", valuethere: "значение там",
         remove: "убрать строку",
         nothing: "пока нечего показывать — заполните строку и запустите",
         applies: "приборы, которым было что сказать",
@@ -421,9 +429,21 @@ function collect() {
   // must never see a key the language does not have.
   const clean = r => Object.fromEntries(
     Object.entries(r).filter(([k]) => !k.startsWith("_")));
-  return { rows: ROWS.filter(r => (r.name || "").trim()).map(clean),
+  const doc = { rows: ROWS.filter(r => (r.name || "").trim()).map(clean),
            grounds: ($("grounds") || {}).value || "",
            claim: $("claim").value };
+  const cb = (($("certbound") || {}).value || "").trim();
+  if (cb) {
+    const laws = (($("certlaws") || {}).value || "").split(";").map(x => x.trim()).filter(Boolean);
+    doc.certificate = { bound: cb, ...(laws.length ? { laws } : {}) };
+  }
+  return doc;
+}
+
+function setCert(doc) {
+  const c = Array.isArray(doc.certificate) ? doc.certificate[0] : doc.certificate;
+  if ($("certbound")) $("certbound").value = (c && c.bound) || "";
+  if ($("certlaws")) $("certlaws").value = ((c && c.laws) || []).join("; ");
 }
 
 // --------------------------------------------------------------- reporting
@@ -466,6 +486,19 @@ function showReport(r) {
         [t("component"), t("kind"), t("detail")],
         rep.passport.map(p => [esc(p.component.join(", ")),
                                verdictSpan(p.kind), esc(p.detail)])) : "")));
+  }
+  if (rep.certificate) {
+    const v = { CHECKED: "T", FAILS: "F", "NOT FOUND": "Z", REFUSED: "Z" };
+    const word = { CHECKED: "certchecked", FAILS: "certfails", "NOT FOUND": "certnotfound", REFUSED: "certrefused" };
+    out.push(panel(t("certificate"), rep.certificate.map(c =>
+      `<p><code>${esc(c.bound || "")}</code> — <b class="v-${v[c.verdict] || "Z"}">${esc(c.verdict)}</b>: ` +
+      esc(t(word[c.verdict] || "certrefused")) +
+      (c.pieces ? ` (${esc(String(c.pieces))} ${esc(t("pieces"))})` : "") + "</p>" +
+      (c.found_by ? `<p class="muted">${esc(t("foundby"))}: ${esc(c.found_by)}` +
+                    (c.checked_by ? " · " + esc(c.checked_by) : "") + "</p>" : "") +
+      (c.at ? `<p>${esc(t("at"))} <code>${esc(JSON.stringify(c.at))}</code> · ${esc(t("valuethere"))} <code>${esc(c.value_there)}</code></p>` : "") +
+      (c.reason ? `<p class="muted">${esc(c.reason)}</p>` : "") +
+      (c.rests_on ? `<p class="muted">${esc(c.rests_on)}</p>` : "")).join("")));
   }
   if (rep.numeric) {
     const sv = Object.entries(rep.numeric.solved || {});
@@ -638,6 +671,7 @@ function loadExample(kind, n) {
   if (!item) return;
   ROWS = JSON.parse(JSON.stringify(item.doc.rows));
   $("claim").value = item.doc.claim || "";
+  setCert(item.doc);
   // the QUESTION goes into the chat, so the commentary below has something
   // to be an answer TO. Not everyone knows what "Jourdain's postcard" is,
   // and a verdict with no question above it explains nothing.
@@ -677,6 +711,7 @@ async function ask() {
   if (!r.ok) { addMsg("sys", aiError(r)); return; }
   ROWS = r.doc.rows || [];
   $("claim").value = r.doc.claim || "";
+  setCert(r.doc);
   HISTORY.push({ role: "assistant", content: JSON.stringify(r.doc) });
   drawGrid();
   run();

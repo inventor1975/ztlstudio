@@ -468,6 +468,7 @@ import zpassport                                                 # noqa: E402
 import zbook                                                     # noqa: E402
 import zbackward                                                 # noqa: E402
 import zbackward_tree                                            # noqa: E402
+import zcertify                                                  # noqa: E402,F401 (zflcert's kernel)
 
 NAME_RE = re.compile(r"^[A-Za-zА-Яа-яЁё_][\w А-Яа-яЁё-]*$")
 
@@ -533,6 +534,13 @@ def coerce(doc):
     out = {"claim": str(doc.get("claim") or ""),
            "grounds": str(doc.get("grounds") or ""),
            "ask": doc.get("ask") or [], "rows": []}
+    # A BOUND OVER THE WHOLE BOX, BY CERTIFICATE (zflcert.py, 2026-10-09): passes the door as
+    # it came — an object, or a list of at most MAX_CERTIFICATES of them
+    cert = doc.get("certificate")
+    if isinstance(cert, dict):
+        out["certificate"] = [cert]
+    elif isinstance(cert, list):
+        out["certificate"] = [c for c in cert if isinstance(c, dict)][:MAX_CERTIFICATES]
     for r in (doc.get("rows") or []):
         if not isinstance(r, dict):
             continue
@@ -550,6 +558,7 @@ def coerce(doc):
     return out
 
 
+MAX_CERTIFICATES = 2    # bounds by certificate per document; MEASURED 2026-10-09: 4 of the worst probed shape took 2.0 s, 2 take ~1 s
 MAX_ATOMS = 10          # REPEATED plain atoms (named twice or more); см. validate()
 MAX_DISTINCT_ATOMS = 64         # all plain atoms; read-once ones cost ~nothing (2026-09-29)
 MAX_COMPARISONS = 16            # distinct comparisons; measured in validate() 2026-09-27
@@ -1184,6 +1193,8 @@ def applies(doc):
         "epoch": bool((doc.get("claim") or "").strip()) and any(
             (r.get("expires_on") or "").strip() for r in rows),
         "judge": bool((doc.get("claim") or "").strip()),
+        # a bound over the whole box, checked by the kernel on a certificate (zflcert.py)
+        "certificate": bool(doc.get("certificate")) and bool(numeric_rows(rows)),
     }
 
 
@@ -1717,6 +1728,20 @@ def run(doc, ground_registry=None):
             issues.append(_issue("error", "E_UNREADABLE", "ledger",
                                  f"the ledger could not read these rows: "
                                  f"{exc}"))
+            return {"ok": False, "issues": issues}
+
+    if what.get("certificate"):
+        # THE KERNEL CHECKS, THE STUDIO SEARCHES (the decision of 2026-10-09: no budget in
+        # ZTL's kernel). A brought tree is only checked; without one the studio looks for
+        # one within its own budget, and says so. Same invariant as above: a refusal is a
+        # verdict in the report, never a traceback.
+        import zflcert
+        try:
+            sheet = to_sheet(rows)
+            report["certificate"] = zflcert.run_all(doc["certificate"], sheet)
+        except Exception as exc:
+            issues.append(_issue("error", "E_UNREADABLE", "certificate",
+                                 f"the certificate could not be read: {exc}"))
             return {"ok": False, "issues": issues}
 
     # БИРКА НА ЗАВИСЯЩИХ. Заработавшее на объявленном не прячется среди

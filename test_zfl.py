@@ -39,7 +39,8 @@ def sec1_one_table_three_instruments():
     assert r["ok"], r["issues"]
     print(f"   applies: {r['applies']}")
     assert r["applies"] == {"numeric": True, "passport": True,
-                            "ledger": True, "epoch": False, "judge": True}
+                            "ledger": True, "epoch": False, "judge": True,
+                            "certificate": False}
     rep = r["report"]
     print(f"   assembled sheet    : {rep['numeric']['sheet']}")
     print(f"   the invoice claim  : {rep['numeric']['disposition']}")
@@ -670,6 +671,78 @@ def sec11_a_public_service_cannot_be_made_to_raise_or_to_stall():
 
 
 
+def sec12_a_bound_over_the_whole_box_by_certificate():
+    """The kernel checks, the studio searches (2026-10-09: ZTL's kernel takes no budget).
+    The power into a load peaks INSIDE its range; corners and interval readings miss it."""
+    print("\n12. A BOUND OVER THE WHOLE BOX, BY CERTIFICATE")
+    import time
+    import zflcert
+    R = lambda n, v: {"name": n, "value": v, "status": "unverified", "means": n}
+    rows = [R("V", "5"), R("Rs", "[10.89,11.11]"), R("RL", "[1,100]"), R("I", "?"), R("VL", "?")]
+    laws = ["V - VL = I*Rs", "VL = I*RL"]
+
+    def cert(*cs):
+        r = zfl.run({"rows": rows, "claim": "", "certificate": list(cs)})
+        assert r["ok"], r["issues"]
+        return r["report"]["certificate"]
+
+    c = cert({"bound": "VL*I <= 0.6", "laws": laws})[0]
+    assert c["verdict"] == "CHECKED" and "solved the linear laws itself" in c["checked_by"], c
+    print(f"   VL*I <= 0.6 (the peak 0.5739 is inside): CHECKED, {c['pieces']} pieces, {c['found_by']}")
+    c = cert({"bound": "VL*I <= 0.57", "laws": laws})[0]
+    assert c["verdict"] == "FAILS" and zflcert.Fraction(c["value_there"]) > zflcert.Fraction(57, 100), c
+    print(f"   VL*I <= 0.57: FAILS at {c['at']} — {c['value_there']} exactly")
+    c = cert({"bound": "V*V*RL/((Rs + RL)*(Rs + RL)) <= 0.6"})[0]
+    tree = c.get("tree") or zflcert._search(*_expr_for("V*V*RL/((Rs + RL)*(Rs + RL))", rows), "<=",
+                                            zflcert.Fraction(3, 5), [0])["tree"]
+    c = cert({"bound": "V*V*RL/((Rs + RL)*(Rs + RL)) <= 0.6", "tree": tree})[0]
+    assert c["verdict"] == "CHECKED" and c["found_by"] == "brought with the document", c
+    bad = {"leaf": "monotone", "signs": {"RL": "+", "Rs": "-"}}
+    c = cert({"bound": "V*V*RL/((Rs + RL)*(Rs + RL)) <= 0.6", "tree": bad})[0]
+    assert c["verdict"] == "REFUSED" and "kernel rejected" in c["reason"], c
+    print("   a brought tree: CHECKED as brought; a false one (RL increasing everywhere): REFUSED by the kernel")
+    rows2 = [R("V", "5"), R("Rs", "10/3"), R("RL", "[1,100]")]
+    r = zfl.run({"rows": rows2, "claim": "", "certificate": {"bound": "V*V*RL/((Rs + RL)*(Rs + RL)) <= 15/8"}})
+    c = r["report"]["certificate"][0]
+    assert c["verdict"] == "NOT FOUND" and "nothing is claimed" in c["reason"], c
+    print("   the bound exactly AT the peak (15/8 at RL = 10/3): NOT FOUND — nothing claimed either way")
+    for junk, word in (({"bound": "VL*I < 0.6"}, "REFUSED"), ({"bound": "VL*I <= x"}, "REFUSED"),
+                       ({"bound": "VL*I <= 0.6"}, "REFUSED"),
+                       ({"bound": "VL*I <= 0.6", "laws": ["V - VL = I*Rs"]}, "REFUSED"),
+                       ({"bound": "VL*I <= 0.6", "laws": [1, 2]}, "REFUSED"),
+                       ({"bound": "RL <= 1000", "tree": "x"}, "REFUSED"),
+                       ({"bound": "VL*I <= 0.6", "laws": ["VL*I = 1", "VL = I*RL"]}, "REFUSED")):
+        c = cert(junk)[0]
+        assert c["verdict"] == word, (junk, c)
+    big = {"split": "RL", "at": "2", "lo": {"leaf": "interval"}, "hi": {"leaf": "interval"}}
+    for _ in range(16):
+        big = {"split": "RL", "at": "2", "lo": big, "hi": big}
+    c = cert({"bound": "RL <= 1000", "tree": big})[0]
+    assert c["verdict"] == "REFUSED" and "nodes" in c["reason"], c
+    r = zfl.run({"rows": [R("x", "[0,inf]")], "claim": "", "certificate": {"bound": "x <= 1"}})
+    assert r["report"]["certificate"][0]["verdict"] == "REFUSED"
+    print("   seven malformed certificates, an oversized tree, an infinite box: each REFUSED aloud, none raised")
+    names = "abcd"
+    rows3 = [R(n, "[1,2]") for n in names]
+    worst = 0.0
+    for k in (29, 32, 60, 200):
+        x = "*".join(f"({names[i % 4]}-{1 + (i % 97) / 100:.2f})" for i in range(k))[:1990]
+        t = time.time()
+        zfl.run({"rows": rows3, "claim": "", "certificate": [{"bound": x + " <= 1/1000000"}] * 4})
+        worst = max(worst, time.time() - t)
+    assert worst < 3, worst
+    print(f"   a public service: the worst probed document (products up to 200 factors, 4 certificates "
+          f"asked, {zfl.MAX_CERTIFICATES} read) took {worst:.2f} s")
+
+
+def _expr_for(text, rows):
+    import zflcert
+    q, _ = zflcert.parse_quantities(zfl.to_sheet(rows))
+    e = zflcert._parse_arith(text, q)
+    names = sorted(n for n in zflcert.ZC._names(e) if q[n]["lo"] < q[n]["hi"])
+    return e, q, names
+
+
 def sec11b_the_cap_counts_repeated_atoms():
     """2026-09-29, the curator: fix the studio's cap. The exact guarantee branches
     only on atoms named more than once (zverify._only, 27.09); E57 puts the hardness
@@ -737,6 +810,7 @@ if __name__ == "__main__":
     sec10_what_the_ground_holds_and_what_to_check()
     sec11_a_public_service_cannot_be_made_to_raise_or_to_stall()
     sec11b_the_cap_counts_repeated_atoms()
+    sec12_a_bound_over_the_whole_box_by_certificate()
     sec4b_every_example_runs_and_json_types_are_taken_as_they_come()
     sec5_the_spec_can_build_the_form_and_the_page()
     print("=" * 72)
