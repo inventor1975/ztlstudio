@@ -318,6 +318,21 @@ def sec4e_a_system_whose_coefficients_are_known_within_tolerance():
     print("   exactly the corner hull, earned from the two datasheets and the supply;")
     print("   the report's log says so, and says why a rank-two system is not solved;")
     print("   the laws come back EARNED, and (y >= 3/2) & (x == 1) with y measured in [1,2] is OPEN.")
+    # 4f (ZTL 3a296b5): a name DEFINED by a product of toleranced quantities is narrowed — exactly
+    # at the corners when multilinear, by the interval reading otherwise; never inside a system
+    row = lambda n, v: {"name": n, "means": "a part", "status": "verified", "ground": "datasheet", "value": v}
+    ask = lambda n: {"name": n, "means": "sought", "status": "unverified", "value": "?"}
+    t = zfl.run({"rows": [row("R", "[99/10,101/10]"), row("C", "[19/2,21/2]"), ask("tau")],
+                 "claim": "tau == R*C"})["report"]["numeric"]
+    assert (t["solved"]["tau"]["lo"], t["solved"]["tau"]["hi"]) == ("1881/20", "2121/20"), t["solved"]
+    assert any("multilinear, exact at the corners" in l for l in t["log"]), t["log"]
+    pw = zfl.run({"rows": [row("V", "5"), row("R1", "[99/10,101/10]"), row("R2", "[99/10,101/10]"),
+                           ask("I"), ask("U"), ask("P")],
+                  "claim": "(V - U == I*R1) & (U == I*R2) & (P == I*I*R1)"})["report"]["numeric"]
+    assert (pw["solved"]["P"]["lo"], pw["solved"]["P"]["hi"]) == ("12375/20402", "12625/19602"), pw["solved"]["P"]
+    assert any("interval reading" in l for l in pw["log"]), pw["log"]
+    print("   4f. tau == R*C with R, C boxed: [1881/20, 2121/20], exact at the corners;")
+    print("       P == I*I*R1 after the system bounds I: [12375/20402, 12625/19602], an interval reading.")
 
 
 def sec4b_every_example_runs_and_json_types_are_taken_as_they_come():
