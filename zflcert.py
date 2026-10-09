@@ -7,9 +7,10 @@ studio, with the budget of a public service. A document may bring its own tree (
 searcher, any tool) or leave the studio to look for one; either way the verdict is
 the kernel's check, and the report says who found the tree.
 
-    "certificate": {"bound": "V*V*RL/((Rs + RL)*(Rs + RL)) <= 0.6"}
-    "certificate": {"bound": "VL*I <= 0.6", "laws": ["V - VL = I*Rs", "VL = I*RL"]}
-    "certificate": {"bound": "...", "tree": {"split": "RL", "at": "10", "lo": ..., "hi": ...}}
+    "bounds": {"bound": "V*V*RL/((Rs + RL)*(Rs + RL)) <= 0.6"}
+    "bounds": {"bound": "VL*I <= 0.6", "laws": ["V - VL = I*Rs", "VL = I*RL"]}
+    "bounds": {"bound": "...", "tree": {"split": "RL", "at": "10", "lo": ..., "hi": ...}}
+(The document key is `bounds`: `certificate` is already a kind of ground in ZFL.)
 
 The quantities are the document's rows: an interval value is a box, a number is
 fixed, `?` is an unknown fixed by the linear `laws` (the kernel solves them itself).

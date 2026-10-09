@@ -435,13 +435,13 @@ function collect() {
   const cb = (($("certbound") || {}).value || "").trim();
   if (cb) {
     const laws = (($("certlaws") || {}).value || "").split(";").map(x => x.trim()).filter(Boolean);
-    doc.certificate = { bound: cb, ...(laws.length ? { laws } : {}) };
+    doc.bounds = { bound: cb, ...(laws.length ? { laws } : {}) };
   }
   return doc;
 }
 
 function setCert(doc) {
-  const c = Array.isArray(doc.certificate) ? doc.certificate[0] : doc.certificate;
+  const c = Array.isArray(doc.bounds) ? doc.bounds[0] : doc.bounds;
   if ($("certbound")) $("certbound").value = (c && c.bound) || "";
   if ($("certlaws")) $("certlaws").value = ((c && c.laws) || []).join("; ");
 }
@@ -487,10 +487,10 @@ function showReport(r) {
         rep.passport.map(p => [esc(p.component.join(", ")),
                                verdictSpan(p.kind), esc(p.detail)])) : "")));
   }
-  if (rep.certificate) {
+  if (rep.bounds) {
     const v = { CHECKED: "T", FAILS: "F", "NOT FOUND": "Z", REFUSED: "Z" };
     const word = { CHECKED: "certchecked", FAILS: "certfails", "NOT FOUND": "certnotfound", REFUSED: "certrefused" };
-    out.push(panel(t("certificate"), rep.certificate.map(c =>
+    out.push(panel(t("certificate"), rep.bounds.map(c =>
       `<p><code>${esc(c.bound || "")}</code> — <b class="v-${v[c.verdict] || "Z"}">${esc(c.verdict)}</b>: ` +
       esc(t(word[c.verdict] || "certrefused")) +
       (c.pieces ? ` (${esc(String(c.pieces))} ${esc(t("pieces"))})` : "") + "</p>" +

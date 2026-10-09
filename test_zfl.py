@@ -40,7 +40,7 @@ def sec1_one_table_three_instruments():
     print(f"   applies: {r['applies']}")
     assert r["applies"] == {"numeric": True, "passport": True,
                             "ledger": True, "epoch": False, "judge": True,
-                            "certificate": False}
+                            "bounds": False}
     rep = r["report"]
     print(f"   assembled sheet    : {rep['numeric']['sheet']}")
     print(f"   the invoice claim  : {rep['numeric']['disposition']}")
@@ -682,9 +682,9 @@ def sec12_a_bound_over_the_whole_box_by_certificate():
     laws = ["V - VL = I*Rs", "VL = I*RL"]
 
     def cert(*cs):
-        r = zfl.run({"rows": rows, "claim": "", "certificate": list(cs)})
+        r = zfl.run({"rows": rows, "claim": "", "bounds": list(cs)})
         assert r["ok"], r["issues"]
-        return r["report"]["certificate"]
+        return r["report"]["bounds"]
 
     c = cert({"bound": "VL*I <= 0.6", "laws": laws})[0]
     assert c["verdict"] == "CHECKED" and "solved the linear laws itself" in c["checked_by"], c
@@ -702,8 +702,8 @@ def sec12_a_bound_over_the_whole_box_by_certificate():
     assert c["verdict"] == "REFUSED" and "kernel rejected" in c["reason"], c
     print("   a brought tree: CHECKED as brought; a false one (RL increasing everywhere): REFUSED by the kernel")
     rows2 = [R("V", "5"), R("Rs", "10/3"), R("RL", "[1,100]")]
-    r = zfl.run({"rows": rows2, "claim": "", "certificate": {"bound": "V*V*RL/((Rs + RL)*(Rs + RL)) <= 15/8"}})
-    c = r["report"]["certificate"][0]
+    r = zfl.run({"rows": rows2, "claim": "", "bounds": {"bound": "V*V*RL/((Rs + RL)*(Rs + RL)) <= 15/8"}})
+    c = r["report"]["bounds"][0]
     assert c["verdict"] == "NOT FOUND" and "nothing is claimed" in c["reason"], c
     print("   the bound exactly AT the peak (15/8 at RL = 10/3): NOT FOUND — nothing claimed either way")
     for junk, word in (({"bound": "VL*I < 0.6"}, "REFUSED"), ({"bound": "VL*I <= x"}, "REFUSED"),
@@ -719,8 +719,8 @@ def sec12_a_bound_over_the_whole_box_by_certificate():
         big = {"split": "RL", "at": "2", "lo": big, "hi": big}
     c = cert({"bound": "RL <= 1000", "tree": big})[0]
     assert c["verdict"] == "REFUSED" and "nodes" in c["reason"], c
-    r = zfl.run({"rows": [R("x", "[0,inf]")], "claim": "", "certificate": {"bound": "x <= 1"}})
-    assert r["report"]["certificate"][0]["verdict"] == "REFUSED"
+    r = zfl.run({"rows": [R("x", "[0,inf]")], "claim": "", "bounds": {"bound": "x <= 1"}})
+    assert r["report"]["bounds"][0]["verdict"] == "REFUSED"
     print("   seven malformed certificates, an oversized tree, an infinite box: each REFUSED aloud, none raised")
     names = "abcd"
     rows3 = [R(n, "[1,2]") for n in names]
@@ -728,7 +728,7 @@ def sec12_a_bound_over_the_whole_box_by_certificate():
     for k in (29, 32, 60, 200):
         x = "*".join(f"({names[i % 4]}-{1 + (i % 97) / 100:.2f})" for i in range(k))[:1990]
         t = time.time()
-        zfl.run({"rows": rows3, "claim": "", "certificate": [{"bound": x + " <= 1/1000000"}] * 4})
+        zfl.run({"rows": rows3, "claim": "", "bounds": [{"bound": x + " <= 1/1000000"}] * 4})
         worst = max(worst, time.time() - t)
     assert worst < 3, worst
     print(f"   a public service: the worst probed document (products up to 200 factors, 4 certificates "

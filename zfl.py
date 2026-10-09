@@ -400,6 +400,24 @@ DOC_FIELDS = [
         # claim is a perfectly good question — it asks for passports.
     },
     {
+        # A BOUND OVER THE WHOLE BOX (2026-10-09, zflcert.py + ZTL zcertify): the studio
+        # searches a certificate within its budget, the kernel checks it exactly.
+        "key": "bounds", "type": "object", "required": False, "advanced": True,
+        "en": ("bounds over the whole box",
+               "up to two objects {\"bound\": \"expression <= number\" (or >=), \"laws\": "
+               "[linear equalities fixing the ? rows], \"tree\": optional certificate}. Interval "
+               "rows are the box. Without a tree the studio searches one; the ZTL kernel checks it "
+               "exactly. CHECKED = holds on the whole box; FAILS = a point where it is false; "
+               "NOT FOUND = nothing claimed either way; REFUSED = with the reason"),
+        "ru": ("границы на всей коробке",
+               "до двух объектов {\"bound\": \"выражение <= число\" (или >=), \"laws\": "
+               "[линейные равенства для строк ?], \"tree\": сертификат, если есть}. Строки-интервалы "
+               "задают коробку. Без дерева студия ищет его сама; ядро ZTL проверяет точно. "
+               "CHECKED — верно на всей коробке; FAILS — точка, где неверно; NOT FOUND — ничего "
+               "не утверждается; REFUSED — с причиной"),
+        "eg": ['{"bound": "VL*I <= 0.6", "laws": ["V - VL = I*Rs", "VL = I*RL"]}'],
+    },
+    {
         "key": "ask", "type": "multi", "required": False,
         "options": ["verdict", "warranty", "passport", "stipulations",
                     "blast", "brackets"],
@@ -536,11 +554,12 @@ def coerce(doc):
            "ask": doc.get("ask") or [], "rows": []}
     # A BOUND OVER THE WHOLE BOX, BY CERTIFICATE (zflcert.py, 2026-10-09): passes the door as
     # it came — an object, or a list of at most MAX_CERTIFICATES of them
-    cert = doc.get("certificate")
+    # (the key is `bounds`, not `certificate`: that word is already a KIND OF GROUND here)
+    cert = doc.get("bounds")
     if isinstance(cert, dict):
-        out["certificate"] = [cert]
+        out["bounds"] = [cert]
     elif isinstance(cert, list):
-        out["certificate"] = [c for c in cert if isinstance(c, dict)][:MAX_CERTIFICATES]
+        out["bounds"] = [c for c in cert if isinstance(c, dict)][:MAX_CERTIFICATES]
     for r in (doc.get("rows") or []):
         if not isinstance(r, dict):
             continue
@@ -1194,7 +1213,7 @@ def applies(doc):
             (r.get("expires_on") or "").strip() for r in rows),
         "judge": bool((doc.get("claim") or "").strip()),
         # a bound over the whole box, checked by the kernel on a certificate (zflcert.py)
-        "certificate": bool(doc.get("certificate")) and bool(numeric_rows(rows)),
+        "bounds": bool(doc.get("bounds")) and bool(numeric_rows(rows)),
     }
 
 
@@ -1730,7 +1749,7 @@ def run(doc, ground_registry=None):
                                  f"{exc}"))
             return {"ok": False, "issues": issues}
 
-    if what.get("certificate"):
+    if what.get("bounds"):
         # THE KERNEL CHECKS, THE STUDIO SEARCHES (the decision of 2026-10-09: no budget in
         # ZTL's kernel). A brought tree is only checked; without one the studio looks for
         # one within its own budget, and says so. Same invariant as above: a refusal is a
@@ -1738,10 +1757,10 @@ def run(doc, ground_registry=None):
         import zflcert
         try:
             sheet = to_sheet(rows)
-            report["certificate"] = zflcert.run_all(doc["certificate"], sheet)
+            report["bounds"] = zflcert.run_all(doc["bounds"], sheet)
         except Exception as exc:
-            issues.append(_issue("error", "E_UNREADABLE", "certificate",
-                                 f"the certificate could not be read: {exc}"))
+            issues.append(_issue("error", "E_UNREADABLE", "bounds",
+                                 f"the bound could not be read: {exc}"))
             return {"ok": False, "issues": issues}
 
     # БИРКА НА ЗАВИСЯЩИХ. Заработавшее на объявленном не прячется среди
