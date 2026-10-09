@@ -1353,9 +1353,17 @@ def what_to_check(claim, marking, unverified):
     phi = formalize(claim)
     atoms = _formula_atoms(phi)
     own = sorted(a for a in unverified if a in atoms)
-    if len(own) > BACKWARD_CAP:
-        return {"refused": f"{len(own)} unverified inputs; the reverse pass is computed "
-                           f"up to {BACKWARD_CAP} (it calls the whole judge up to 3·Σ C(u,k)·2^k times)"}
+    # READ-ONCE: NO CAP (ZTL 610984c, zbackward_tree). Where every unverified input
+    # occurs once in the claim, the reverse pass is read off the connectives' tables in
+    # one walk — no judge per filling, no size cut: "a & b & c & d & e & f & g" gets its
+    # one set of seven instead of a refusal. Where an input repeats, the enumeration and
+    # its cap stand.
+    occ = _occurrences(phi, {})
+    read_once = all(occ.get(a, 0) == 1 for a in own)
+    if len(own) > BACKWARD_CAP and not read_once:
+        return {"refused": f"{len(own)} unverified inputs, some used more than once; the reverse "
+                           f"pass is then computed up to {BACKWARD_CAP} (it calls the whole judge "
+                           f"up to 3·Σ C(u,k)·2^k times)"}
     m = {a: v for a, v in marking.items() if a in atoms}
     out, memo = {}, {}          # the three targets share one disposition per filling
     # SETTLED is the order a person can act on first: check these, and the
@@ -1363,7 +1371,7 @@ def what_to_check(claim, marking, unverified):
     for target, key in (("EARNED", "EARNED"), ("REFUTED", "REFUTED"),
                         (zbackward.TERMINAL, "SETTLED")):
         b = zbackward.backward(phi, m, target, by_disposition=True,
-                               cap_grounds=BACKWARD_CAP, memo=memo)
+                               cap_grounds=BACKWARD_CAP if not read_once else len(own), memo=memo)
         # AN EMPTY FAMILY IS SAID, NOT LEFT EMPTY: a bare [] reads as
         # "nothing to check", the opposite of "no set will do" (zbackward's
         # own rule, kept at the door).
@@ -1375,6 +1383,15 @@ def what_to_check(claim, marking, unverified):
         if "не_искал_дальше" in b:
             out[key]["searched_up_to"] = zbackward.MAX_K
     return out
+
+
+def _occurrences(phi, acc):
+    if isinstance(phi, str):
+        acc[phi] = acc.get(phi, 0) + 1
+        return acc
+    for x in phi[1:]:
+        _occurrences(x, acc)
+    return acc
 
 
 def _formula_atoms(phi):

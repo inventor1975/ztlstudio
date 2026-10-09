@@ -3,7 +3,8 @@
 These 12 files are the ZTL logic kernel (the judge), vendored from the ZTL repository so introspect
 clones and runs self-contained. **Source of truth: https://github.com/inventor1975/ZTL**
 
-Vendored: 2026-10-09 znumsolve.py from inventor1975/ZTL @ ca17ad4 (ONE parameter of rank > 1 — one steel batch in every stiffness, x = p/(1+p^2) — solved exactly: the others at their corners, its ends and the real critical points of N(p)/D(p); two such parameters still refused);
+Vendored: 2026-10-09 zbackward.py + NEW zbackward_tree.py from inventor1975/ZTL @ 0bbff54 (the reverse pass read off the connectives' tables: the same minimal sets as the enumeration, in its order, with no size cut where every unverified input occurs once; elsewhere the enumeration as before);
+before it the same day znumsolve.py @ ca17ad4 (ONE parameter of rank > 1 — one steel batch in every stiffness, x = p/(1+p^2) — solved exactly: the others at their corners, its ends and the real critical points of N(p)/D(p); two such parameters still refused);
 before it the same day znumsolve.py @ 3a296b5 (a name DEFINED by one equality is narrowed: by the exact corners when the expression is multilinear — tau == R*C, Tj == Ta + P*(R1+R2) — and by the interval reading otherwise — P == I*I*R, f == 1/(2*pi*tau) — sound, logged as such; both only for definitions, never inside a system);
 before it the same day znumsolve.py + znumjudge.py @ 62b71ea (the verdict reads the sheet as given — a measured quantity is no longer narrowed by the claim it is judged against; a solved unknown remembers its dependence);
 before it the same day znumsolve.py @ feacdd4 (linear systems with parameters in the coefficients — matrices, exact at the corners when each parameter is rank-one, an equality outside the linear rows named in the log; the other files unchanged since ea05959);
@@ -27,5 +28,5 @@ before it aa0eaf4, a name is one number across the whole claim, 1/inf an exact z
 before it cc6cc28, formula length cap; before it 9056479, zbackward; before it 1dc81f6, znumjudge reads sqrt).
 Earlier: 2026-09-13 @ f0a2f50; refreshed 2026-09-21 to 9fde0fd and 383ffb4 (this line
 was not updated then — the files were; checked file by file on 2026-09-24).
-To refresh: copy fixedpoint/zbackward/zbook/zmodal/znum/znumjudge/znumsolve/zpassport/ztime/ztl/ztljudge/zverify.py
+To refresh: copy fixedpoint/zbackward/zbackward_tree/zbook/zmodal/znum/znumjudge/znumsolve/zpassport/ztime/ztl/ztljudge/zverify.py
 from the ZTL repo root into this directory.
