@@ -3,7 +3,8 @@
 These 14 modules (plus three of its stands) are the ZTL logic kernel (the judge), vendored from the ZTL repository so introspect
 clones and runs self-contained. **Source of truth: https://github.com/inventor1975/ZTL**
 
-Vendored: 2026-10-09 NEW zcertify.py from inventor1975/ZTL @ c94bc5b (a bound over the whole box checked on a brought certificate — a bisection tree of monotone and interval leaves, exact, no budget; a quantity solved from a linear system is solved by the kernel itself, Cramer; the studio's zflcert.py searches, the kernel only checks);
+Vendored: 2026-10-10 znumsolve.py from inventor1975/ZTL @ 3be637b (parameters only on the right of two or more equalities: exact at the corners — (x + y == p) & (x - y == q) was left at (-inf, inf));
+before it 2026-10-09 NEW zcertify.py from inventor1975/ZTL @ c94bc5b (a bound over the whole box checked on a brought certificate — a bisection tree of monotone and interval leaves, exact, no budget; a quantity solved from a linear system is solved by the kernel itself, Cramer; the studio's zflcert.py searches, the kernel only checks);
 before it the same day zbackward_tree.py from inventor1975/ZTL @ 6df2b38 (repeated unverified inputs as worlds — up to six of them, the rest still read off the tables);
 before it the same day zbackward.py + NEW zbackward_tree.py @ 0bbff54 (the reverse pass read off the connectives' tables: the same minimal sets as the enumeration, in its order, with no size cut where every unverified input occurs once; elsewhere the enumeration as before);
 before it the same day znumsolve.py @ ca17ad4 (ONE parameter of rank > 1 — one steel batch in every stiffness, x = p/(1+p^2) — solved exactly: the others at their corners, its ends and the real critical points of N(p)/D(p); two such parameters still refused);
