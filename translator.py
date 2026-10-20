@@ -86,6 +86,14 @@ def schema(lang="en"):
                  + ", ".join(zfl.OPERATOR_WORDS)
                  + ". They are the connectives themselves; a row named after "
                    "one can never be referred to in a formula.")
+    # ФУНКЦИИ — из того же списка ядра (zfl.FUNCTION_WORDS), не пересказом.
+    lines.append("Functions in a comparison: "
+                 + ", ".join(w for w in zfl.FUNCTION_WORDS if w not in ("integral", "pi"))
+                 + " (radians for the trigonometry); `pi` is the constant; "
+                   "`integral(f, x, a, b)` is the definite integral of f over x "
+                   "from a to b — x is the variable of integration, NOT a row, and "
+                   "must not be the name of a row; a and b may be rows with ranges. "
+                   "Never use these words as row names either.")
     return "\n".join(lines)
 
 

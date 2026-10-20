@@ -68,8 +68,10 @@ _HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, _HERE)
 
 from ztljudge import judge                                  # noqa: E402
+import zfunc as _zfunc                                     # noqa: E402
+from znum import Integrand, names_in                       # noqa: E402
 from znum import (EARNED, CREDIT, INF, qty, compare, num,   # noqa: E402
-                  typename, bounds_bearing, type_bearing)
+                  typename, type_bearing, _degrade)
 
 
 # ------------------------------------------------------------ sheet parsing
@@ -158,6 +160,26 @@ def _closes_last(s, i):
     return False
 
 
+def _split_top(inner):
+    """Split at the commas outside every bracket."""
+    parts, depth, start = [], 0, 0
+    for i, c in enumerate(inner):
+        if c in "([":
+            depth += 1
+        elif c in ")]":
+            depth -= 1
+        elif c == "," and depth == 0:
+            parts.append(inner[start:i])
+            start = i + 1
+    parts.append(inner[start:])
+    return parts
+
+
+def _holds_integral(e):
+    return isinstance(e, tuple) and bool(e) and (e[0] == "integral" or any(
+        _holds_integral(a) for a in (e[1] if e[0] == "sum" else e[1:])))
+
+
 def _parse_arith(s, quantities):
     """A tiny arithmetic reader for one comparison side: numbers,
     quantities, + - * /, sum(...) and sqrt(...). Returns a znum expression."""
@@ -180,6 +202,12 @@ def _parse_arith(s, quantities):
             elif c in "([":
                 depth -= 1
             elif c in level and depth == 0:
+                # A SIGN, NOT AN OPERATOR: a `+`/`-` right after another operator or an opening paren is the sign of
+                # its operand (`x0 - -19`, `a * -b`, as Python's ast.unparse writes them). Splitting there left an
+                # empty side — "malformed arithmetic: ''" (found 2026-10-13 by the ztl-stand soundness audit, seven
+                # fuzz bricks); the split moves on to the operator before it.
+                if c in "+-" and s[:i].rstrip()[-1:] in ("", "+", "-", "*", "/", "(", "[", ","):
+                    continue
                 return (_TAG[c], _parse_arith(s[:i], quantities),
                         _parse_arith(s[i + 1:], quantities))
     # SQUARE ROOT, AS A CALL: `sqrt(expr)`. znum has evaluated ("sqrt", e)
@@ -191,6 +219,58 @@ def _parse_arith(s, quantities):
     # and only when the parenthesis opened by `sqrt(` is the one that ends.
     if s.startswith("sqrt(") and s.endswith(")") and _closes_last(s, 4):
         return ("sqrt", _parse_arith(s[5:-1], quantities))
+    # FUNCTIONS (zfunc, 2026-10-10): exp ln log10 atan tan with one argument (sin cos since 2026-10-13), pow min max
+    # with two, split at the top-level comma. Same rule as sqrt: only when the parenthesis
+    # the name opens is the one that ends the text.
+    # A DEFINITE INTEGRAL (2026-10-20, the curator's "интегралы и прочее" into ZFL): integral(f, x, a, b) — f read
+    # in the variable x, which is NOT a quantity of the sheet (it may not shadow one); a and b are ordinary sides
+    # (numbers, quantities, intervals: limits that move). The node keeps f opaque (znum.Integrand) so the walkers
+    # that collect names never meet x; f's other names ride as the node's own arguments after the limits.
+    if s.startswith("integral(") and s.endswith(")") and _closes_last(s, 8):
+        parts = _split_top(s[9:-1])
+        if len(parts) != 4:
+            raise ValueError(f"integral takes 4 arguments, integral(f, x, a, b), got {len(parts)}: {s!r}")
+        x = parts[1].strip()
+        if not re.match(r"^[A-Za-z_][A-Za-z_0-9]*$", x):
+            raise ValueError(f"integral: the variable of integration must be a plain name, not {x!r}")
+        if x in quantities:
+            raise ValueError(f"integral: the variable of integration {x!r} is already a quantity of the sheet "
+                             f"— give it a letter of its own")
+        q2 = dict(quantities)
+        q2[x] = qty(0, 0, CREDIT, None)
+        f = _parse_arith(parts[0], q2)
+        for k, v in q2.items():                 # interval literals inside f join the sheet as usual
+            if k != x and k not in quantities:
+                quantities[k] = v
+        if _holds_integral(f):
+            raise ValueError("integral: an integral inside an integrand is not read (yet) — name the inner one "
+                             "as a row of its own")
+        a = _parse_arith(parts[2], quantities)
+        b = _parse_arith(parts[3], quantities)
+        params = tuple(sorted(n for n in names_in(f) if n != x and n in quantities))
+        return ("integral", Integrand(f, x), a, b, *params)
+    # PI: zfunc's proved bracket of pi, an EARNED constant (a sheet's own row named `pi` wins).
+    if s == "pi" and "pi" not in quantities:
+        if "_pi" not in quantities:
+            quantities["_pi"] = qty(_zfunc.PI[0], _zfunc.PI[1], EARNED, "zfunc.PI: a proved bracket of pi")
+        return "_pi"
+    m = re.match(r"^(exp|ln|log10|atan|tan|sin|cos|pow|min|max|ifpos_d|ifpos)\(", s)
+    if m and s.endswith(")") and _closes_last(s, len(m.group(1))):
+        inner = s[len(m.group(1)) + 1:-1]
+        parts, depth, start = [], 0, 0
+        for i, c in enumerate(inner):
+            if c in "([":
+                depth += 1
+            elif c in ")]":
+                depth -= 1
+            elif c == "," and depth == 0:
+                parts.append(inner[start:i])
+                start = i + 1
+        parts.append(inner[start:])
+        want = 2 if m.group(1) in ("pow", "min", "max") else (3 if m.group(1).startswith("ifpos") else 1)
+        if len(parts) != want:
+            raise ValueError(f"{m.group(1)} takes {want} argument(s), got {len(parts)}: {s!r}")
+        return (m.group(1), *[_parse_arith(x, quantities) for x in parts])
     if s.startswith("(") and s.endswith(")"):
         return _parse_arith(s[1:-1], quantities)
     # UNARY SIGN. The binary split above starts at index 1, so a leading
@@ -388,10 +468,23 @@ def judge_sheet_claim(formula, quantities, marks, fixed=None):
     # an atom read JOINTLY (`fixed`) rests on every credit quantity of its
     # system: the widening probe re-reads it apart and would see nothing move,
     # so for it the whole credit pedigree bears — the cautious side
+    # bounds_bearing's probe, each answer computed ONCE (2026-10-12, the universal stand: a pension portfolio of 14
+    # bonds spent 113 s here — every probe re-read the atom's unwidened verdict, and every (atom, quantity) pair was
+    # probed twice, here and in the cures below; 41.5 s with the cache, the same verdicts). Same rule as
+    # znum.bounds_bearing: widen q to full ignorance, does the atom's verdict move?
+    _base, _bear = {}, {}
+
     def _bears(n, q):
         if fixed and natoms[n][3] in fixed:
             return True
-        return bounds_bearing(*natoms[n][:3], quantities, q)
+        if (n, q) not in _bear:
+            kind, e1, e2 = natoms[n][:3]
+            if n not in _base:
+                _base[n] = compare(kind, e1, e2, quantities)[0]
+            wide = dict(quantities)
+            wide[q] = _degrade(quantities[q])
+            _bear[(n, q)] = compare(kind, e1, e2, wide)[0] != _base[n]
+        return _bear[(n, q)]
     bearing_credit = sorted({q for n in bearing
                              for q in numeric[n]["pedigree"]
                              if _bears(n, q)})

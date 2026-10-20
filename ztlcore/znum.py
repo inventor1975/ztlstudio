@@ -352,6 +352,114 @@ class _NoReadings(Exception):
 
 
 # ------------------------------------ the linear fragment, read coherently
+import zfunc as _zf                  # noqa: E402  (functions on the floor, 2026-10-10)
+# "integral" joins the functions for every walker that only asks "is this exact/linear/polynomial?" (no: the
+# interval path reads it); _ev_tree reads it before the functions' own branch.
+_FUNC_OPS = _zf.FUNC_OPS | {"integral"}
+
+
+class Integrand:
+    """The integrand of `integral(f, x, a, b)` with its bound variable (2026-10-20). OPAQUE to the walkers that
+    collect names (names_in, zcertify._names): x is not a quantity of the sheet. The parameters f reads travel as
+    the node's own arguments after the limits — their names and provenance are collected as for any node."""
+    __slots__ = ("f", "x")
+
+    def __init__(self, f, x):
+        self.f, self.x = f, x
+
+    def __eq__(self, o):
+        return isinstance(o, Integrand) and (self.f, self.x) == (o.f, o.x)
+
+    def __hash__(self):
+        return hash(("Integrand", self.f, self.x))
+
+    def __repr__(self):
+        return f"Integrand({self.x}: {self.f!r})"
+
+
+# The search is untrusted (zintegral.search); the enclosure it returns is the KERNEL's check() of its certificate.
+# Tolerances RELATIVE to the integral's scale (width x the largest |f| read over the box), tried in turn: a
+# certificate this narrow, else a wider one, else the mark (undecided, never a guess). With every datum a point the
+# answer can be narrow; with a datum's RANGE the enclosure is dominated by that range (each piece carries it), and
+# chasing a narrow tolerance only exhausts the pieces — MEASURED 2026-10-20 on P0*exp(-t/tau), P0 in [95,105],
+# tau in [9,11], t in [0,20]: absolute 1e-9 and 1e-6 each gave up at 4000 pieces (20 s each), 1e-2 gave
+# [762.342, 967.524] in 1.8 s against the true range [762.345, 967.520].
+INTEGRAL_REL_POINT = (Fraction(1, 10 ** 12), Fraction(1, 10 ** 9), Fraction(1, 10 ** 6))
+INTEGRAL_REL_RANGE = (Fraction(1, 10 ** 5), Fraction(1, 10 ** 3))
+INTEGRAL_MAX_PIECES = 4000
+_INTEGRAL_CACHE = {}
+
+
+def _integral_scale(I, qs2, hull):
+    """(b - a) x max |f| read over the whole box — the size the tolerances are relative to (1 when unreadable)."""
+    import zcertify as _ZC
+    try:
+        box = {n: (qs2[n]["lo"], qs2[n]["hi"]) for n in _ZC._names(I.f) if n in qs2}
+        box[I.x] = hull
+        r = _ZC._reading(I.f, qs2, box)
+    except Exception:                         # noqa: BLE001 — a scale only; the kernel decides elsewhere
+        r = None
+    if r is None or any(v in (INF, -INF) for v in r):
+        return Fraction(1)
+    return max(Fraction(1, 10 ** 30), (hull[1] - hull[0]) * max(abs(Fraction(r[0])), abs(Fraction(r[1]))))
+
+
+def _ev_integral(args, quantities):
+    """∫_a^b f dx over the sheet's readings: the kernel-checked enclosure for EVERY value of f's parameters and of the
+    limits (moving limits by zintegral.check_limits), or None (undecided) when no certificate was found. Units: f's
+    unit times the limits' unit. A reversed pair of point limits is the negated integral."""
+    import zintegral as _ZI                  # zintegral imports zcertify imports znum: read lazily
+    I, a, b, *params = args
+    ea, eb = _ev(a, quantities), _ev(b, quantities)
+    eps = [_ev(p, quantities) for p in params]
+    ped = ea[1] | eb[1] | set().union(*[e[1] for e in eps]) if eps else ea[1] | eb[1]
+    used = ea[2] | eb[2] | set().union(*[e[2] for e in eps]) if eps else ea[2] | eb[2]
+    ux = _unify_units(ea[4], eb[4], "add")
+    ra, rb = ea[0], eb[0]
+    qs2 = dict(quantities)
+    finite = ra is not None and rb is not None and all(v not in (INF, -INF) for v in (*ra, *rb))
+    hull = (min(ra[0], rb[0]), max(ra[1], rb[1])) if finite else (Fraction(0), Fraction(0))
+    qs2[I.x] = qty(hull[0], hull[1], CREDIT, None, unit=ux)
+    try:
+        unit_f = _ev(I.f, qs2)[4]
+    except _NoReadings:
+        unit_f = None
+    unit = _unit_combine(unit_f, ux, +1)
+    if not finite:
+        return None, ped, used, None, unit           # an improper integral is not read: the mark
+    key = (I, ra, rb, tuple((p, quantities[p]["lo"], quantities[p]["hi"]) for p in params if p in quantities))
+    hit = _INTEGRAL_CACHE.get(key)
+    if hit is None:
+        hit = ("none",)
+        point = ra[0] == ra[1] and rb[0] == rb[1]
+        boxed = any(quantities[p]["lo"] != quantities[p]["hi"] for p in params if p in quantities)
+        scale = _integral_scale(I, qs2, hull)
+        for rel in (INTEGRAL_REL_RANGE if boxed or not point else INTEGRAL_REL_POINT):
+            tol = rel * scale
+            if point:
+                A, B = ra[0], rb[0]
+                if A == B:
+                    hit = ("iv", (Fraction(0), Fraction(0)))
+                    break
+                lo_, hi_ = (A, B) if A < B else (B, A)
+                c = _ZI.search(I.f, I.x, lo_, hi_, qs2, tol, max_pieces=INTEGRAL_MAX_PIECES)
+                if "gave_up" not in c:
+                    L, U = c["enclosure"]
+                    hit = ("iv", (L, U) if A < B else (-U, -L))
+                    break
+            else:
+                c = _ZI.search_limits(I.f, I.x, a, b, qs2, tol, max_pieces=INTEGRAL_MAX_PIECES)
+                if "gave_up" not in c:
+                    hit = ("iv", tuple(c["enclosure"]))
+                    break
+                if "apart" in c["gave_up"]:
+                    break                              # limits that cross over the box: no tolerance helps
+        _INTEGRAL_CACHE[key] = hit
+    if hit[0] != "iv":
+        return None, ped, used, None, unit
+    return hit[1], ped, used, None, unit
+
+
 class _NotLinear(Exception):
     pass
 
@@ -384,6 +492,8 @@ def _linear(expr, quantities, counter, seen=None):
         return Fraction(0), {key: (Fraction(1), expr)}, q.get("unit"), \
             _step(q.get("discrete"))
     op, *args = expr
+    if op in _FUNC_OPS:              # exp/ln/... (zfunc, 2026-10-10): no exact form — the interval path reads them
+        raise _NotLinear()
     if op == "sqrt":
         # THE ROOT OF A KNOWN NUMBER is a constant when it is exact: sqrt(disc)
         # with disc pinned at 1 is 1 (MEASURED 2026-09-24: a model's table
@@ -511,6 +621,8 @@ def _poly(expr, quantities, counter, seen=None):
         return (Fraction(0), {key: (Fraction(1), Fraction(0), expr)},
                 q.get("unit"), None)
     op, *args = expr
+    if op in _FUNC_OPS:              # exp/ln/... (zfunc, 2026-10-10): no exact form — the interval path reads them
+        raise _NotLinear()
     if op == "sqrt":                     # as in `_linear`: exact roots of constants only
         c1, t1, u1, _ = _poly(args[0], quantities, counter, seen)
         r = _rat_sqrt(c1) if not t1 and c1 >= 0 else None
@@ -712,6 +824,8 @@ def _ev_exact(expr, quantities):
             return q["lo"]
         raise _NotLinear()
     op, *args = expr
+    if op in _FUNC_OPS:              # exp/ln/... (zfunc, 2026-10-10): no exact form — the interval path reads them
+        raise _NotLinear()
     if op == "sqrt":
         v = _ev_exact(args[0], quantities)
         if isinstance(v, QSqrt) or v < 0:
@@ -928,6 +1042,8 @@ def _upoly(expr, quantities, seen=None):
             raise _NotLinear()
         return [Fraction(0), Fraction(1)], expr
     op, *args = expr
+    if op in _FUNC_OPS:              # exp/ln/... (zfunc, 2026-10-10): no exact form — the interval path reads them
+        raise _NotLinear()
     if op == "sqrt":
         a, n = _upoly(args[0], quantities, seen)
         r = _rat_sqrt(a[0]) if n is None and len(_ptrim(a)) == 1 and a[0] >= 0 else None
@@ -1034,6 +1150,8 @@ def _mlin(expr, quantities, counter, keys, seen=None):
         keys[key] = expr
         return {frozenset([key]): Fraction(1)}, q.get("unit")
     op, *args = expr
+    if op in _FUNC_OPS:              # exp/ln/... (zfunc, 2026-10-10): no exact form — the interval path reads them
+        raise _NotLinear()
     if op == "sqrt":
         t1, u1 = _mlin(args[0], quantities, counter, keys, seen)
         c1 = t1.get(frozenset(), Fraction(0))
@@ -1153,6 +1271,8 @@ def _ipoly(expr, quantities):
             return {(): Fraction(lo)} if lo else {}
         return {((expr, 1),): Fraction(1)}
     op, *args = expr
+    if op in _FUNC_OPS:              # exp/ln/... (zfunc, 2026-10-10): no exact form — the interval path reads them
+        raise _NotLinear()
     if op == "sum":
         out = {}
         for a in args[0]:
@@ -1392,7 +1512,29 @@ def _int_refine(kind, e1, e2, quantities):
     return "F"
 
 
+_MEMO = [None]          # {node: result} while ONE reading runs (zcertify._reading_one), else None
+
+
 def _ev(expr, quantities):
+    """_ev_tree with a GRAPH's memory (2026-10-16, the curator's "в ZTL нет графов, можно добавить?"): a subtree met
+    again in the same reading — the chamber pressure five times inside a rocket's delta-v — is read once. _ev_tree
+    is a pure function of (expr, quantities), so the reading is the same, only once per distinct node. The sets in a
+    result are copied on every hit: no caller can change what another one reads."""
+    memo = _MEMO[0]
+    if memo is None or not isinstance(expr, tuple):
+        return _ev_tree(expr, quantities)
+    try:
+        hit = memo.get(expr)
+    except TypeError:                       # a node holding a list (a "sum"): not hashable, read as a tree
+        return _ev_tree(expr, quantities)
+    if hit is None:
+        hit = _ev_tree(expr, quantities)
+        memo[expr] = hit
+    iv, ped, used, step, unit = hit
+    return iv, set(ped), set(used), step, unit
+
+
+def _ev_tree(expr, quantities):
     """Rich evaluator: (interval|None, pedigree, used, lattice_step, unit).
     Discreteness is tracked exactly through +, -, *, sum (integer lattices
     are closed there) and is dropped at division — a conservative
@@ -1427,6 +1569,62 @@ def _ev(expr, quantities):
             step = step if (step is not None and st == step) else None
             iv, ped, used = _iv_add(iv, r), ped | p, used | u
         return iv, ped, used, step, unit
+    if op in _zf.TERNARY:
+        # A BRANCH (blind test 2, 2026-10-10): the condition is read first; a decided condition reads only
+        # its branch (the other may be undefined there), an undecided one reads both. x's unit is free (a
+        # sign is read), the branches share theirs.
+        rx, px, ux, _, _ = _ev(args[0], quantities)
+        side = _zf._side(rx) if rx is not None and not any(isinstance(v, float) for v in rx) else 0
+        want = [1] if side == 1 else ([2] if side == -1 else [1, 2])
+        evs = {i: _ev(args[i], quantities) for i in want}
+        ped = px.union(*[e[1] for e in evs.values()])
+        used = ux.union(*[e[2] for e in evs.values()])
+        units = [e[4] for e in evs.values()]
+        unit = units[0] if len(units) == 1 else _unify_units(units[0], units[1], "add")
+        if rx is None or any(e[0] is None for e in evs.values()):
+            return None, ped, used, None, unit
+        a = evs[1][0] if 1 in evs else None
+        b = evs[2][0] if 2 in evs else None
+        return _zf.TERNARY[op](rx, a, b), ped, used, None, unit
+    if op == "integral":
+        return _ev_integral(args, quantities)
+    if op in _FUNC_OPS:
+        # FUNCTIONS (zfunc.py, 2026-10-10): a proved bracket of rationals, never a rounding.
+        # A transcendental function reads a DIMENSIONLESS argument; pow(x, n) with n a point
+        # integer carries x's unit to the n-th power; min/max unify their units.
+        evs = [_ev(a, quantities) for a in args]
+        ped = set().union(*[e[1] for e in evs])
+        used = set().union(*[e[2] for e in evs])
+        if op in ("min", "max"):
+            unit = _unify_units(evs[0][4], evs[1][4], "add")
+        elif op == "pow":
+            rb = evs[1][0]
+            if evs[1][4]:
+                raise _NoReadings(f"pow: the exponent must be dimensionless, not {evs[1][4]!r}")
+            if evs[0][4] and not (rb is not None and rb[0] == rb[1] and Fraction(rb[0]).denominator == 1):
+                raise _NoReadings(f"pow: a quantity with the unit {evs[0][4]!r} to a non-integer power")
+            unit = None
+            if evs[0][4]:
+                n = int(rb[0])
+                unit = None
+                for _ in range(abs(n)):
+                    unit = _unit_combine(unit, evs[0][4], +1)
+                if n < 0:
+                    unit = _unit_combine(None, unit, -1)
+        else:
+            if evs[0][4]:
+                raise _NoReadings(f"{op}: the argument must be dimensionless, not {evs[0][4]!r}")
+            unit = None
+        if any(e[0] is None for e in evs):
+            return None, ped, used, None, unit
+        try:
+            if op in _zf.UNARY:
+                iv = _zf.UNARY[op](evs[0][0])
+            else:
+                iv = _zf.BINARY[op](evs[0][0], evs[1][0])
+        except _zf.NoReadings as why:
+            raise _NoReadings(str(why))
+        return iv, ped, used, None, unit
     if op == "sqrt":                       # УНАРНАЯ — до распаковки двух
         ra, pa, ua, sa, una = _ev(args[0], quantities)
         unit = _unit_sqrt(una)             # бросит _NoReadings на нечётной
