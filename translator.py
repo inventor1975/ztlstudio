@@ -170,6 +170,8 @@ def vocabulary(lang):
     words = {o["value"]: o["label"] for o in st["options"]}
     extra = {
         "ru": {"EARNED": "заработано", "REFUTED": "опровергнуто",
+               "EARNED IF STABLE": "заработано при стабильности",
+               "REFUTED IF STABLE": "опровергнуто при стабильности",
                "OPEN": "открыто", "ON CREDIT": "в кредит", "E": "E — "
                "нечего читать", "PARADOX": "парадокс",
                "UNDERDETERMINED": "недоопределено (нужна оговорка)",
