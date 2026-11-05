@@ -98,7 +98,7 @@
 <tr><td><code>E_OPEN_INTERVAL</code></td><td>an open bound like (0,10) — put the strictness in the claim instead</td></tr>
 <tr><td><code>E_RESERVED</code></td><td>a constant, connective or function of the language used as a row name — it silently changes the reading</td></tr>
 <tr><td><code>E_SCALE</code></td><td>a scale that is not empty/int/decimalK/fracM, or out of bounds</td></tr>
-<tr><td><code>E_SETS</code></td><td>—</td></tr>
+<tr><td><code>E_SETS</code></td><td>the sets cannot be read, or are over the public limits, or a row has a membership cell&#x27;s name</td></tr>
 <tr><td><code>E_STATUS</code></td><td>a status outside the four</td></tr>
 <tr><td><code>E_TOOBIG</code></td><td>more than 10 atoms NAMED MORE THAN ONCE in the formulas, or more than 64 atoms in all. The exact guarantee branches only on atoms that repeat; an atom named once costs almost nothing (40 read-once atoms: under 0.01 s; 30 repeated atoms in a pigeonhole witness: 0.66 s — measured 2026-09-29). Rows are not capped. Split the question, not the table</td></tr>
 <tr><td><code>E_TOOLONG</code></td><td>a formula longer than 2000 characters — the readers cost the square of the length (4.6 s at 39 KB, 0.21 s at 4 KB, measured 2026-09-24); split the question</td></tr>
@@ -197,7 +197,7 @@
 <tr><td><code>E_OPEN_INTERVAL</code></td><td>открытая граница вроде (0,10) — строгость пишется в утверждении</td></tr>
 <tr><td><code>E_RESERVED</code></td><td>константа, связка или функция языка в роли имени строки — молча меняет разбор</td></tr>
 <tr><td><code>E_SCALE</code></td><td>шкала не пустая/int/decimalK/fracM либо вне границ</td></tr>
-<tr><td><code>E_SETS</code></td><td>—</td></tr>
+<tr><td><code>E_SETS</code></td><td>множества не читаются, или превышают публичные пределы, или строка носит имя клетки a_in_S</td></tr>
 <tr><td><code>E_STATUS</code></td><td>статус вне четырёх</td></tr>
 <tr><td><code>E_TOOBIG</code></td><td>больше 10 атомов, НАЗВАННЫХ БОЛЕЕ ОДНОГО РАЗА, или больше 64 атомов всего. Точная гарантия ветвится только по повторным атомам; атом, названный один раз, почти бесплатен (40 таких — меньше 0,01 с; 30 повторных в формуле о голубях — 0,66 с, промерено 29.09.2026). Строки НЕ ограничены. Делить надо вопрос, а не таблицу</td></tr>
 <tr><td><code>E_TOOLONG</code></td><td>формула длиннее 2000 знаков — чтение стоит квадрат длины (4,6 с на 39 КБ, 0,21 с на 4 КБ, промерено 24.09.2026); разделите вопрос</td></tr>
@@ -296,7 +296,7 @@
 <tr><td><code>E_OPEN_INTERVAL</code></td><td>an open bound like (0,10) — put the strictness in the claim instead</td></tr>
 <tr><td><code>E_RESERVED</code></td><td>a constant, connective or function of the language used as a row name — it silently changes the reading</td></tr>
 <tr><td><code>E_SCALE</code></td><td>a scale that is not empty/int/decimalK/fracM, or out of bounds</td></tr>
-<tr><td><code>E_SETS</code></td><td>—</td></tr>
+<tr><td><code>E_SETS</code></td><td>the sets cannot be read, or are over the public limits, or a row has a membership cell&#x27;s name</td></tr>
 <tr><td><code>E_STATUS</code></td><td>a status outside the four</td></tr>
 <tr><td><code>E_TOOBIG</code></td><td>more than 10 atoms NAMED MORE THAN ONCE in the formulas, or more than 64 atoms in all. The exact guarantee branches only on atoms that repeat; an atom named once costs almost nothing (40 read-once atoms: under 0.01 s; 30 repeated atoms in a pigeonhole witness: 0.66 s — measured 2026-09-29). Rows are not capped. Split the question, not the table</td></tr>
 <tr><td><code>E_TOOLONG</code></td><td>a formula longer than 2000 characters — the readers cost the square of the length (4.6 s at 39 KB, 0.21 s at 4 KB, measured 2026-09-24); split the question</td></tr>
@@ -395,7 +395,7 @@
 <tr><td><code>E_OPEN_INTERVAL</code></td><td>an open bound like (0,10) — put the strictness in the claim instead</td></tr>
 <tr><td><code>E_RESERVED</code></td><td>a constant, connective or function of the language used as a row name — it silently changes the reading</td></tr>
 <tr><td><code>E_SCALE</code></td><td>a scale that is not empty/int/decimalK/fracM, or out of bounds</td></tr>
-<tr><td><code>E_SETS</code></td><td>—</td></tr>
+<tr><td><code>E_SETS</code></td><td>the sets cannot be read, or are over the public limits, or a row has a membership cell&#x27;s name</td></tr>
 <tr><td><code>E_STATUS</code></td><td>a status outside the four</td></tr>
 <tr><td><code>E_TOOBIG</code></td><td>more than 10 atoms NAMED MORE THAN ONCE in the formulas, or more than 64 atoms in all. The exact guarantee branches only on atoms that repeat; an atom named once costs almost nothing (40 read-once atoms: under 0.01 s; 30 repeated atoms in a pigeonhole witness: 0.66 s — measured 2026-09-29). Rows are not capped. Split the question, not the table</td></tr>
 <tr><td><code>E_TOOLONG</code></td><td>a formula longer than 2000 characters — the readers cost the square of the length (4.6 s at 39 KB, 0.21 s at 4 KB, measured 2026-09-24); split the question</td></tr>
@@ -494,7 +494,7 @@
 <tr><td><code>E_OPEN_INTERVAL</code></td><td>an open bound like (0,10) — put the strictness in the claim instead</td></tr>
 <tr><td><code>E_RESERVED</code></td><td>a constant, connective or function of the language used as a row name — it silently changes the reading</td></tr>
 <tr><td><code>E_SCALE</code></td><td>a scale that is not empty/int/decimalK/fracM, or out of bounds</td></tr>
-<tr><td><code>E_SETS</code></td><td>—</td></tr>
+<tr><td><code>E_SETS</code></td><td>the sets cannot be read, or are over the public limits, or a row has a membership cell&#x27;s name</td></tr>
 <tr><td><code>E_STATUS</code></td><td>a status outside the four</td></tr>
 <tr><td><code>E_TOOBIG</code></td><td>more than 10 atoms NAMED MORE THAN ONCE in the formulas, or more than 64 atoms in all. The exact guarantee branches only on atoms that repeat; an atom named once costs almost nothing (40 read-once atoms: under 0.01 s; 30 repeated atoms in a pigeonhole witness: 0.66 s — measured 2026-09-29). Rows are not capped. Split the question, not the table</td></tr>
 <tr><td><code>E_TOOLONG</code></td><td>a formula longer than 2000 characters — the readers cost the square of the length (4.6 s at 39 KB, 0.21 s at 4 KB, measured 2026-09-24); split the question</td></tr>
@@ -593,7 +593,7 @@
 <tr><td><code>E_OPEN_INTERVAL</code></td><td>an open bound like (0,10) — put the strictness in the claim instead</td></tr>
 <tr><td><code>E_RESERVED</code></td><td>a constant, connective or function of the language used as a row name — it silently changes the reading</td></tr>
 <tr><td><code>E_SCALE</code></td><td>a scale that is not empty/int/decimalK/fracM, or out of bounds</td></tr>
-<tr><td><code>E_SETS</code></td><td>—</td></tr>
+<tr><td><code>E_SETS</code></td><td>the sets cannot be read, or are over the public limits, or a row has a membership cell&#x27;s name</td></tr>
 <tr><td><code>E_STATUS</code></td><td>a status outside the four</td></tr>
 <tr><td><code>E_TOOBIG</code></td><td>more than 10 atoms NAMED MORE THAN ONCE in the formulas, or more than 64 atoms in all. The exact guarantee branches only on atoms that repeat; an atom named once costs almost nothing (40 read-once atoms: under 0.01 s; 30 repeated atoms in a pigeonhole witness: 0.66 s — measured 2026-09-29). Rows are not capped. Split the question, not the table</td></tr>
 <tr><td><code>E_TOOLONG</code></td><td>a formula longer than 2000 characters — the readers cost the square of the length (4.6 s at 39 KB, 0.21 s at 4 KB, measured 2026-09-24); split the question</td></tr>
@@ -692,7 +692,7 @@
 <tr><td><code>E_OPEN_INTERVAL</code></td><td>an open bound like (0,10) — put the strictness in the claim instead</td></tr>
 <tr><td><code>E_RESERVED</code></td><td>a constant, connective or function of the language used as a row name — it silently changes the reading</td></tr>
 <tr><td><code>E_SCALE</code></td><td>a scale that is not empty/int/decimalK/fracM, or out of bounds</td></tr>
-<tr><td><code>E_SETS</code></td><td>—</td></tr>
+<tr><td><code>E_SETS</code></td><td>the sets cannot be read, or are over the public limits, or a row has a membership cell&#x27;s name</td></tr>
 <tr><td><code>E_STATUS</code></td><td>a status outside the four</td></tr>
 <tr><td><code>E_TOOBIG</code></td><td>more than 10 atoms NAMED MORE THAN ONCE in the formulas, or more than 64 atoms in all. The exact guarantee branches only on atoms that repeat; an atom named once costs almost nothing (40 read-once atoms: under 0.01 s; 30 repeated atoms in a pigeonhole witness: 0.66 s — measured 2026-09-29). Rows are not capped. Split the question, not the table</td></tr>
 <tr><td><code>E_TOOLONG</code></td><td>a formula longer than 2000 characters — the readers cost the square of the length (4.6 s at 39 KB, 0.21 s at 4 KB, measured 2026-09-24); split the question</td></tr>
