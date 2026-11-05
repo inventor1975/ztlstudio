@@ -127,7 +127,7 @@ TOPIC_MAP = {
     "grounds": "which kinds of ground this document accepts (a registry): when the person says which sources count "
                "and which do not ('only signed records', 'testimony is not enough')",
     "functions": "exp, ln, log10, sin, cos, tan, atan, pow, pi, integral(f, x, a, b) inside comparisons",
-    "degrees": "probabilities of statements (ZTL-I): 'how likely', 'with probability 0.9', 'at least 95%', risk; "
+    "degrees": "probabilities of statements (ZTL degrees): 'how likely', 'with probability 0.9', 'at least 95%', risk; "
                "the row column `degree` and the document fields `need` and `independent`",
 }
 
