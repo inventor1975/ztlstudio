@@ -1419,7 +1419,9 @@ def to_sheet(rows):
         prov = (f"earned:{_witness(r)}"
                 if (r.get("status") == "verified" and r.get("ground"))
                 else "credit")
-        bits = [f"{r['name']}={r['value'].strip()}", prov]
+        # whitespace inside a value is layout, not content: "[0, 1]" is how people and models write an interval, and the
+        # sheet reader takes "[0,1]" only (2026-11-05: a blind formalization died three rounds on "[0, 1]")
+        bits = [f"{r['name']}={re.sub(r'\s+', '', r['value'])}", prov]
         if (r.get("scale") or "").strip():
             bits.append(r["scale"].strip())
         if (r.get("unit") or "").strip():

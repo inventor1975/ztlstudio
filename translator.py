@@ -146,6 +146,20 @@ RULES, and they are not stylistic:
   identifier, not a sentence: two rows sharing a ground share a document and
   fall together, so `the story` with a space is not a longer name, it is a
   different one truncated.
+- A MATHEMATICAL FACT YOU CAN PROVE ON THE SPOT is not an invented
+  verification. Arithmetic, or a short argument anyone can redo from the
+  question alone ("there is no largest natural number: n + 1 exceeds n"):
+  give it status "verified" or "refuted", ground `proof`, ground_kind `act`,
+  and write the proof itself in "means". Never for a fact about the world,
+  a person, a document or a measurement, and never for something you only
+  believe or remember — those stay "unverified". The studio tells the person
+  that the row rests on your proof, so they can redo it.
+- WHEN THE QUESTION HAS SEVERAL READINGS — several measures, units, methods,
+  premises, ways to count — LAY EVERY READING; never pick one silently. Give
+  each its own row (a hidden-premise row, or a quantity marked `convention`
+  whose value spans what the readings give), so the verdict shows what holds
+  under every reading and what each one gives. If the readings form a family
+  with a parameter, lay the parameter, not a sample of it.
 - SWEEP EVERY REGISTER before you finalise — a layout that stops at true/false
   misses what the core can read. For each fact ask: (a) HIDDEN PREMISE — does
   the conclusion need something the person left unsaid? make it its own
@@ -235,6 +249,14 @@ def _invented_grounds(doc, history):
             continue
         stem = g.lower().replace("-", " ").split()[0]
         if g.lower() in TOLD:
+            continue
+        # A PROOF THE MODEL PERFORMED (2026-11-05, the curator's "да"): a mathematical fact anyone can redo from the
+        # question is not an invented document — but it is the MODEL's act, so the person is told, every time,
+        # which rows rest on it and where the proof is written. Not silence, and not a false "never mentioned".
+        if g.lower() == "proof" and str(r.get("ground_kind") or "").strip() == "act":
+            out.append({"level": "warn", "code": "W_AI_PROOF", "where": f"row {i} / ground",
+                        "hint": "the model proved this itself (the proof is in 'means'): redo it before relying "
+                                "on this row"})
             continue
         if len(stem) > 2 and stem not in said and g.lower() not in said:
             out.append({"level": "warn", "code": "W_AI_INVENTED_GROUND",

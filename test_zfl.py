@@ -518,6 +518,10 @@ def sec16_a_lone_equals_is_read_by_the_types_of_its_sides():
         assert not zfl.run({"rows": rows, "claim": "p = q"})["ok"]  # ... and the biconditional dies again
     finally:
         zfl.eq_kinds = real
+    # whitespace inside a value is layout: "[0, 1]" reads as "[0,1]" (a blind formalization died three rounds on it)
+    for v in ("[0, 1]", " [0 ,1] ", "[ 1/4 , 1/2 ]"):
+        assert zfl.run({"rows": [{"name": "w", "status": "unverified", "value": v, "means": "m"}],
+                        "claim": "w >= 0"})["ok"], v
     print("   numbers = numbers -> ==; statements = statements -> the biconditional, beside a quantity too;")
     print("   a statement = a number -> E_TYPE_EQ; the old per-document reading, as sabotage, is caught")
 
