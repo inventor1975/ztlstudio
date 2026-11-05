@@ -7,7 +7,7 @@
 // buttons and headings that are not part of the language.
 
 const UI = {
-  en: { advanced: "advanced", reference: "what is ZFL? (the language)", addrow: "add a row",
+  en: { advanced: "advanced", tools: "two more checkers", reference: "what is ZFL? (the language)", addrow: "add a row",
           mirror: "what the core read from your table",
           mirrorsilent: "silent",
           mirrornone: "No instrument took this up. The table was parsed; nothing answered.",
@@ -52,7 +52,7 @@ const UI = {
                + "visitor). Press \u00abuse my own AI\u00bb above to carry on "
                + "with your own key \u2014 or keep working without it: the "
                + "table and the verdict never needed the AI." },
-  ru: { advanced: "дополнительно", reference: "что такое ZFL? (язык)",
+  ru: { advanced: "дополнительно", tools: "ещё два прибора", reference: "что такое ZFL? (язык)",
           mirror: "что ядро прочитало из вашей таблицы",
           mirrorsilent: "промолчали",
           mirrornone: "Ни один прибор не взялся. Таблица разобрана; отвечать некому.",
@@ -97,7 +97,7 @@ const UI = {
                + "посетителя). Нажмите «свой ИИ» вверху и продолжите со "
                + "своим ключом — или работайте без него: таблица и вердикт "
                + "в ИИ никогда не нуждались." },
-  uk: { advanced: "додатково", reference: "що таке ZFL? (мова)",
+  uk: { advanced: "додатково", tools: "ще два прилади", reference: "що таке ZFL? (мова)",
           mirror: "що ядро прочитало з вашої таблиці",
           mirrorsilent: "промовчали",
           mirrornone: "Жоден прилад не взявся. Таблицю розібрано; відповідати нікому.",
@@ -138,7 +138,7 @@ const UI = {
                + "відвідувача). Натисніть «свій ШІ» вгорі й продовжте зі "
                + "своїм ключем — або працюйте без нього: таблиця і вердикт "
                + "у ШІ ніколи не потребували." },
-  he: { advanced: "מתקדם", reference: "מהי ZFL? (השפה)",
+  he: { advanced: "מתקדם", tools: "שני בודקים נוספים", reference: "מהי ZFL? (השפה)",
           mirror: "מה שהליבה קראה מהטבלה שלך",
           mirrorsilent: "שתקו",
           mirrornone: "אף מכשיר לא נטל זאת. הטבלה נותחה; אין מי שיענה.",
@@ -177,7 +177,7 @@ const UI = {
         limit: "ה־AI החינמי מוצה (20 בקשות ל־10 דקות למבקר). לחצו על "
                + "«ה־AI שלי» למעלה והמשיכו עם מפתח משלכם — או עבדו בלעדיו: "
                + "הטבלה והפסק מעולם לא נזקקו ל־AI." },
-  de: { advanced: "erweitert", reference: "Was ist ZFL? (die Sprache)",
+  de: { advanced: "erweitert", tools: "zwei weitere Prüfer", reference: "Was ist ZFL? (die Sprache)",
           mirror: "was der Kern aus Ihrer Tabelle gelesen hat",
           mirrorsilent: "schwiegen",
           mirrornone: "Kein Instrument hat sich zuständig gefühlt. Die Tabelle wurde gelesen; niemand antwortet.",
@@ -219,7 +219,7 @@ const UI = {
                + "je Besucher). Klicken Sie oben auf «eigene KI» und machen Sie "
                + "mit Ihrem Schlüssel weiter — oder arbeiten Sie ohne: Tabelle "
                + "und Urteil haben die KI nie gebraucht." },
-  fr: { advanced: "avancé", reference: "qu'est-ce que ZFL ? (le langage)",
+  fr: { advanced: "avancé", tools: "deux autres vérificateurs", reference: "qu'est-ce que ZFL ? (le langage)",
           mirror: "ce que le noyau a lu dans votre tableau",
           mirrorsilent: "silencieux",
           mirrornone: "Aucun instrument ne s'en est saisi. Le tableau a été analysé ; personne ne répond.",
@@ -261,7 +261,7 @@ const UI = {
                + "visiteur). Cliquez sur «mon IA» en haut et continuez avec "
                + "votre clé — ou travaillez sans : le tableau et le verdict "
                + "n'ont jamais eu besoin de l'IA." },
-  es: { advanced: "avanzado", reference: "¿qué es ZFL? (el lenguaje)",
+  es: { advanced: "avanzado", tools: "dos verificadores más", reference: "¿qué es ZFL? (el lenguaje)",
           mirror: "lo que el núcleo leyó de su tabla",
           mirrorsilent: "callaron",
           mirrornone: "Ningún instrumento se hizo cargo. La tabla se analizó; nadie responde.",

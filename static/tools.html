@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ZTL Studio — two more checkers</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Ctext%20x%3D%2232%22%20y%3D%2243%22%20text-anchor%3D%22middle%22%20font-family%3D%22Georgia%2Cserif%22%20font-size%3D%2227%22%20font-weight%3D%22bold%22%20fill%3D%22%23f2c40f%22%3EZTL%3C%2Ftext%3E%3C%2Fsvg%3E">
+<!--
+  Two checkers beside the table judge (2026-11-05), both from the ZTL kernel, no AI anywhere on this page:
+    /api/steps  — zsteps.check : the price of each step of an algebra derivation (solution sets, exactly);
+    /api/naive  — znaive.check : sets defined by a property, self-reference allowed; passports for what is
+                  left undecided (PARADOX / UNDERDETERMINED / ...), dispositions for claims.
+  Every request the kernel cannot read, or that is above the public limits, comes back REFUSED with the reason;
+  the same request always gets the same answer (the limits are on the form of the request, not on time).
+-->
+<style>
+ :root { --bad:#b3261e; --warn:#8a6d00; --ok:#1a6b2f; --line:#d6d6d6; }
+ body { font: 14px/1.45 system-ui, sans-serif; margin: 0; color: #111; background: #fafafa; }
+ header { display:flex; align-items:center; gap:1em; padding:.7em 1.2em; background:#fff;
+          border-bottom:1px solid var(--line); flex-wrap: wrap; }
+ header h1 { font-size:15px; margin:0; font-weight:600; letter-spacing:.02em; }
+ header h1 a { color: inherit; text-decoration: none; }
+ header .sp { flex:1 }
+ header a { font-size:13px; }
+ main { padding: 1.2em; max-width: 1100px; margin: 0 auto; }
+ section { background:#fff; border:1px solid var(--line); padding: 1em 1.2em; margin-bottom: 1.4em; }
+ h2 { font-size: 16px; margin: 0 0 .3em; }
+ p.lead { margin: 0 0 .8em; color: #333; }
+ textarea { width: 100%; box-sizing: border-box; font: 13px/1.4 ui-monospace, Menlo, Consolas, monospace;
+            border:1px solid var(--line); padding: .5em; }
+ .row { display:flex; gap: .8em; align-items: center; flex-wrap: wrap; margin: .6em 0; }
+ input[type=text] { width: 7em; font: inherit; padding: .2em .4em; border:1px solid var(--line); }
+ button { font: inherit; padding: .35em 1em; cursor: pointer; }
+ button.primary { background:#111; color:#fff; border: 1px solid #111; }
+ .out { margin-top: .8em; }
+ .v { font-weight: 700; }
+ .EARNED, .GROUNDED { color: var(--ok); }
+ .REFUTED, .PARADOX, .E { color: var(--bad); }
+ .OPEN, .UNDERDETERMINED, .ONCREDIT, .INPUT, .DOWNSTREAM, .INTRINSIC { color: var(--warn); }
+ table { border-collapse: collapse; width: 100%; font-size: 13px; }
+ td, th { border-bottom: 1px solid #eee; text-align: left; padding: .3em .4em; vertical-align: top; }
+ code { font: 12.5px ui-monospace, Menlo, Consolas, monospace; }
+ .refused { color: var(--bad); }
+ .dim { color: #777; }
+ select { font: inherit; }
+</style>
+
+<header>
+  <h1><a href="/">ZTL STUDIO</a></h1>
+  <span class="sp"></span>
+  <a href="/">the table judge</a>
+  <a href="/zfl" target="_blank">what is ZFL?</a>
+</header>
+
+<main>
+<section id="steps">
+  <h2>Check an algebra derivation, step by step</h2>
+  <p class="lead">One equation per line, each the next step. Every step is judged by its <b>solution sets</b>,
+  exactly: a step that cancels a factor or divides by an expression can <b>lose</b> a solution, and a step that
+  clears a denominator can <b>gain</b> one where the original was undefined — the witness and the cause are named.
+  Dividing by an expression that is 0 for every value (the "1 = 2" proofs) has nothing to check: <b>E</b>.
+  One unknown; <code>+ - * / ^</code> with whole powers; exact decimals.</p>
+  <div class="row">
+    <label>example <select id="sx"></select></label>
+  </div>
+  <textarea id="eqs" rows="5" spellcheck="false"></textarea>
+  <div class="row">
+    <label>unknown <input type="text" id="var" value="x"></label>
+    <label>domain from <input type="text" id="lo" placeholder="−∞"></label>
+    <label>to <input type="text" id="hi" placeholder="+∞"></label>
+    <label><input type="checkbox" id="dver" checked> the domain is verified</label>
+    <button class="primary" id="go1">Check the steps</button>
+  </div>
+  <div class="out" id="out1"></div>
+</section>
+
+<section id="naive">
+  <h2>Sets defined by a property — self-reference allowed</h2>
+  <p class="lead">Give each set as a <code>list</code> of names, as <code>data</code> cell by cell
+  (<code>"T"</code>, <code>"F"</code> or <code>"Z"</code> for unknown), or by a property
+  <code>abs</code> of <code>x</code> — which may mention any set, itself included. Every name is also something
+  that can be a member. Membership is decided where the definitions ground it; what they leave undecided gets a
+  passport: <b>PARADOX</b> (no stipulation can repair it), <b>UNDERDETERMINED</b> (consistent, but a decision is
+  owed), <b>INPUT</b> (verify the given cell), <b>DOWNSTREAM</b> (inherits a quarantine). Claims get the judge's
+  dispositions. Formulas: <code>["in",a,S]</code>, <code>["not",φ]</code>, <code>["and"|"or"|"imp"|"iff",φ,ψ]</code>,
+  <code>["all"|"ex","y",φ]</code>, <code>["eq",S,T]</code>.</p>
+  <div class="row">
+    <label>example <select id="nx"></select></label>
+  </div>
+  <textarea id="spec" rows="12" spellcheck="false"></textarea>
+  <div class="row"><button class="primary" id="go2">Judge the definitions</button></div>
+  <div class="out" id="out2"></div>
+</section>
+<p class="dim">Both checkers are the ZTL kernel itself (<code>zsteps.py</code>, <code>znaive.py</code> at
+<a href="https://github.com/inventor1975/ZTL">github.com/inventor1975/ZTL</a>), no AI. A request above the public
+limits is refused with the reason — run the same files on your own machine for larger ones.</p>
+</main>
+
+<script>
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"}[c]));
+const cls = v => String(v).split(" ")[0].replace(/[^A-Z]/g, "") || "";
+const tag = v => `<span class="v ${cls(v)}">${esc(v)}</span>`;
+
+function fill(sel, obj, on) {
+  Object.keys(obj).forEach(k => sel.add(new Option(k, k)));
+  sel.onchange = () => on(obj[sel.value]);
+  on(obj[sel.value]);
+}
+// the examples come from the kernel itself (zsteps.EXAMPLES, znaive.EXAMPLES): one source, judged by its self-test
+fetch("/api/steps/examples").then(r => r.json()).then(ex => fill($("sx"), ex, e => {
+  $("eqs").value = e.equations.join("\n");
+  $("lo").value = (e.domain && e.domain[0]) || ""; $("hi").value = (e.domain && e.domain[1]) || "";
+}));
+fetch("/api/naive/examples").then(r => r.json()).then(ex => fill($("nx"), ex,
+  e => { $("spec").value = JSON.stringify(e, null, 1); }));
+
+async function post(url, body) {
+  const r = await fetch(url, {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(body)});
+  try { return await r.json(); } catch (e) { return {ok: false, refused: `the server answered ${r.status}`}; }
+}
+function refusedOr(r, out) {
+  if (r.ok) return false;
+  out.innerHTML = `<p class="refused">Refused: ${esc(r.refused || r.error || (r.issues && r.issues[0] && r.issues[0].hint) || "unknown")}</p>`;
+  return true;
+}
+
+$("go1").onclick = async () => {
+  const out = $("out1"); out.textContent = "…";
+  const lo = $("lo").value.trim(), hi = $("hi").value.trim();
+  const r = await post("/api/steps", {equations: $("eqs").value, var: $("var").value.trim() || "x",
+    domain: (lo || hi) ? [lo || null, hi || null] : null, domain_verified: $("dver").checked});
+  if (refusedOr(r, out)) return;
+  let h = `<p>The derivation: ${tag(r.verdict)} <span class="dim">— ${esc(r.legend[r.verdict.split(" (")[0]] || "")}</span></p><table>`;
+  h += "<tr><th>from</th><th>to</th><th>step</th><th>why</th></tr>";
+  for (const s of r.steps) {
+    const why = [];
+    for (const l of s.lost) why.push(`<b>lost</b> ${esc(r.var)} = ${esc(l.x)}: ${esc(l.cause)}`);
+    for (const g of s.gained) why.push(`<b>gained</b> ${esc(r.var)} = ${esc(g.x)}: ${esc(g.cause)}`);
+    if (s.why) why.push(esc(s.why));
+    if (s.domain) why.push(esc(s.domain));
+    h += `<tr><td><code>${esc(s.from)}</code></td><td><code>${esc(s.to)}</code></td><td>${tag(s.verdict)}</td><td>${why.join("<br>") || '<span class="dim">same solutions</span>'}</td></tr>`;
+  }
+  out.innerHTML = h + "</table>";
+};
+
+$("go2").onclick = async () => {
+  const out = $("out2"); out.textContent = "…";
+  let spec;
+  try { spec = JSON.parse($("spec").value); } catch (e) { out.innerHTML = `<p class="refused">Not JSON: ${esc(e.message)}</p>`; return; }
+  const r = await post("/api/naive", spec);
+  if (refusedOr(r, out)) return;
+  let h = "<table><tr><th>set</th><th>members (earned)</th><th>not members (earned)</th><th>undecided — passport</th></tr>";
+  for (const s of r.sets)
+    h += `<tr><td><b>${esc(s.set)}</b></td><td>${s.in.map(esc).join(", ")}</td><td class="dim">${s.out.map(esc).join(", ")}</td>
+          <td>${s.quarantined.map(q => `${esc(q.member)} ${tag(q.passport)}`).join("<br>")}</td></tr>`;
+  h += "</table>";
+  if (r.claims.length) {
+    h += "<p></p><table><tr><th>claim</th><th>disposition</th><th>rests on</th></tr>";
+    for (const c of r.claims) {
+      const rests = Object.entries(c.rests_on || {}).map(([k, v]) => `${esc(k)} ${tag(v)}`);
+      if (c.residue && c.residue.length) rests.push(`<span class="dim">left undecided for: ${c.residue.map(esc).join(", ")}</span>`);
+      if (c.note) rests.push(`<span class="dim">${esc(c.note)}</span>`);
+      h += `<tr><td><code>${esc(JSON.stringify(c.claim))}</code></td><td>${tag(c.disposition)}</td><td>${rests.join("<br>")}</td></tr>`;
+    }
+    h += "</table>";
+  }
+  out.innerHTML = h;
+};
+</script>
+</html>

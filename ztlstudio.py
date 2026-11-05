@@ -75,7 +75,7 @@ def _client_ip(handler):
 # judge on a button press, not on typing, so a person never meets it.
 _JL = defaultdict(deque)
 _JL_MAX, _JL_WINDOW = 30, 60
-_JUDGE_ROUTES = ("/api/v2run", "/api/v2validate")
+_JUDGE_ROUTES = ("/api/v2run", "/api/v2validate", "/api/steps", "/api/naive")
 
 
 def _judge_rate_ok(ip):
@@ -421,8 +421,8 @@ def api_savekey(payload):
 # reloading `zfl` re-runs its imports and Python hands back the cached core
 # module. So the whole chain is watched by file mtime and reloaded bottom-up
 # when it moves.
-_V2_CHAIN = ["ztl", "znum", "znumjudge", "znumsolve", "zpassport", "zbook",
-             "zfl", "zflexamples", "zfldoc", "translator"]
+_V2_CHAIN = ["ztl", "znum", "znumjudge", "znumsolve", "fixedpoint", "zpassport", "zbook",
+             "zsteps", "znaive", "zfl", "zflexamples", "zfldoc", "translator"]
 _MTIMES = {}
 _RELOAD_LOCK = threading.Lock()   # never reload a module under two threads
 
@@ -516,7 +516,20 @@ def api_v2validate(payload):
     return {"ok": True, "issues": _v2("zfl").validate(doc)}
 
 
-ROUTES = {"/api/v2run": api_v2run, "/api/v2validate": api_v2validate,
+def api_steps(payload):
+    """The price of each step of an algebra derivation — the kernel's zsteps.check (2026-11-05). It never raises on
+    input: an unreadable or oversized request comes back refused, with the reason."""
+    return _v2("zsteps").check(payload)
+
+
+def api_naive(payload):
+    """Sets defined by a property, self-reference allowed — the kernel's znaive.check (2026-11-05): memberships
+    grounded where the definitions ground them, passports for the rest, dispositions for claims."""
+    return _v2("znaive").check(payload)
+
+
+ROUTES = {"/api/steps": api_steps, "/api/naive": api_naive,
+          "/api/v2run": api_v2run, "/api/v2validate": api_v2validate,
           "/api/v2fill": api_v2fill, "/api/v2comment": api_v2comment,
                                         "/api/providers": api_providers, "/api/savekey": api_savekey,
           }
@@ -583,6 +596,13 @@ class Handler(BaseHTTPRequestHandler):
                     self._send(200, f.read(), "text/html; charset=utf-8")
             else:
                 self._send(404, {"error": "reference not built"})
+        elif self.path in ("/tools", "/tools.html"):
+            with open(os.path.join(HERE, "static", "tools.html"), "rb") as f:
+                self._send(200, f.read(), "text/html; charset=utf-8")
+        elif self.path == "/api/steps/examples":
+            self._send(200, _v2("zsteps").EXAMPLES)
+        elif self.path == "/api/naive/examples":
+            self._send(200, _v2("znaive").EXAMPLES)
         elif self.path == "/api/v2examples":
             zflexamples = _v2("zflexamples")
             self._send(200, zflexamples.catalogue(_lang(query)))
