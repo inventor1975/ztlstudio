@@ -88,6 +88,8 @@ CODE_HELP = {
     "E_NOGROUND": ("verified, refuted or defined, with nothing backing it",
                    "проверено, опровергнуто или определено — но без основания"),
     "E_KIND": ("a kind of ground outside the list", "вид основания вне списка"),
+    "E_TYPE_EQ": ("a statement set equal to a number with `=` — no reading makes a truth value equal to a number",
+                  "утверждение приравнено к числу знаком `=` — никакое прочтение не делает истинностное значение числом"),
     "E_CONVENTION": ("a convention also marked as separate measurements, or on a row with no value",
                      "договорённость, помеченная ещё и как отдельные измерения, или на строке без значения"),
     "E_SETS": ("the sets cannot be read, or are over the public limits, or a row has a membership cell's name",
@@ -416,14 +418,13 @@ PRECEDENCE = {
 OP_HELP = {
     "&": ("and", "и"), "|": ("or", "или"), "->": ("if … then", "если … то"),
     "^": ("exactly one of", "ровно одно из"),
-    # (2026-11-05, a blind formalization audit: two of six documents died on it) In a document where ANY row has a
-    # value, a lone `=` is read as numeric equality (`normalise`: `x - 10 = 20` is what people write) — so `p = q`
-    # between rows, or `p = (x > 1)`, is refused there. The gloss used to say only "biconditional", and the
-    # translators believed it. Said now as the parser reads it; `<->` is the biconditional everywhere.
-    "=": ("biconditional between rows — but ONLY in a document with no numbers; where any row has a value, `=` is "
-          "numeric equality, so write <-> for 'the same truth value as' (p <-> (x > 1))",
-          "равносильность между строками — но ТОЛЬКО в документе без чисел; где у какой-то строки есть значение, `=` — "
-          "числовое равенство, поэтому для «то же истинностное значение» пишите <-> (p <-> (x > 1))"),
+    # (2026-11-05) `=` is read by the TYPES of its two sides (zfl.eq_kinds): numbers -> numeric equality, statements
+    # -> the biconditional, a statement against a number -> E_TYPE_EQ. Before, the reading depended on whether ANY row
+    # had a value, and two of six documents of a blind formalization audit died on `p = (x > 1)`.
+    "=": ("the same value: between numbers numeric equality (x - 10 = 20), between statements the same TRUTH value "
+          "(p = q, p = (x > 1)); a statement set equal to a number is refused",
+          "то же значение: между числами — числовое равенство (x - 10 = 20), между утверждениями — то же ИСТИННОСТНОЕ "
+          "значение (p = q, p = (x > 1)); утверждение, приравненное к числу, — отказ"),
     "~": ("not", "не"),
     "Tr(x)": ("the value of the row x — this is how self-reference is "
               "written", "значение строки x — так пишется самоссылка"),

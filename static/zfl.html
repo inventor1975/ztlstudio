@@ -41,7 +41,7 @@
 <h2>operators</h2><table>
 <tr><td><code>&amp;</code></td><td>and</td></tr>
 <tr><td><code>-&gt;</code></td><td>if … then</td></tr>
-<tr><td><code>=</code></td><td>biconditional between rows — but ONLY in a document with no numbers; where any row has a value, `=` is numeric equality, so write &lt;-&gt; for &#x27;the same truth value as&#x27; (p &lt;-&gt; (x &gt; 1))</td></tr>
+<tr><td><code>=</code></td><td>the same value: between numbers numeric equality (x - 10 = 20), between statements the same TRUTH value (p = q, p = (x &gt; 1)); a statement set equal to a number is refused</td></tr>
 <tr><td><code>^</code></td><td>exactly one of</td></tr>
 <tr><td><code>|</code></td><td>or</td></tr>
 <tr><td><code>~</code></td><td>not</td></tr>
@@ -105,6 +105,7 @@
 <tr><td><code>E_TOOBIG</code></td><td>more than 10 atoms NAMED MORE THAN ONCE in the formulas, or more than 64 atoms in all. The exact guarantee branches only on atoms that repeat; an atom named once costs almost nothing (40 read-once atoms: under 0.01 s; 30 repeated atoms in a pigeonhole witness: 0.66 s — measured 2026-09-29). Rows are not capped. Split the question, not the table</td></tr>
 <tr><td><code>E_TOOLONG</code></td><td>a formula longer than 2000 characters — the readers cost the square of the length (4.6 s at 39 KB, 0.21 s at 4 KB, measured 2026-09-24); split the question</td></tr>
 <tr><td><code>E_TOOMANYEVENTS</code></td><td>more than 6 expiry events in one document — the epoch floor reads the claim on both sides of each (800 events cost 76.7 s, measured 2026-09-27); split the question</td></tr>
+<tr><td><code>E_TYPE_EQ</code></td><td>a statement set equal to a number with `=` — no reading makes a truth value equal to a number</td></tr>
 <tr><td><code>E_UNIT</code></td><td>a unit that cannot be read — a word, optionally with a power (m2), joined by · or /</td></tr>
 <tr><td><code>E_UNKNOWN_NAME</code></td><td>a formula names a row that does not exist</td></tr>
 <tr><td><code>E_UNREADABLE</code></td><td>the instruments could not read the claim — the message says what they choked on</td></tr>
@@ -142,7 +143,7 @@
 <h2>операторы</h2><table>
 <tr><td><code>&amp;</code></td><td>и</td></tr>
 <tr><td><code>-&gt;</code></td><td>если … то</td></tr>
-<tr><td><code>=</code></td><td>равносильность между строками — но ТОЛЬКО в документе без чисел; где у какой-то строки есть значение, `=` — числовое равенство, поэтому для «то же истинностное значение» пишите &lt;-&gt; (p &lt;-&gt; (x &gt; 1))</td></tr>
+<tr><td><code>=</code></td><td>то же значение: между числами — числовое равенство (x - 10 = 20), между утверждениями — то же ИСТИННОСТНОЕ значение (p = q, p = (x &gt; 1)); утверждение, приравненное к числу, — отказ</td></tr>
 <tr><td><code>^</code></td><td>ровно одно из</td></tr>
 <tr><td><code>|</code></td><td>или</td></tr>
 <tr><td><code>~</code></td><td>не</td></tr>
@@ -206,6 +207,7 @@
 <tr><td><code>E_TOOBIG</code></td><td>больше 10 атомов, НАЗВАННЫХ БОЛЕЕ ОДНОГО РАЗА, или больше 64 атомов всего. Точная гарантия ветвится только по повторным атомам; атом, названный один раз, почти бесплатен (40 таких — меньше 0,01 с; 30 повторных в формуле о голубях — 0,66 с, промерено 29.09.2026). Строки НЕ ограничены. Делить надо вопрос, а не таблицу</td></tr>
 <tr><td><code>E_TOOLONG</code></td><td>формула длиннее 2000 знаков — чтение стоит квадрат длины (4,6 с на 39 КБ, 0,21 с на 4 КБ, промерено 24.09.2026); разделите вопрос</td></tr>
 <tr><td><code>E_TOOMANYEVENTS</code></td><td>больше 6 событий истечения в одном документе — эпохальный пол читает утверждение по обе стороны каждого (800 событий — 76,7 с, промерено 27.09.2026); разделите вопрос</td></tr>
+<tr><td><code>E_TYPE_EQ</code></td><td>утверждение приравнено к числу знаком `=` — никакое прочтение не делает истинностное значение числом</td></tr>
 <tr><td><code>E_UNIT</code></td><td>единица, которую нельзя прочесть — слово, при желании со степенью (m2), соединяется через · или /</td></tr>
 <tr><td><code>E_UNKNOWN_NAME</code></td><td>формула называет несуществующую строку</td></tr>
 <tr><td><code>E_UNREADABLE</code></td><td>приборы не смогли прочесть утверждение — в сообщении сказано, на чём именно</td></tr>
@@ -243,7 +245,7 @@
 <h2>оператори</h2><table>
 <tr><td><code>&amp;</code></td><td>and</td></tr>
 <tr><td><code>-&gt;</code></td><td>if … then</td></tr>
-<tr><td><code>=</code></td><td>biconditional between rows — but ONLY in a document with no numbers; where any row has a value, `=` is numeric equality, so write &lt;-&gt; for &#x27;the same truth value as&#x27; (p &lt;-&gt; (x &gt; 1))</td></tr>
+<tr><td><code>=</code></td><td>the same value: between numbers numeric equality (x - 10 = 20), between statements the same TRUTH value (p = q, p = (x &gt; 1)); a statement set equal to a number is refused</td></tr>
 <tr><td><code>^</code></td><td>exactly one of</td></tr>
 <tr><td><code>|</code></td><td>or</td></tr>
 <tr><td><code>~</code></td><td>not</td></tr>
@@ -307,6 +309,7 @@
 <tr><td><code>E_TOOBIG</code></td><td>more than 10 atoms NAMED MORE THAN ONCE in the formulas, or more than 64 atoms in all. The exact guarantee branches only on atoms that repeat; an atom named once costs almost nothing (40 read-once atoms: under 0.01 s; 30 repeated atoms in a pigeonhole witness: 0.66 s — measured 2026-09-29). Rows are not capped. Split the question, not the table</td></tr>
 <tr><td><code>E_TOOLONG</code></td><td>a formula longer than 2000 characters — the readers cost the square of the length (4.6 s at 39 KB, 0.21 s at 4 KB, measured 2026-09-24); split the question</td></tr>
 <tr><td><code>E_TOOMANYEVENTS</code></td><td>more than 6 expiry events in one document — the epoch floor reads the claim on both sides of each (800 events cost 76.7 s, measured 2026-09-27); split the question</td></tr>
+<tr><td><code>E_TYPE_EQ</code></td><td>a statement set equal to a number with `=` — no reading makes a truth value equal to a number</td></tr>
 <tr><td><code>E_UNIT</code></td><td>a unit that cannot be read — a word, optionally with a power (m2), joined by · or /</td></tr>
 <tr><td><code>E_UNKNOWN_NAME</code></td><td>a formula names a row that does not exist</td></tr>
 <tr><td><code>E_UNREADABLE</code></td><td>the instruments could not read the claim — the message says what they choked on</td></tr>
@@ -344,7 +347,7 @@
 <h2>אופרטורים</h2><table>
 <tr><td><code>&amp;</code></td><td>and</td></tr>
 <tr><td><code>-&gt;</code></td><td>if … then</td></tr>
-<tr><td><code>=</code></td><td>biconditional between rows — but ONLY in a document with no numbers; where any row has a value, `=` is numeric equality, so write &lt;-&gt; for &#x27;the same truth value as&#x27; (p &lt;-&gt; (x &gt; 1))</td></tr>
+<tr><td><code>=</code></td><td>the same value: between numbers numeric equality (x - 10 = 20), between statements the same TRUTH value (p = q, p = (x &gt; 1)); a statement set equal to a number is refused</td></tr>
 <tr><td><code>^</code></td><td>exactly one of</td></tr>
 <tr><td><code>|</code></td><td>or</td></tr>
 <tr><td><code>~</code></td><td>not</td></tr>
@@ -408,6 +411,7 @@
 <tr><td><code>E_TOOBIG</code></td><td>more than 10 atoms NAMED MORE THAN ONCE in the formulas, or more than 64 atoms in all. The exact guarantee branches only on atoms that repeat; an atom named once costs almost nothing (40 read-once atoms: under 0.01 s; 30 repeated atoms in a pigeonhole witness: 0.66 s — measured 2026-09-29). Rows are not capped. Split the question, not the table</td></tr>
 <tr><td><code>E_TOOLONG</code></td><td>a formula longer than 2000 characters — the readers cost the square of the length (4.6 s at 39 KB, 0.21 s at 4 KB, measured 2026-09-24); split the question</td></tr>
 <tr><td><code>E_TOOMANYEVENTS</code></td><td>more than 6 expiry events in one document — the epoch floor reads the claim on both sides of each (800 events cost 76.7 s, measured 2026-09-27); split the question</td></tr>
+<tr><td><code>E_TYPE_EQ</code></td><td>a statement set equal to a number with `=` — no reading makes a truth value equal to a number</td></tr>
 <tr><td><code>E_UNIT</code></td><td>a unit that cannot be read — a word, optionally with a power (m2), joined by · or /</td></tr>
 <tr><td><code>E_UNKNOWN_NAME</code></td><td>a formula names a row that does not exist</td></tr>
 <tr><td><code>E_UNREADABLE</code></td><td>the instruments could not read the claim — the message says what they choked on</td></tr>
@@ -445,7 +449,7 @@
 <h2>Operatoren</h2><table>
 <tr><td><code>&amp;</code></td><td>and</td></tr>
 <tr><td><code>-&gt;</code></td><td>if … then</td></tr>
-<tr><td><code>=</code></td><td>biconditional between rows — but ONLY in a document with no numbers; where any row has a value, `=` is numeric equality, so write &lt;-&gt; for &#x27;the same truth value as&#x27; (p &lt;-&gt; (x &gt; 1))</td></tr>
+<tr><td><code>=</code></td><td>the same value: between numbers numeric equality (x - 10 = 20), between statements the same TRUTH value (p = q, p = (x &gt; 1)); a statement set equal to a number is refused</td></tr>
 <tr><td><code>^</code></td><td>exactly one of</td></tr>
 <tr><td><code>|</code></td><td>or</td></tr>
 <tr><td><code>~</code></td><td>not</td></tr>
@@ -509,6 +513,7 @@
 <tr><td><code>E_TOOBIG</code></td><td>more than 10 atoms NAMED MORE THAN ONCE in the formulas, or more than 64 atoms in all. The exact guarantee branches only on atoms that repeat; an atom named once costs almost nothing (40 read-once atoms: under 0.01 s; 30 repeated atoms in a pigeonhole witness: 0.66 s — measured 2026-09-29). Rows are not capped. Split the question, not the table</td></tr>
 <tr><td><code>E_TOOLONG</code></td><td>a formula longer than 2000 characters — the readers cost the square of the length (4.6 s at 39 KB, 0.21 s at 4 KB, measured 2026-09-24); split the question</td></tr>
 <tr><td><code>E_TOOMANYEVENTS</code></td><td>more than 6 expiry events in one document — the epoch floor reads the claim on both sides of each (800 events cost 76.7 s, measured 2026-09-27); split the question</td></tr>
+<tr><td><code>E_TYPE_EQ</code></td><td>a statement set equal to a number with `=` — no reading makes a truth value equal to a number</td></tr>
 <tr><td><code>E_UNIT</code></td><td>a unit that cannot be read — a word, optionally with a power (m2), joined by · or /</td></tr>
 <tr><td><code>E_UNKNOWN_NAME</code></td><td>a formula names a row that does not exist</td></tr>
 <tr><td><code>E_UNREADABLE</code></td><td>the instruments could not read the claim — the message says what they choked on</td></tr>
@@ -546,7 +551,7 @@
 <h2>opérateurs</h2><table>
 <tr><td><code>&amp;</code></td><td>and</td></tr>
 <tr><td><code>-&gt;</code></td><td>if … then</td></tr>
-<tr><td><code>=</code></td><td>biconditional between rows — but ONLY in a document with no numbers; where any row has a value, `=` is numeric equality, so write &lt;-&gt; for &#x27;the same truth value as&#x27; (p &lt;-&gt; (x &gt; 1))</td></tr>
+<tr><td><code>=</code></td><td>the same value: between numbers numeric equality (x - 10 = 20), between statements the same TRUTH value (p = q, p = (x &gt; 1)); a statement set equal to a number is refused</td></tr>
 <tr><td><code>^</code></td><td>exactly one of</td></tr>
 <tr><td><code>|</code></td><td>or</td></tr>
 <tr><td><code>~</code></td><td>not</td></tr>
@@ -610,6 +615,7 @@
 <tr><td><code>E_TOOBIG</code></td><td>more than 10 atoms NAMED MORE THAN ONCE in the formulas, or more than 64 atoms in all. The exact guarantee branches only on atoms that repeat; an atom named once costs almost nothing (40 read-once atoms: under 0.01 s; 30 repeated atoms in a pigeonhole witness: 0.66 s — measured 2026-09-29). Rows are not capped. Split the question, not the table</td></tr>
 <tr><td><code>E_TOOLONG</code></td><td>a formula longer than 2000 characters — the readers cost the square of the length (4.6 s at 39 KB, 0.21 s at 4 KB, measured 2026-09-24); split the question</td></tr>
 <tr><td><code>E_TOOMANYEVENTS</code></td><td>more than 6 expiry events in one document — the epoch floor reads the claim on both sides of each (800 events cost 76.7 s, measured 2026-09-27); split the question</td></tr>
+<tr><td><code>E_TYPE_EQ</code></td><td>a statement set equal to a number with `=` — no reading makes a truth value equal to a number</td></tr>
 <tr><td><code>E_UNIT</code></td><td>a unit that cannot be read — a word, optionally with a power (m2), joined by · or /</td></tr>
 <tr><td><code>E_UNKNOWN_NAME</code></td><td>a formula names a row that does not exist</td></tr>
 <tr><td><code>E_UNREADABLE</code></td><td>the instruments could not read the claim — the message says what they choked on</td></tr>
@@ -647,7 +653,7 @@
 <h2>operadores</h2><table>
 <tr><td><code>&amp;</code></td><td>and</td></tr>
 <tr><td><code>-&gt;</code></td><td>if … then</td></tr>
-<tr><td><code>=</code></td><td>biconditional between rows — but ONLY in a document with no numbers; where any row has a value, `=` is numeric equality, so write &lt;-&gt; for &#x27;the same truth value as&#x27; (p &lt;-&gt; (x &gt; 1))</td></tr>
+<tr><td><code>=</code></td><td>the same value: between numbers numeric equality (x - 10 = 20), between statements the same TRUTH value (p = q, p = (x &gt; 1)); a statement set equal to a number is refused</td></tr>
 <tr><td><code>^</code></td><td>exactly one of</td></tr>
 <tr><td><code>|</code></td><td>or</td></tr>
 <tr><td><code>~</code></td><td>not</td></tr>
@@ -711,6 +717,7 @@
 <tr><td><code>E_TOOBIG</code></td><td>more than 10 atoms NAMED MORE THAN ONCE in the formulas, or more than 64 atoms in all. The exact guarantee branches only on atoms that repeat; an atom named once costs almost nothing (40 read-once atoms: under 0.01 s; 30 repeated atoms in a pigeonhole witness: 0.66 s — measured 2026-09-29). Rows are not capped. Split the question, not the table</td></tr>
 <tr><td><code>E_TOOLONG</code></td><td>a formula longer than 2000 characters — the readers cost the square of the length (4.6 s at 39 KB, 0.21 s at 4 KB, measured 2026-09-24); split the question</td></tr>
 <tr><td><code>E_TOOMANYEVENTS</code></td><td>more than 6 expiry events in one document — the epoch floor reads the claim on both sides of each (800 events cost 76.7 s, measured 2026-09-27); split the question</td></tr>
+<tr><td><code>E_TYPE_EQ</code></td><td>a statement set equal to a number with `=` — no reading makes a truth value equal to a number</td></tr>
 <tr><td><code>E_UNIT</code></td><td>a unit that cannot be read — a word, optionally with a power (m2), joined by · or /</td></tr>
 <tr><td><code>E_UNKNOWN_NAME</code></td><td>a formula names a row that does not exist</td></tr>
 <tr><td><code>E_UNREADABLE</code></td><td>the instruments could not read the claim — the message says what they choked on</td></tr>

@@ -489,6 +489,39 @@ def sec15_a_convention_changes_the_order_never_the_verdict():
     print("   convention + separate measurements, or a convention with no value: E_CONVENTION; sabotage caught")
 
 
+def sec16_a_lone_equals_is_read_by_the_types_of_its_sides():
+    """(2026-11-05) `=` between numbers is numeric equality, between statements the biconditional, a statement against
+    a number is refused (E_TYPE_EQ) — whatever else the document holds. Both sides: the equations of the catalogue
+    read as before; `p = q` and `p = (x > 1)` are biconditionals even beside a quantity. Sabotage: the old
+    per-document reading must fail the new cases."""
+    print("-" * 72)
+    print("§16 a lone '=' is read by the types of its sides")
+    rows = [{"name": "p", "status": "unverified", "means": "a"}, {"name": "q", "status": "unverified", "means": "b"},
+            {"name": "x", "status": "verified", "ground": "m", "value": "2", "means": "c"}]
+    want = {"p = q": "p = q", "p = (x > 1)": "p = (x > 1)", "(x > 1) = p": "(x > 1) = p",
+            "x = 2": "x == 2", "x - 1 = 1 & p": "x - 1 == 1 & p", "x * 3 = 6": "x * 3 == 6",
+            "sum(x,x) = 4": "sum(x,x) == 4", "p = q & (x >= 1)": "p = q & (x >= 1)"}
+    for c, n in want.items():
+        assert zfl.normalise(c, rows) == n, (c, zfl.normalise(c, rows))
+        assert zfl.run({"rows": rows, "claim": c})["ok"], c
+    for c in ("p = x", "p = 5"):
+        assert any(i["code"] == "E_TYPE_EQ" for i in zfl.validate({"rows": rows, "claim": c})), c
+    # without any quantity a lone `=` between statements is the biconditional, as it always was
+    assert zfl.normalise("p = q", rows[:2]) == "p = q"
+    # verdicts: p = (x > 1) with x = 2 is p's own status; p = q over two Z rows is open
+    r = zfl.run({"rows": rows, "claim": "p = (x > 1)"})["report"]
+    assert r["numeric"]["disposition"] == "OPEN", r
+    real = zfl.eq_kinds
+    zfl.eq_kinds = lambda text, rows: [(m.start(), "unknown") for m in zfl._LONE_EQ.finditer(text)]   # sabotage
+    try:
+        assert zfl.normalise("p = q", rows) == "p == q"          # the old reading comes back ...
+        assert not zfl.run({"rows": rows, "claim": "p = q"})["ok"]  # ... and the biconditional dies again
+    finally:
+        zfl.eq_kinds = real
+    print("   numbers = numbers -> ==; statements = statements -> the biconditional, beside a quantity too;")
+    print("   a statement = a number -> E_TYPE_EQ; the old per-document reading, as sabotage, is caught")
+
+
 def sec4b_every_example_runs_and_json_types_are_taken_as_they_come():
     print("-" * 72)
     print("4b. THE CATALOGUE, AND WHAT ARRIVES FROM A MODEL")
@@ -964,6 +997,7 @@ if __name__ == "__main__":
     sec13_naive_sets_are_in_the_language()
     sec14_the_model_chain_moves_on()
     sec15_a_convention_changes_the_order_never_the_verdict()
+    sec16_a_lone_equals_is_read_by_the_types_of_its_sides()
     sec4b_every_example_runs_and_json_types_are_taken_as_they_come()
     sec5_the_spec_can_build_the_form_and_the_page()
     print("=" * 72)

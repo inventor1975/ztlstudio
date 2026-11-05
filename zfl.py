@@ -1047,6 +1047,14 @@ def validate(doc):
                 issues.append(_issue(
                     "error", "E_UNKNOWN_NAME", f"row {i} / ground",
                     f"no row is called {sorted(unknown)}"))
+    _spelt = _spell((doc.get("claim") or "").strip())
+    for pat, sym in _WORDS:
+        _spelt = re.sub(pat, sym, _spelt)
+    if any(k == "mixed" for _p, k in eq_kinds(_spelt, rows)):
+        issues.append(_issue("error", "E_TYPE_EQ", "claim",
+                             "a statement is set equal to a number with `=`: no reading makes a truth value equal to a "
+                             "number. If the statement's row is a quantity, give it a value; if you meant 'the same "
+                             "truth value as', compare it with a statement (p = (x > 1)); for numbers write =="))
     claim = normalise((doc.get("claim") or "").strip(), rows)
     if claim:
         try:
@@ -1256,19 +1264,100 @@ def _spell(text):
     return (text or "").replace("<->", "↔")
 
 
-def normalise(claim, rows):
-    """`x - 10 = 20` is what a person writes, and it is not wrong.
+# A LONE `=` IS READ BY THE TYPES OF ITS TWO SIDES (2026-11-05, the curator's "по типам сторон").
+#
+# `=` means "the same value": between two numbers, numeric equality (`x - 10 = 20`); between two statements, the same
+# TRUTH value — the biconditional, which IS equality of truth values (`p = q`, `p = (x > 1)`). The kind of value is
+# known from the rows: a row with a value is a number, a row without one is a statement, a comparison or a connective
+# makes a statement. Before, the reading was chosen per DOCUMENT: any row with a value turned every lone `=` numeric,
+# so `p = q` between two statements died with "p is read as a number" the moment an unrelated quantity was added —
+# the meaning of a symbol changed with a row it does not mention (two of six documents of a blind formalization
+# audit died on it). `==` and `<->` stay the explicit forms; the mathematical and the logical equality stay apart —
+# the TYPES decide which one is meant, not the neighbourhood.
+#   both sides numeric      -> `==`  (binds as an equation: `x - 10 = 20 & ok` is `(x - 10 == 20) & ok`)
+#   both sides statements   -> `=`   (the core's biconditional, the weakest binding)
+#   a statement = a number  -> refused by form, E_TYPE_EQ: no reading equates a truth value with a number
+#   anything not decidable  -> the old per-document rule (an unknown name, arithmetic on a statement such as an
+#                              equation over value-less rows — whose own error already says which row needs a value)
+_EQ_TOK = re.compile(r"\s*(->|↔|<=|>=|==|!=|[&|~^=<>+\-*/(),\[\]]|\d+(?:\.\d+)?|[A-Za-z_][A-Za-z_0-9]*|\S)")
+_EQ_LOGIC = {"&", "|", "~", "^", "↔", "->", "=", "==", "!=", "<", ">", "<=", ">="}
+_EQ_ARITH = {"+", "-", "*", "/", ",", "[", "]"}
+_EQ_NUMFUN = set(FUNCTION_WORDS) | {"sum", "sqrt", "min", "max", "abs"}
 
-    A single `=` is the biconditional in the propositional parser and
-    equality in the numeric one, which is fine as long as nobody has to
-    know that. Where the document has quantities, a lone `=` is read as
-    equality — the reading anyone typing an equation intends. Elsewhere it
-    keeps its propositional sense."""
+
+def _eq_tokens(text):
+    toks, i = [], 0
+    while i < len(text):
+        m = _EQ_TOK.match(text, i)
+        if not m or m.end() == i:
+            break
+        toks.append((m.group(1), m.start(1)))
+        i = m.end()
+    return toks
+
+
+def _eq_side(toks, i, step, rows):
+    """the operand of the `=` at token i, scanned leftward (step -1) or rightward (+1) up to an unmatched bracket or a
+    top-level connective/comparison; -> 'numeric' | 'statement' | 'unknown'"""
+    open_, close = ("(", ")") if step > 0 else (")", "(")
+    side, depth, j = [], 0, i + step
+    while 0 <= j < len(toks):
+        t = toks[j][0]
+        if t == open_:
+            depth += 1
+        elif t == close:
+            if depth == 0:
+                break
+            depth -= 1
+        elif depth == 0 and t in _EQ_LOGIC:
+            break
+        side.append(t)
+        j += step
+    if not side:
+        return "unknown"
+    names = [t for t in side if re.match(r"[A-Za-z_]", t)]
+    if any(t in _EQ_LOGIC for t in side) or any(n in RESERVED_NAMES for n in names):
+        return "statement"                          # a comparison or a connective inside brackets, or T/F/Z
+    valued = {r.get("name") for r in rows if (r.get("value") or "").strip()}
+    plain = {r.get("name") for r in rows if r.get("name") and not (r.get("value") or "").strip()}
+    arith = any(t in _EQ_ARITH or re.match(r"\d", t) for t in side)
+    stmt = [n for n in names if n in plain]
+    if any(n not in valued and n not in plain and n not in _EQ_NUMFUN for n in names):
+        return "unknown"                            # a name the table does not have: its own error says so
+    if stmt:
+        return "statement" if not arith and len(names) == len(stmt) else "unknown"
+    return "numeric" if (arith or names) else "unknown"
+
+
+def eq_kinds(text, rows):
+    """[(position in text, 'numeric' | 'statement' | 'mixed' | 'unknown')] for every lone `=` in a SPELLED claim"""
+    toks = _eq_tokens(text)
+    out = []
+    for i, (t, pos) in enumerate(toks):
+        if t != "=":
+            continue
+        a, b = _eq_side(toks, i, -1, rows), _eq_side(toks, i, +1, rows)
+        if a == b and a in ("numeric", "statement"):
+            out.append((pos, a))
+        elif {a, b} == {"numeric", "statement"}:
+            out.append((pos, "mixed"))
+        else:
+            out.append((pos, "unknown"))
+    return out
+
+
+def normalise(claim, rows):
+    """`x - 10 = 20` is what a person writes, and it is not wrong; nor is `p = q`. Each lone `=` is read by the types
+    of its two sides (see above); only an undecidable one falls back to the old rule — numeric where the document
+    has quantities, the biconditional elsewhere."""
     out = _spell(claim)
     for pat, sym in _WORDS:
         out = re.sub(pat, sym, out)
-    if numeric_rows(rows) and _LONE_EQ.search(out):
-        out = _LONE_EQ.sub("==", out)
+    legacy_numeric = bool(numeric_rows(rows))
+    kinds = eq_kinds(out, rows)
+    for pos, kind in sorted(kinds, reverse=True):          # right to left: earlier positions stay valid
+        if kind == "numeric" or (kind in ("mixed", "unknown") and legacy_numeric):
+            out = out[:pos] + "==" + out[pos + 1:]
     return out
 
 
