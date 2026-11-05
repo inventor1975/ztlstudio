@@ -7,7 +7,8 @@
 // buttons and headings that are not part of the language.
 
 const UI = {
-  en: { advanced: "advanced", tools: "two more checkers", setsl: "sets (JSON, optional)", setsview: "sets — the naive view", setsin: "members", setsout: "not members", setsq: "undecided — passport", setsclaims: "claims over the universe", reference: "what is ZFL? (the language)", addrow: "add a row",
+  en: { degree: "degree — how probable", needl: "threshold (need, optional)", indepl: "the statements are independent (a convention)", degiv: "over every joint of the statements", degstable: "if each unverified statement means one thing throughout", degind: "stipulated independent", degneed: "needed", degrests: "rests on degrees that were told, not checked",
+        advanced: "advanced", tools: "two more checkers", setsl: "sets (JSON, optional)", setsview: "sets — the naive view", setsin: "members", setsout: "not members", setsq: "undecided — passport", setsclaims: "claims over the universe", reference: "what is ZFL? (the language)", addrow: "add a row",
           mirror: "what the core read from your table",
           mirrorsilent: "silent",
           mirrornone: "No instrument took this up. The table was parsed; nothing answered.",
@@ -52,7 +53,8 @@ const UI = {
                + "visitor). Press \u00abuse my own AI\u00bb above to carry on "
                + "with your own key \u2014 or keep working without it: the "
                + "table and the verdict never needed the AI." },
-  ru: { advanced: "дополнительно", tools: "ещё два прибора", setsl: "множества (JSON, по желанию)", setsview: "множества — наивный взгляд", setsin: "элементы", setsout: "не элементы", setsq: "не решено — паспорт", setsclaims: "утверждения обо всём универсуме", reference: "что такое ZFL? (язык)",
+  ru: { degree: "степень — насколько вероятно", needl: "порог (need, по желанию)", indepl: "утверждения независимы (договорённость)", degiv: "по всем совместным распределениям утверждений", degstable: "если каждое непроверенное утверждение везде значит одно", degind: "по договорённости о независимости", degneed: "нужно", degrests: "держится на сообщённых, а не проверенных степенях",
+        advanced: "дополнительно", tools: "ещё два прибора", setsl: "множества (JSON, по желанию)", setsview: "множества — наивный взгляд", setsin: "элементы", setsout: "не элементы", setsq: "не решено — паспорт", setsclaims: "утверждения обо всём универсуме", reference: "что такое ZFL? (язык)",
           mirror: "что ядро прочитало из вашей таблицы",
           mirrorsilent: "промолчали",
           mirrornone: "Ни один прибор не взялся. Таблица разобрана; отвечать некому.",
@@ -97,7 +99,8 @@ const UI = {
                + "посетителя). Нажмите «свой ИИ» вверху и продолжите со "
                + "своим ключом — или работайте без него: таблица и вердикт "
                + "в ИИ никогда не нуждались." },
-  uk: { advanced: "додатково", tools: "ще два прилади", setsl: "множини (JSON, за бажанням)", setsview: "множини — наївний погляд", setsin: "елементи", setsout: "не елементи", setsq: "не вирішено — паспорт", setsclaims: "твердження про весь універсум", reference: "що таке ZFL? (мова)",
+  uk: { degree: "ступінь — наскільки ймовірно", needl: "поріг (need, за бажанням)", indepl: "твердження незалежні (домовленість)", degiv: "за всіма спільними розподілами тверджень", degstable: "якщо кожне неперевірене твердження всюди означає одне", degind: "за домовленістю про незалежність", degneed: "потрібно", degrests: "тримається на повідомлених, а не перевірених ступенях",
+        advanced: "додатково", tools: "ще два прилади", setsl: "множини (JSON, за бажанням)", setsview: "множини — наївний погляд", setsin: "елементи", setsout: "не елементи", setsq: "не вирішено — паспорт", setsclaims: "твердження про весь універсум", reference: "що таке ZFL? (мова)",
           mirror: "що ядро прочитало з вашої таблиці",
           mirrorsilent: "промовчали",
           mirrornone: "Жоден прилад не взявся. Таблицю розібрано; відповідати нікому.",
@@ -138,7 +141,8 @@ const UI = {
                + "відвідувача). Натисніть «свій ШІ» вгорі й продовжте зі "
                + "своїм ключем — або працюйте без нього: таблиця і вердикт "
                + "у ШІ ніколи не потребували." },
-  he: { advanced: "מתקדם", tools: "שני בודקים נוספים", setsl: "קבוצות (JSON, לא חובה)", setsview: "קבוצות — המבט הנאיבי", setsin: "איברים", setsout: "לא איברים", setsq: "לא הוכרע — דרכון", setsclaims: "טענות על כל העולם", reference: "מהי ZFL? (השפה)",
+  he: { degree: "דרגה — עד כמה סביר", needl: "סף (need, לא חובה)", indepl: "הטענות בלתי תלויות (מוסכמה)", degiv: "על פני כל ההתפלגויות המשותפות של הטענות", degstable: "אם כל טענה שלא אומתה פירושה אחד לאורך כל הדרך", degind: "בהנחת אי-תלות מוסכמת", degneed: "נדרש", degrests: "נשען על דרגות שנמסרו, לא נבדקו",
+        advanced: "מתקדם", tools: "שני בודקים נוספים", setsl: "קבוצות (JSON, לא חובה)", setsview: "קבוצות — המבט הנאיבי", setsin: "איברים", setsout: "לא איברים", setsq: "לא הוכרע — דרכון", setsclaims: "טענות על כל העולם", reference: "מהי ZFL? (השפה)",
           mirror: "מה שהליבה קראה מהטבלה שלך",
           mirrorsilent: "שתקו",
           mirrornone: "אף מכשיר לא נטל זאת. הטבלה נותחה; אין מי שיענה.",
@@ -177,7 +181,8 @@ const UI = {
         limit: "ה־AI החינמי מוצה (20 בקשות ל־10 דקות למבקר). לחצו על "
                + "«ה־AI שלי» למעלה והמשיכו עם מפתח משלכם — או עבדו בלעדיו: "
                + "הטבלה והפסק מעולם לא נזקקו ל־AI." },
-  de: { advanced: "erweitert", tools: "zwei weitere Prüfer", setsl: "Mengen (JSON, optional)", setsview: "Mengen — die naive Sicht", setsin: "Elemente", setsout: "keine Elemente", setsq: "unentschieden — Pass", setsclaims: "Aussagen über das ganze Universum", reference: "Was ist ZFL? (die Sprache)",
+  de: { degree: "Grad — wie wahrscheinlich", needl: "Schwelle (need, optional)", indepl: "die Aussagen sind unabhängig (Konvention)", degiv: "über jede gemeinsame Verteilung der Aussagen", degstable: "falls jede ungeprüfte Aussage überall dasselbe bedeutet", degind: "bei vereinbarter Unabhängigkeit", degneed: "nötig", degrests: "beruht auf mitgeteilten, nicht geprüften Graden",
+        advanced: "erweitert", tools: "zwei weitere Prüfer", setsl: "Mengen (JSON, optional)", setsview: "Mengen — die naive Sicht", setsin: "Elemente", setsout: "keine Elemente", setsq: "unentschieden — Pass", setsclaims: "Aussagen über das ganze Universum", reference: "Was ist ZFL? (die Sprache)",
           mirror: "was der Kern aus Ihrer Tabelle gelesen hat",
           mirrorsilent: "schwiegen",
           mirrornone: "Kein Instrument hat sich zuständig gefühlt. Die Tabelle wurde gelesen; niemand antwortet.",
@@ -219,7 +224,8 @@ const UI = {
                + "je Besucher). Klicken Sie oben auf «eigene KI» und machen Sie "
                + "mit Ihrem Schlüssel weiter — oder arbeiten Sie ohne: Tabelle "
                + "und Urteil haben die KI nie gebraucht." },
-  fr: { advanced: "avancé", tools: "deux autres vérificateurs", setsl: "ensembles (JSON, facultatif)", setsview: "ensembles — la vue naïve", setsin: "éléments", setsout: "non-éléments", setsq: "indécis — passeport", setsclaims: "affirmations sur tout l'univers", reference: "qu'est-ce que ZFL ? (le langage)",
+  fr: { degree: "degré — à quel point probable", needl: "seuil (need, facultatif)", indepl: "les énoncés sont indépendants (convention)", degiv: "sur toute loi jointe des énoncés", degstable: "si chaque énoncé non vérifié garde un seul sens partout", degind: "indépendance stipulée", degneed: "requis", degrests: "repose sur des degrés annoncés, non vérifiés",
+        advanced: "avancé", tools: "deux autres vérificateurs", setsl: "ensembles (JSON, facultatif)", setsview: "ensembles — la vue naïve", setsin: "éléments", setsout: "non-éléments", setsq: "indécis — passeport", setsclaims: "affirmations sur tout l'univers", reference: "qu'est-ce que ZFL ? (le langage)",
           mirror: "ce que le noyau a lu dans votre tableau",
           mirrorsilent: "silencieux",
           mirrornone: "Aucun instrument ne s'en est saisi. Le tableau a été analysé ; personne ne répond.",
@@ -261,7 +267,8 @@ const UI = {
                + "visiteur). Cliquez sur «mon IA» en haut et continuez avec "
                + "votre clé — ou travaillez sans : le tableau et le verdict "
                + "n'ont jamais eu besoin de l'IA." },
-  es: { advanced: "avanzado", tools: "dos verificadores más", setsl: "conjuntos (JSON, opcional)", setsview: "conjuntos — la vista ingenua", setsin: "miembros", setsout: "no miembros", setsq: "sin decidir — pasaporte", setsclaims: "afirmaciones sobre todo el universo", reference: "¿qué es ZFL? (el lenguaje)",
+  es: { degree: "grado — cuán probable", needl: "umbral (need, opcional)", indepl: "los enunciados son independientes (convención)", degiv: "sobre toda distribución conjunta de los enunciados", degstable: "si cada enunciado no verificado significa lo mismo en todas partes", degind: "independencia estipulada", degneed: "necesario", degrests: "descansa en grados comunicados, no verificados",
+        advanced: "avanzado", tools: "dos verificadores más", setsl: "conjuntos (JSON, opcional)", setsview: "conjuntos — la vista ingenua", setsin: "miembros", setsout: "no miembros", setsq: "sin decidir — pasaporte", setsclaims: "afirmaciones sobre todo el universo", reference: "¿qué es ZFL? (el lenguaje)",
           mirror: "lo que el núcleo leyó de su tabla",
           mirrorsilent: "callaron",
           mirrornone: "Ningún instrumento se hizo cargo. La tabla se analizó; nadie responde.",
@@ -437,6 +444,10 @@ function collect() {
   if (st) {
     try { doc.sets = JSON.parse(st); } catch (e) { doc.sets = st; }
   }
+  // DEGREES (2026-11-05): the threshold and the independence convention are document fields, sent only when set
+  const nd = (($("need") || {}).value || "").trim();
+  if (nd) doc.need = nd;
+  if (($("independent") || {}).checked) doc.independent = true;
   const cb = (($("certbound") || {}).value || "").trim();
   if (cb) {
     const laws = (($("certlaws") || {}).value || "").split(";").map(x => x.trim()).filter(Boolean);
@@ -447,6 +458,11 @@ function collect() {
 
 function setSets(doc) {
   if ($("sets")) $("sets").value = doc.sets ? JSON.stringify(doc.sets) : "";
+}
+
+function setDeg(doc) {
+  if ($("need")) $("need").value = doc.need || "";
+  if ($("independent")) $("independent").checked = !!doc.independent;
 }
 
 function setCert(doc) {
@@ -541,6 +557,21 @@ function showReport(r) {
           esc(rep.numeric.next_check.join(" · ")) + "</p>" : "") +
       `<p class="muted">${t("sheet")}: <code>` +
       esc(rep.numeric.sheet) + "</code></p>"));
+  }
+  if (rep.degree) {
+    // DEGREES (2026-11-05): the claim's probability as an interval over every joint, exact; the threshold verdict
+    const D = rep.degree, iv = x => x[0] === x[1] ? x[0] : `[${x[0]}, ${x[1]}]`;
+    out.push(panel(t("degree"), D.refused ? `<p class="muted">${esc(D.refused)}</p>` :
+      `<p><b>${esc(iv(D.interval))}</b> <span class="muted">${esc(t("degiv"))}</span></p>` +
+      (iv(D.if_stable) !== iv(D.interval)
+        ? `<p>${esc(iv(D.if_stable))} <span class="muted">${esc(t("degstable"))}</span></p>` : "") +
+      (D.independent ? `<p>${esc(iv(D.independent))} <span class="muted">${esc(t("degind"))}</span></p>` : "") +
+      (D.verdict ? `<p>${esc(t("degneed"))} &ge; ${esc(D.need)}: ${verdictSpan(D.verdict)}` +
+        (D.polarity ? ` <span class="muted">(${esc(D.polarity)})</span>` : "") + "</p>" : "") +
+      (D.rests_on_told ? `<p class="muted">${esc(t("degrests"))}: ${esc(D.rests_on_told.join(", "))}</p>` : "") +
+      (D.next_check && D.next_check.length
+        ? `<p class="muted">${t("cures")}: ${esc(D.next_check.join(" · "))}</p>` : "") +
+      `<p class="muted">${esc(D.proved)}</p>`));
   }
   if (rep.judge) {
     // A CREDIT THAT CANNOT BE REDEEMED must not read as an ordinary one.
@@ -692,6 +723,7 @@ function loadExample(kind, n) {
   $("claim").value = item.doc.claim || "";
   setCert(item.doc);
   setSets(item.doc);
+  setDeg(item.doc);
   // the QUESTION goes into the chat, so the commentary below has something
   // to be an answer TO. Not everyone knows what "Jourdain's postcard" is,
   // and a verdict with no question above it explains nothing.
@@ -733,6 +765,7 @@ async function ask() {
   $("claim").value = r.doc.claim || "";
   setCert(r.doc);
   setSets(r.doc);
+  setDeg(r.doc);
   HISTORY.push({ role: "assistant", content: JSON.stringify(r.doc) });
   drawGrid();
   run();
