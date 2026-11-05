@@ -88,6 +88,8 @@ CODE_HELP = {
     "E_NOGROUND": ("verified, refuted or defined, with nothing backing it",
                    "проверено, опровергнуто или определено — но без основания"),
     "E_KIND": ("a kind of ground outside the list", "вид основания вне списка"),
+    "E_CONVENTION": ("a convention also marked as separate measurements, or on a row with no value",
+                     "договорённость, помеченная ещё и как отдельные измерения, или на строке без значения"),
     "E_SETS": ("the sets cannot be read, or are over the public limits, or a row has a membership cell's name",
                "множества не читаются, или превышают публичные пределы, или строка носит имя клетки a_in_S"),
     "E_EXPIRY_NO_GROUND": (

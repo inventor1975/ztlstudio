@@ -29,6 +29,7 @@
 <tr><td><b>unit</b></td><td>only with a value; metres never meet roubles</td><td>no</td><td>RUB · m · m2</td></tr>
 <tr><td><b>scale</b></td><td>what it rounds to</td><td>no</td><td>exact · whole · hundredths · thirds</td></tr>
 <tr class="adv"><td><b>separate measurements</b></td><td>each occurrence is its own act of measuring</td><td>no</td><td></td></tr>
+<tr class="adv"><td><b>a convention</b></td><td>no value to find until one is declared (a measure nobody named, a unit, a summation method)</td><td>no</td><td></td></tr>
 </table>
 <h2>the document itself</h2><table><tr><th>column</th><th>what it is</th><th>required</th><th>options / examples</th></tr>
 <tr><td><b>admissible grounds</b></td><td>the grounds this document accepts, comma-separated. A row earning on a ground outside the list falls to unverified rather than to false. A tier may be given — &#x27;master:story, perebor:act&#x27;: story means &#x27;so it was said&#x27;, and what earns on it is marked. Empty: the gate says nothing</td><td>no</td><td>registry_extract:place, testimony:story · перебор:act, промер:act, мастер:story</td></tr>
@@ -83,6 +84,7 @@
 <tr><td><code>E_BADNAME</code></td><td>a name a formula could not use</td></tr>
 <tr><td><code>E_BOUNDVAR</code></td><td>the variable of an integral is also a row — inside integral(f, x, a, b) the x runs over [a, b]; give it a letter of its own</td></tr>
 <tr><td><code>E_CLAIM</code></td><td>the claim does not parse</td></tr>
+<tr><td><code>E_CONVENTION</code></td><td>a convention also marked as separate measurements, or on a row with no value</td></tr>
 <tr><td><code>E_DIM</code></td><td>a dimension outside the list — a ground either supports a claim or permits it</td></tr>
 <tr><td><code>E_DIM_CLASH</code></td><td>a ground carries one mark, not two: &#x27;authority&#x27; cannot be combined with an act, a certificate or another row</td></tr>
 <tr><td><code>E_DUPNAME</code></td><td>the same name twice</td></tr>
@@ -128,6 +130,7 @@
 <tr><td><b>единица</b></td><td>только с величиной; метры не встречаются с рублями</td><td>нет</td><td>RUB · m · m2</td></tr>
 <tr><td><b>шкала</b></td><td>до чего округляем</td><td>нет</td><td>точно · целые · сотые · трети</td></tr>
 <tr class="adv"><td><b>отдельные измерения</b></td><td>каждое вхождение — свой акт измерения</td><td>нет</td><td></td></tr>
+<tr class="adv"><td><b>договорённость</b></td><td>значения нет, пока его не договорили (неназванная мера, единица, метод суммирования)</td><td>нет</td><td></td></tr>
 </table>
 <h2>сам документ</h2><table><tr><th>колонка</th><th>что это</th><th>обязательна</th><th>варианты / примеры</th></tr>
 <tr><td><b>допустимые основания</b></td><td>основания, которые этот документ признаёт, через запятую. Строка, заработавшая на основании вне списка, падает в непроверенное, а не в ложь. Можно указать ярус — «master:story, perebor:act»: story значит «так сказано», и заработавшее на нём будет помечено. Пусто — ворота молчат</td><td>нет</td><td>registry_extract:place, testimony:story · перебор:act, промер:act, мастер:story</td></tr>
@@ -182,6 +185,7 @@
 <tr><td><code>E_BADNAME</code></td><td>имя, непригодное для формулы</td></tr>
 <tr><td><code>E_BOUNDVAR</code></td><td>переменная интеграла совпала с именем строки — внутри integral(f, x, a, b) x пробегает [a, b]; дайте ей свою букву</td></tr>
 <tr><td><code>E_CLAIM</code></td><td>утверждение не разбирается</td></tr>
+<tr><td><code>E_CONVENTION</code></td><td>договорённость, помеченная ещё и как отдельные измерения, или на строке без значения</td></tr>
 <tr><td><code>E_DIM</code></td><td>измерение вне списка — основание либо подпирает утверждение, либо даёт на него право</td></tr>
 <tr><td><code>E_DIM_CLASH</code></td><td>основание несёт одну пометку, а не две: «разрешение» не сочетается с актом, сертификатом или другой строкой</td></tr>
 <tr><td><code>E_DUPNAME</code></td><td>имя повторяется</td></tr>
@@ -227,6 +231,7 @@
 <tr><td><b>одиниця</b></td><td>лише з величиною; метри не зустрічаються з гривнями</td><td>ні</td><td>RUB · m · m2</td></tr>
 <tr><td><b>шкала</b></td><td>до чого округлюємо</td><td>ні</td><td>цілі · соті · третини</td></tr>
 <tr class="adv"><td><b>окремі виміри</b></td><td>число з вибірки, а не одне вимірювання</td><td>ні</td><td></td></tr>
+<tr class="adv"><td><b>домовленість</b></td><td>значення немає, доки його не домовились (неназвана міра, одиниця)</td><td>ні</td><td></td></tr>
 </table>
 <h2>сам документ</h2><table><tr><th>стовпець</th><th>що це</th><th>обов&#x27;язково</th><th>варіанти / приклади</th></tr>
 <tr><td><b>допустимі підстави</b></td><td>через кому; порожньо — ворота мовчать</td><td>ні</td><td>registry_extract:place, testimony:story · перебор:act, промер:act, мастер:story</td></tr>
@@ -281,6 +286,7 @@
 <tr><td><code>E_BADNAME</code></td><td>a name a formula could not use</td></tr>
 <tr><td><code>E_BOUNDVAR</code></td><td>змінна інтеграла збіглася з назвою рядка — усередині integral(f, x, a, b) x пробігає [a, b]; дайте їй свою літеру</td></tr>
 <tr><td><code>E_CLAIM</code></td><td>the claim does not parse</td></tr>
+<tr><td><code>E_CONVENTION</code></td><td>a convention also marked as separate measurements, or on a row with no value</td></tr>
 <tr><td><code>E_DIM</code></td><td>a dimension outside the list — a ground either supports a claim or permits it</td></tr>
 <tr><td><code>E_DIM_CLASH</code></td><td>a ground carries one mark, not two: &#x27;authority&#x27; cannot be combined with an act, a certificate or another row</td></tr>
 <tr><td><code>E_DUPNAME</code></td><td>the same name twice</td></tr>
@@ -326,6 +332,7 @@
 <tr><td><b>יחידה</b></td><td>רק עם ערך; מטרים לא נפגשים עם שקלים</td><td>לא</td><td>RUB · m · m2</td></tr>
 <tr><td><b>סולם</b></td><td>לאן מעגלים</td><td>לא</td><td>שלמים · מאיות · שלישים</td></tr>
 <tr class="adv"><td><b>מדידות נפרדות</b></td><td>מספר מתוך מדגם, לא מדידה אחת</td><td>לא</td><td></td></tr>
+<tr class="adv"><td><b>מוסכמה</b></td><td>אין ערך למצוא עד שקובעים אחד (מידה שלא נקבעה, יחידה)</td><td>לא</td><td></td></tr>
 </table>
 <h2>המסמך עצמו</h2><table><tr><th>עמודה</th><th>מה זה</th><th>חובה</th><th>אפשרויות / דוגמאות</th></tr>
 <tr><td><b>אסמכתאות קבילות</b></td><td>מופרדות בפסיק; ריק — השער שותק</td><td>לא</td><td>registry_extract:place, testimony:story · перебор:act, промер:act, мастер:story</td></tr>
@@ -380,6 +387,7 @@
 <tr><td><code>E_BADNAME</code></td><td>a name a formula could not use</td></tr>
 <tr><td><code>E_BOUNDVAR</code></td><td>משתנה האינטגרל זהה לשם של שורה — בתוך integral(f, x, a, b) ה-x רץ על [a, b]; תנו לו אות משלו</td></tr>
 <tr><td><code>E_CLAIM</code></td><td>the claim does not parse</td></tr>
+<tr><td><code>E_CONVENTION</code></td><td>a convention also marked as separate measurements, or on a row with no value</td></tr>
 <tr><td><code>E_DIM</code></td><td>a dimension outside the list — a ground either supports a claim or permits it</td></tr>
 <tr><td><code>E_DIM_CLASH</code></td><td>a ground carries one mark, not two: &#x27;authority&#x27; cannot be combined with an act, a certificate or another row</td></tr>
 <tr><td><code>E_DUPNAME</code></td><td>the same name twice</td></tr>
@@ -425,6 +433,7 @@
 <tr><td><b>Einheit</b></td><td>nur mit einem Wert; Meter treffen nie auf Euro</td><td>nein</td><td>RUB · m · m2</td></tr>
 <tr><td><b>Skala</b></td><td>worauf gerundet wird</td><td>nein</td><td>ganze · Hundertstel · Drittel</td></tr>
 <tr class="adv"><td><b>Einzelmessungen</b></td><td>eine Zahl aus einer Stichprobe, keine einzelne Messung</td><td>nein</td><td></td></tr>
+<tr class="adv"><td><b>eine Konvention</b></td><td>kein Wert zu finden, bis einer festgelegt wird (ein ungenanntes Maß, eine Einheit)</td><td>nein</td><td></td></tr>
 </table>
 <h2>das Dokument selbst</h2><table><tr><th>Spalte</th><th>was es ist</th><th>Pflicht</th><th>Optionen / Beispiele</th></tr>
 <tr><td><b>zulässige Grundlagen</b></td><td>kommagetrennt; leer heißt: das Tor schweigt</td><td>nein</td><td>registry_extract:place, testimony:story · перебор:act, промер:act, мастер:story</td></tr>
@@ -479,6 +488,7 @@
 <tr><td><code>E_BADNAME</code></td><td>a name a formula could not use</td></tr>
 <tr><td><code>E_BOUNDVAR</code></td><td>die Variable eines Integrals ist auch eine Zeile — in integral(f, x, a, b) läuft x über [a, b]; geben Sie ihr einen eigenen Buchstaben</td></tr>
 <tr><td><code>E_CLAIM</code></td><td>the claim does not parse</td></tr>
+<tr><td><code>E_CONVENTION</code></td><td>a convention also marked as separate measurements, or on a row with no value</td></tr>
 <tr><td><code>E_DIM</code></td><td>a dimension outside the list — a ground either supports a claim or permits it</td></tr>
 <tr><td><code>E_DIM_CLASH</code></td><td>a ground carries one mark, not two: &#x27;authority&#x27; cannot be combined with an act, a certificate or another row</td></tr>
 <tr><td><code>E_DUPNAME</code></td><td>the same name twice</td></tr>
@@ -524,6 +534,7 @@
 <tr><td><b>unité</b></td><td>seulement avec une valeur ; les mètres ne rencontrent pas les euros</td><td>non</td><td>RUB · m · m2</td></tr>
 <tr><td><b>échelle</b></td><td>jusqu&#x27;où l&#x27;on arrondit</td><td>non</td><td>entiers · centièmes · tiers</td></tr>
 <tr class="adv"><td><b>mesures séparées</b></td><td>un nombre issu d&#x27;un échantillon, pas d&#x27;une seule mesure</td><td>non</td><td></td></tr>
+<tr class="adv"><td><b>une convention</b></td><td>pas de valeur à trouver tant qu&#x27;on n&#x27;en fixe pas une (une mesure non nommée, une unité)</td><td>non</td><td></td></tr>
 </table>
 <h2>le document lui-même</h2><table><tr><th>colonne</th><th>ce que c&#x27;est</th><th>obligatoire</th><th>options / exemples</th></tr>
 <tr><td><b>fondements admis</b></td><td>separes par des virgules ; vide : la porte se tait</td><td>non</td><td>registry_extract:place, testimony:story · перебор:act, промер:act, мастер:story</td></tr>
@@ -578,6 +589,7 @@
 <tr><td><code>E_BADNAME</code></td><td>a name a formula could not use</td></tr>
 <tr><td><code>E_BOUNDVAR</code></td><td>la variable d&#x27;une intégrale est aussi une ligne — dans integral(f, x, a, b), x parcourt [a, b] ; donnez-lui sa propre lettre</td></tr>
 <tr><td><code>E_CLAIM</code></td><td>the claim does not parse</td></tr>
+<tr><td><code>E_CONVENTION</code></td><td>a convention also marked as separate measurements, or on a row with no value</td></tr>
 <tr><td><code>E_DIM</code></td><td>a dimension outside the list — a ground either supports a claim or permits it</td></tr>
 <tr><td><code>E_DIM_CLASH</code></td><td>a ground carries one mark, not two: &#x27;authority&#x27; cannot be combined with an act, a certificate or another row</td></tr>
 <tr><td><code>E_DUPNAME</code></td><td>the same name twice</td></tr>
@@ -623,6 +635,7 @@
 <tr><td><b>unidad</b></td><td>solo con un valor; los metros no se cruzan con los euros</td><td>no</td><td>RUB · m · m2</td></tr>
 <tr><td><b>escala</b></td><td>hasta dónde redondeamos</td><td>no</td><td>enteros · centésimas · tercios</td></tr>
 <tr class="adv"><td><b>mediciones separadas</b></td><td>un número de una muestra, no una sola medición</td><td>no</td><td></td></tr>
+<tr class="adv"><td><b>una convención</b></td><td>no hay valor que hallar hasta que se fija uno (una medida sin nombrar, una unidad)</td><td>no</td><td></td></tr>
 </table>
 <h2>el documento mismo</h2><table><tr><th>columna</th><th>qué es</th><th>obligatorio</th><th>opciones / ejemplos</th></tr>
 <tr><td><b>fundamentos admitidos</b></td><td>separados por comas; vacio: la puerta calla</td><td>no</td><td>registry_extract:place, testimony:story · перебор:act, промер:act, мастер:story</td></tr>
@@ -677,6 +690,7 @@
 <tr><td><code>E_BADNAME</code></td><td>a name a formula could not use</td></tr>
 <tr><td><code>E_BOUNDVAR</code></td><td>la variable de una integral también es una fila — en integral(f, x, a, b) la x recorre [a, b]; dele una letra propia</td></tr>
 <tr><td><code>E_CLAIM</code></td><td>the claim does not parse</td></tr>
+<tr><td><code>E_CONVENTION</code></td><td>a convention also marked as separate measurements, or on a row with no value</td></tr>
 <tr><td><code>E_DIM</code></td><td>a dimension outside the list — a ground either supports a claim or permits it</td></tr>
 <tr><td><code>E_DIM_CLASH</code></td><td>a ground carries one mark, not two: &#x27;authority&#x27; cannot be combined with an act, a certificate or another row</td></tr>
 <tr><td><code>E_DUPNAME</code></td><td>the same name twice</td></tr>

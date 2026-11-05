@@ -355,6 +355,24 @@ COLUMNS = [
         "uk": ("окремі виміри", "число з вибірки, а не одне вимірювання"),
         "he": ("מדידות נפרדות", "מספר מתוך מדגם, לא מדידה אחת"),
     },
+    {
+        # A CONVENTION (2026-11-05, Bertrand's chord, Sleeping Beauty, an outside review): a quantity with no value to
+        # find until one is DECLARED — a probability over a measure nobody named, a unit, a summation method, which
+        # quantity a study asks for. The numeric floor then names the cure "stipulate", never "measure"; NO verdict
+        # changes (ZTL znumjudge, tested both sides). An empirical quantity is never a convention: its value is
+        # measured, and declaring it would be whitewashing.
+        "key": "convention", "type": "bool", "required": False, "advanced": True,
+        "default": False,
+        "en": ("a convention",
+               "no value to find until one is declared (a measure nobody named, a unit, a summation method)"),
+        "ru": ("договорённость",
+               "значения нет, пока его не договорили (неназванная мера, единица, метод суммирования)"),
+        "de": ("eine Konvention", "kein Wert zu finden, bis einer festgelegt wird (ein ungenanntes Maß, eine Einheit)"),
+        "fr": ("une convention", "pas de valeur à trouver tant qu'on n'en fixe pas une (une mesure non nommée, une unité)"),
+        "es": ("una convención", "no hay valor que hallar hasta que se fija uno (una medida sin nombrar, una unidad)"),
+        "uk": ("домовленість", "значення немає, доки його не домовились (неназвана міра, одиниця)"),
+        "he": ("מוסכמה", "אין ערך למצוא עד שקובעים אחד (מידה שלא נקבעה, יחידה)"),
+    },
 ]
 
 DOC_FIELDS = [
@@ -681,7 +699,7 @@ def coerce(doc):
             continue                          # membership rows are re-made below, never carried over
         row = {}
         for k, v in r.items():
-            if k == "sample":
+            if k in ("sample", "convention"):
                 row[k] = bool(v)
             elif v is None:
                 row[k] = ""
@@ -864,6 +882,14 @@ def validate(doc):
                                  f"'{name}' is already used above"))
         seen.add(name)
 
+        if r.get("convention") and r.get("sample"):
+            issues.append(_issue("error", "E_CONVENTION", f"{at} / convention",
+                                 "a convention has one value, and 'separate measurements' makes each occurrence its "
+                                 "own measurement: the two cannot both hold"))
+        elif r.get("convention") and not (r.get("value") or "").strip():
+            issues.append(_issue("error", "E_CONVENTION", f"{at} / convention",
+                                 "'a convention' marks a quantity: give the row a value (an interval for what the "
+                                 "convention could fix), or it changes nothing"))
         status = (r.get("status") or "").strip()
         if status not in STATUSES:
             issues.append(_issue("error", "E_STATUS", f"{at} / status",
@@ -1311,6 +1337,8 @@ def to_sheet(rows):
             bits.append(r["unit"].strip())
         if r.get("sample"):
             bits.append("sample")
+        if r.get("convention"):
+            bits.append("convention")
         parts.append(" ".join(bits))
     return ", ".join(parts)
 

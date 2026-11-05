@@ -450,6 +450,45 @@ def sec14_the_model_chain_moves_on():
     print(f"   groq {g[0]} at its limit -> {g[1]} at once (no sleeping); all Groq at the limit -> NVIDIA;")
     print("   every model refusing -> a refusal naming each; a person's chosen model is never replaced.")
 
+def sec15_a_convention_changes_the_order_never_the_verdict():
+    """(2026-11-05) The `convention` column. Both sides: on a battery of documents the numeric disposition and polarity
+    are the same with and without it, and the cures differ only measure <-> stipulate for that row; an empirical row
+    beside it keeps 'measure'; a convention with 'sample' or without a value is refused (E_CONVENTION). Sabotage: a
+    to_sheet that drops the token must break the cure check."""
+    import copy
+    print("-" * 72)
+    print("§15 a convention changes the order, never the verdict")
+    docs = [
+        ({"rows": [{"name": "P", "status": "verified", "ground": "methods", "value": "[1/4,1/2]"}]}, "P == 1/2"),
+        ({"rows": [{"name": "P", "status": "verified", "ground": "methods", "value": "[1/4,1/2]"}]}, "P >= 1/4"),
+        ({"rows": [{"name": "P", "status": "unverified", "value": "[1/4,1/2]"}]}, "P > 1/2"),
+        ({"rows": [{"name": "P", "status": "verified", "ground": "methods", "value": "[1/4,1/2]"},
+                   {"name": "n", "status": "verified", "ground": "count", "value": "[30,50]"}]}, "P * n >= 10"),
+    ]
+    for doc, claim in docs:
+        plain = copy.deepcopy(doc); plain["claim"] = claim
+        conv = copy.deepcopy(plain); conv["rows"][0]["convention"] = True
+        a, b = zfl.run(plain)["report"]["numeric"], zfl.run(conv)["report"]["numeric"]
+        assert (a["disposition"], a.get("polarity")) == (b["disposition"], b.get("polarity")), (claim, a, b)
+        assert [c.replace("measure P", "stipulate P") for c in a["next_check"]] == b["next_check"], (claim, a, b)
+    both = {"rows": [{"name": "P", "status": "verified", "ground": "methods", "value": "[1/4,1/2]", "convention": True},
+                     {"name": "n", "status": "verified", "ground": "count", "value": "[30,50]"}], "claim": "P * n >= 10"}
+    cures = zfl.run(both)["report"]["numeric"]["next_check"]
+    assert "stipulate P" in cures and "measure n" in cures, cures
+    for bad in ({"rows": [{"name": "P", "status": "unverified", "value": "[0,1]", "convention": True, "sample": True}],
+                 "claim": "P > 0"},
+                {"rows": [{"name": "q", "status": "unverified", "convention": True}], "claim": "q"}):
+        assert any(i["code"] == "E_CONVENTION" for i in zfl.validate(bad)), bad
+    real = zfl.to_sheet
+    zfl.to_sheet = lambda rows: real(rows).replace(" convention", "")         # sabotage: the token never travels
+    try:
+        assert "stipulate P" not in zfl.run(both)["report"]["numeric"]["next_check"]
+    finally:
+        zfl.to_sheet = real
+    print("   same verdict with and without the column; 'stipulate' for the convention, 'measure' beside it;")
+    print("   convention + separate measurements, or a convention with no value: E_CONVENTION; sabotage caught")
+
+
 def sec4b_every_example_runs_and_json_types_are_taken_as_they_come():
     print("-" * 72)
     print("4b. THE CATALOGUE, AND WHAT ARRIVES FROM A MODEL")
@@ -924,6 +963,7 @@ if __name__ == "__main__":
     sec12_a_bound_over_the_whole_box_by_certificate()
     sec13_naive_sets_are_in_the_language()
     sec14_the_model_chain_moves_on()
+    sec15_a_convention_changes_the_order_never_the_verdict()
     sec4b_every_example_runs_and_json_types_are_taken_as_they_come()
     sec5_the_spec_can_build_the_form_and_the_page()
     print("=" * 72)
