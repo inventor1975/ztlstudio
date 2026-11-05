@@ -416,7 +416,14 @@ PRECEDENCE = {
 OP_HELP = {
     "&": ("and", "и"), "|": ("or", "или"), "->": ("if … then", "если … то"),
     "^": ("exactly one of", "ровно одно из"),
-    "=": ("biconditional between rows: the same TRUTH value as", "равносильность между строками: то же ИСТИННОСТНОЕ значение"),
+    # (2026-11-05, a blind formalization audit: two of six documents died on it) In a document where ANY row has a
+    # value, a lone `=` is read as numeric equality (`normalise`: `x - 10 = 20` is what people write) — so `p = q`
+    # between rows, or `p = (x > 1)`, is refused there. The gloss used to say only "biconditional", and the
+    # translators believed it. Said now as the parser reads it; `<->` is the biconditional everywhere.
+    "=": ("biconditional between rows — but ONLY in a document with no numbers; where any row has a value, `=` is "
+          "numeric equality, so write <-> for 'the same truth value as' (p <-> (x > 1))",
+          "равносильность между строками — но ТОЛЬКО в документе без чисел; где у какой-то строки есть значение, `=` — "
+          "числовое равенство, поэтому для «то же истинностное значение» пишите <-> (p <-> (x > 1))"),
     "~": ("not", "не"),
     "Tr(x)": ("the value of the row x — this is how self-reference is "
               "written", "значение строки x — так пишется самоссылка"),
