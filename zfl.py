@@ -1056,6 +1056,10 @@ def validate(doc):
                              "number. If the statement's row is a quantity, give it a value; if you meant 'the same "
                              "truth value as', compare it with a statement (p = (x > 1)); for numbers write =="))
     claim = normalise((doc.get("claim") or "").strip(), rows)
+    if claim and _COMPARES.search(claim) and any((r.get("expires_on") or "").strip() for r in rows):
+        issues.append(_issue("warn", "W_EPOCH_NUMERIC", "claim",
+                             "the time layer reads statements only: this claim compares numbers, so whether it "
+                             "survives a clock running out is not judged here — the rest of the report stands"))
     if claim:
         try:
             phi = _formula(claim, {r.get("name"): r for r in rows})
@@ -1486,6 +1490,9 @@ def to_book(rows):
     return book
 
 
+_COMPARES = re.compile(r"<=|>=|==|!=|<|(?<!-)>")
+
+
 def applies(doc):
     """Which instruments have something to say. The report shows these and
     no more; nobody chooses a tab."""
@@ -1508,8 +1515,12 @@ def applies(doc):
         # claim too: what it measures is whether the CONCLUSION survives the
         # world changing, which is `EpochBoundary.epoch_boundary_iff` read
         # over one document instead of over every formula at once.
+        # ...and it reads STATEMENTS: a claim that compares numbers is not read across the clock (2026-11-05: such a
+        # claim beside a clock crashed the floor — "stray character '>'" — on a document that had passed validation;
+        # an A/B of the translator found it). Not silent: validate says so (W_EPOCH_NUMERIC).
         "epoch": bool((doc.get("claim") or "").strip()) and any(
-            (r.get("expires_on") or "").strip() for r in rows),
+            (r.get("expires_on") or "").strip() for r in rows)
+            and not _COMPARES.search(normalise((doc.get("claim") or "").strip(), rows)),
         "judge": bool((doc.get("claim") or "").strip()),
         # a bound over the whole box, checked by the kernel on a certificate (zflcert.py)
         "bounds": bool(doc.get("bounds")) and bool(numeric_rows(rows)),

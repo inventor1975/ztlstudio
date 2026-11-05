@@ -88,6 +88,10 @@ CODE_HELP = {
     "E_NOGROUND": ("verified, refuted or defined, with nothing backing it",
                    "проверено, опровергнуто или определено — но без основания"),
     "E_KIND": ("a kind of ground outside the list", "вид основания вне списка"),
+    "W_EPOCH_NUMERIC": ("a clock beside a claim that compares numbers: the time layer reads statements only, so the "
+                        "claim is not read across the clock",
+                        "часы рядом с утверждением, сравнивающим числа: слой времени читает только высказывания, "
+                        "поэтому утверждение через срок не прочитано"),
     "E_TYPE_EQ": ("a statement set equal to a number with `=` — no reading makes a truth value equal to a number",
                   "утверждение приравнено к числу знаком `=` — никакое прочтение не делает истинностное значение числом"),
     "E_CONVENTION": ("a convention also marked as separate measurements, or on a row with no value",

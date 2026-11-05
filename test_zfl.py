@@ -526,6 +526,30 @@ def sec16_a_lone_equals_is_read_by_the_types_of_its_sides():
     print("   a statement = a number -> E_TYPE_EQ; the old per-document reading, as sabotage, is caught")
 
 
+def sec17_a_clock_beside_a_numeric_claim_never_crashes():
+    """(2026-11-05) A row with a clock (expires_on) and a claim that compares numbers made the time layer raise
+    ("stray character '>'") on a document that had passed validation — a public service turning a question into an
+    internal error. Now the time layer reads statements only and says so (W_EPOCH_NUMERIC); a statement claim beside
+    a clock still gets the time layer. Both sides."""
+    print("-" * 72)
+    print("§17 a clock beside a numeric claim never crashes, and says what it did not read")
+    rows = [{"name": "cert", "means": "a certificate", "status": "verified", "ground": "story", "ground_kind": "certificate",
+             "expires_on": "cert_end"},
+            {"name": "cert_end", "means": "the end", "status": "unverified"},
+            {"name": "fee", "means": "fee", "status": "unverified", "value": "?"},
+            {"name": "paid", "means": "paid", "status": "unverified", "value": "?"},
+            {"name": "ok", "means": "covered", "status": "unverified"}]
+    for c in ("paid >= fee", "paid >= fee & ok = (paid >= fee)"):
+        r = zfl.run({"rows": rows, "claim": c})
+        assert r["ok"] and "epoch" not in r["report"], (c, r.get("issues"))
+        assert any(i["code"] == "W_EPOCH_NUMERIC" for i in r["issues"]), c
+    for c in ("cert & ok", "cert -> ok"):
+        r = zfl.run({"rows": rows, "claim": c})
+        assert r["ok"] and "epoch" in r["report"], c
+        assert not any(i["code"] == "W_EPOCH_NUMERIC" for i in r["issues"]), c
+    print("   numeric claim + clock: no crash, the time layer named as not reading it; statements: the time layer reads")
+
+
 def sec4b_every_example_runs_and_json_types_are_taken_as_they_come():
     print("-" * 72)
     print("4b. THE CATALOGUE, AND WHAT ARRIVES FROM A MODEL")
@@ -1002,6 +1026,7 @@ if __name__ == "__main__":
     sec14_the_model_chain_moves_on()
     sec15_a_convention_changes_the_order_never_the_verdict()
     sec16_a_lone_equals_is_read_by_the_types_of_its_sides()
+    sec17_a_clock_beside_a_numeric_claim_never_crashes()
     sec4b_every_example_runs_and_json_types_are_taken_as_they_come()
     sec5_the_spec_can_build_the_form_and_the_page()
     print("=" * 72)

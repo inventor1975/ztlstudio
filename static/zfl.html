@@ -111,6 +111,7 @@
 <tr><td><code>E_UNREADABLE</code></td><td>the instruments could not read the claim — the message says what they choked on</td></tr>
 <tr><td><code>E_VALUE_FORM</code></td><td>a value that is neither a number, an interval nor ?</td></tr>
 <tr><td><code>E_VALUE_SET</code></td><td>a choice between values, {0,10} — that is two rows, not one quantity</td></tr>
+<tr><td><code>W_EPOCH_NUMERIC</code></td><td>a clock beside a claim that compares numbers: the time layer reads statements only, so the claim is not read across the clock</td></tr>
 <tr><td><code>W_NO_GLOSS</code></td><td>no gloss, so nobody can check the name means what it seems to</td></tr>
 <tr><td><code>W_SOLVED</code></td><td>a `?` value was read as the question and solved: EARNED is the established answer to &#x27;which values satisfy the claim&#x27;, not a statement about the actual value — to ask whether the claim holds for a real input you do not know yet, give its range, e.g. [0,inf]</td></tr>
 <tr><td><code>W_UNIT_NO_VALUE</code></td><td>a unit with no value</td></tr>
@@ -213,6 +214,7 @@
 <tr><td><code>E_UNREADABLE</code></td><td>приборы не смогли прочесть утверждение — в сообщении сказано, на чём именно</td></tr>
 <tr><td><code>E_VALUE_FORM</code></td><td>величина, которая не число, не интервал и не ?</td></tr>
 <tr><td><code>E_VALUE_SET</code></td><td>выбор между величинами, {0,10} — это две строки, а не одна величина</td></tr>
+<tr><td><code>W_EPOCH_NUMERIC</code></td><td>часы рядом с утверждением, сравнивающим числа: слой времени читает только высказывания, поэтому утверждение через срок не прочитано</td></tr>
 <tr><td><code>W_NO_GLOSS</code></td><td>нет пояснения — некому проверить, то ли значит имя</td></tr>
 <tr><td><code>W_SOLVED</code></td><td>величина `?` прочитана как вопрос и найдена: EARNED — установленный ответ на «какие значения подходят», а не утверждение о настоящем значении — чтобы спросить, выполняется ли утверждение для реального неизвестного входа, дайте его интервал, например [0,inf]</td></tr>
 <tr><td><code>W_UNIT_NO_VALUE</code></td><td>единица без величины</td></tr>
@@ -315,6 +317,7 @@
 <tr><td><code>E_UNREADABLE</code></td><td>the instruments could not read the claim — the message says what they choked on</td></tr>
 <tr><td><code>E_VALUE_FORM</code></td><td>a value that is neither a number, an interval nor ?</td></tr>
 <tr><td><code>E_VALUE_SET</code></td><td>a choice between values, {0,10} — that is two rows, not one quantity</td></tr>
+<tr><td><code>W_EPOCH_NUMERIC</code></td><td>a clock beside a claim that compares numbers: the time layer reads statements only, so the claim is not read across the clock</td></tr>
 <tr><td><code>W_NO_GLOSS</code></td><td>no gloss, so nobody can check the name means what it seems to</td></tr>
 <tr><td><code>W_SOLVED</code></td><td>a `?` value was read as the question and solved: EARNED is the established answer to &#x27;which values satisfy the claim&#x27;, not a statement about the actual value — to ask whether the claim holds for a real input you do not know yet, give its range, e.g. [0,inf]</td></tr>
 <tr><td><code>W_UNIT_NO_VALUE</code></td><td>a unit with no value</td></tr>
@@ -417,6 +420,7 @@
 <tr><td><code>E_UNREADABLE</code></td><td>the instruments could not read the claim — the message says what they choked on</td></tr>
 <tr><td><code>E_VALUE_FORM</code></td><td>a value that is neither a number, an interval nor ?</td></tr>
 <tr><td><code>E_VALUE_SET</code></td><td>a choice between values, {0,10} — that is two rows, not one quantity</td></tr>
+<tr><td><code>W_EPOCH_NUMERIC</code></td><td>a clock beside a claim that compares numbers: the time layer reads statements only, so the claim is not read across the clock</td></tr>
 <tr><td><code>W_NO_GLOSS</code></td><td>no gloss, so nobody can check the name means what it seems to</td></tr>
 <tr><td><code>W_SOLVED</code></td><td>a `?` value was read as the question and solved: EARNED is the established answer to &#x27;which values satisfy the claim&#x27;, not a statement about the actual value — to ask whether the claim holds for a real input you do not know yet, give its range, e.g. [0,inf]</td></tr>
 <tr><td><code>W_UNIT_NO_VALUE</code></td><td>a unit with no value</td></tr>
@@ -519,6 +523,7 @@
 <tr><td><code>E_UNREADABLE</code></td><td>the instruments could not read the claim — the message says what they choked on</td></tr>
 <tr><td><code>E_VALUE_FORM</code></td><td>a value that is neither a number, an interval nor ?</td></tr>
 <tr><td><code>E_VALUE_SET</code></td><td>a choice between values, {0,10} — that is two rows, not one quantity</td></tr>
+<tr><td><code>W_EPOCH_NUMERIC</code></td><td>a clock beside a claim that compares numbers: the time layer reads statements only, so the claim is not read across the clock</td></tr>
 <tr><td><code>W_NO_GLOSS</code></td><td>no gloss, so nobody can check the name means what it seems to</td></tr>
 <tr><td><code>W_SOLVED</code></td><td>a `?` value was read as the question and solved: EARNED is the established answer to &#x27;which values satisfy the claim&#x27;, not a statement about the actual value — to ask whether the claim holds for a real input you do not know yet, give its range, e.g. [0,inf]</td></tr>
 <tr><td><code>W_UNIT_NO_VALUE</code></td><td>a unit with no value</td></tr>
@@ -621,6 +626,7 @@
 <tr><td><code>E_UNREADABLE</code></td><td>the instruments could not read the claim — the message says what they choked on</td></tr>
 <tr><td><code>E_VALUE_FORM</code></td><td>a value that is neither a number, an interval nor ?</td></tr>
 <tr><td><code>E_VALUE_SET</code></td><td>a choice between values, {0,10} — that is two rows, not one quantity</td></tr>
+<tr><td><code>W_EPOCH_NUMERIC</code></td><td>a clock beside a claim that compares numbers: the time layer reads statements only, so the claim is not read across the clock</td></tr>
 <tr><td><code>W_NO_GLOSS</code></td><td>no gloss, so nobody can check the name means what it seems to</td></tr>
 <tr><td><code>W_SOLVED</code></td><td>a `?` value was read as the question and solved: EARNED is the established answer to &#x27;which values satisfy the claim&#x27;, not a statement about the actual value — to ask whether the claim holds for a real input you do not know yet, give its range, e.g. [0,inf]</td></tr>
 <tr><td><code>W_UNIT_NO_VALUE</code></td><td>a unit with no value</td></tr>
@@ -723,6 +729,7 @@
 <tr><td><code>E_UNREADABLE</code></td><td>the instruments could not read the claim — the message says what they choked on</td></tr>
 <tr><td><code>E_VALUE_FORM</code></td><td>a value that is neither a number, an interval nor ?</td></tr>
 <tr><td><code>E_VALUE_SET</code></td><td>a choice between values, {0,10} — that is two rows, not one quantity</td></tr>
+<tr><td><code>W_EPOCH_NUMERIC</code></td><td>a clock beside a claim that compares numbers: the time layer reads statements only, so the claim is not read across the clock</td></tr>
 <tr><td><code>W_NO_GLOSS</code></td><td>no gloss, so nobody can check the name means what it seems to</td></tr>
 <tr><td><code>W_SOLVED</code></td><td>a `?` value was read as the question and solved: EARNED is the established answer to &#x27;which values satisfy the claim&#x27;, not a statement about the actual value — to ask whether the claim holds for a real input you do not know yet, give its range, e.g. [0,inf]</td></tr>
 <tr><td><code>W_UNIT_NO_VALUE</code></td><td>a unit with no value</td></tr>

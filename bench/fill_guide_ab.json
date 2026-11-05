@@ -1,0 +1,1041 @@
+[
+ {
+  "example": 32,
+  "kind": "numbers",
+  "label": "power into a load: the peak inside the range (bound by certificate)",
+  "ask": "A 5 V source behind an 11 ohm 1% resistor feeds any load from 1 to 100 ohm. Can the load ever get more than 0.6 W?",
+  "want": [
+   [
+    "bounds",
+    [
+     "CHECKED"
+    ]
+   ]
+  ],
+  "full": {
+   "model": "nvidia/nemotron-3-ultra-550b-a55b",
+   "ok": true,
+   "doc": {
+    "rows": [
+     {
+      "name": "V",
+      "means": "the problem states a 5 V source",
+      "status": "verified",
+      "ground": "problem",
+      "ground_kind": "act",
+      "value": 5,
+      "unit": "V"
+     },
+     {
+      "name": "Rs_nom",
+      "means": "the problem states an 11 ohm resistor",
+      "status": "verified",
+      "ground": "problem",
+      "ground_kind": "act",
+      "value": 11,
+      "unit": "ohm"
+     },
+     {
+      "name": "tol",
+      "means": "the problem states 1% tolerance",
+      "status": "verified",
+      "ground": "problem",
+      "ground_kind": "act",
+      "value": 0.01,
+      "unit": ""
+     },
+     {
+      "name": "Rs_min",
+      "means": "minimum source resistance = Rs_nom * (1 - tol) = 11 * 0.99 = 10.89 ohm",
+      "status": "verified",
+      "ground": "proof",
+      "ground_kind": "act",
+      "value": 10.89,
+      "unit": "ohm"
+     },
+     {
+      "name": "Rs_max",
+      "means": "maximum source resistance = Rs_nom * (1 + tol) = 11 * 1.01 = 11.11 ohm",
+      "status": "verified",
+      "ground": "proof",
+      "ground_kind": "act",
+      "value": 11.11,
+      "unit": "ohm"
+     },
+     {
+      "name": "RL_min",
+      "means": "the problem states load from 1 ohm",
+      "status": "verified",
+      "ground": "problem",
+      "ground_kind": "act",
+      "value": 1,
+      "unit": "ohm"
+     },
+     {
+      "name": "RL_max",
+      "means": "the problem states load up to 100 ohm",
+      "status": "verified",
+      "ground": "problem",
+      "ground_kind": "act",
+      "value": 100,
+      "unit": "ohm"
+     },
+     {
+      "name": "P_max",
+      "means": "maximum power delivered to load over all allowed Rs and RL: for a given Rs, power is maximized when RL = Rs (matched load) provided Rs lies in [RL_min, RL_max]; here Rs_min=10.89 and Rs_max=11.11 are within [1,100], so maximum occurs at RL=Rs. The power at match is V^2/(4*Rs), which decreases as Rs increases. Therefore the overall maximum is at Rs_min: P_max = V^2/(4*Rs_min) = 25/(4*10.89) = 0.5739 W",
+      "status": "verified",
+      "ground": "proof",
+      "ground_kind": "act",
+      "value": 0.5739,
+      "unit": "W",
+      "scale": "decimal4"
+     },
+     {
+      "name": "limit",
+      "means": "the threshold 0.6 W from the question",
+      "status": "verified",
+      "ground": "problem",
+      "ground_kind": "act",
+      "value": 0.6,
+      "unit": "W"
+     }
+    ],
+    "claim": "P_max <= limit"
+   },
+   "topics": [],
+   "seconds": 103.9,
+   "verdict": [
+    [
+     "numeric",
+     "EARNED"
+    ]
+   ],
+   "match": false
+  },
+  "map": {
+   "ok": false,
+   "error": "nvidia/nemotron-3.5-lightning-30b-a3b: ни одна модель не ответила — nvidia/nvidia/nemotron-3.5-lightning-30b-a3b: The read operation timed out",
+   "verdict": [
+    "NO DOCUMENT"
+   ],
+   "match": false
+  }
+ },
+ {
+  "example": 54,
+  "kind": "paradox",
+  "label": "Russell's set, as a set (sets in the language)",
+  "ask": "R is the set of everything that is not a member of itself. Is a, a set with no members, in R? Is b, which contains itself, out of R? And R itself?",
+  "want": [
+   [
+    "judge",
+    "EARNED"
+   ],
+   [
+    "passport",
+    [
+     "PARADOX"
+    ]
+   ],
+   [
+    "sets",
+    []
+   ]
+  ],
+  "full": {
+   "ok": false,
+   "error": "nvidia/nemotron-3.5-lightning-30b-a3b: ни одна модель не ответила — nvidia/nvidia/nemotron-3.5-lightning-30b-a3b: The read operation timed out",
+   "verdict": [
+    "NO DOCUMENT"
+   ],
+   "match": false
+  },
+  "map": {
+   "ok": false,
+   "error": "nvidia/nemotron-3.5-lightning-30b-a3b: ни одна модель не ответила — nvidia/nvidia/nemotron-3.5-lightning-30b-a3b: The read operation timed out",
+   "verdict": [
+    "NO DOCUMENT"
+   ],
+   "match": false
+  }
+ },
+ {
+  "example": 55,
+  "kind": "audit",
+  "label": "a web of trust: keys that sign each other (sets in the language)",
+  "ask": "A key is trusted if it is a root, or a trusted key signed it. alice is signed by root, bob by alice; mallory1 and mallory2 only sign each other. Is bob trusted and carol not?",
+  "want": [
+   [
+    "judge",
+    "EARNED"
+   ],
+   [
+    "passport",
+    [
+     "UNDERDETERMINED"
+    ]
+   ],
+   [
+    "sets",
+    [
+     "EARNED IF STABLE"
+    ]
+   ]
+  ],
+  "full": {
+   "model": "nvidia/nemotron-3-ultra-550b-a55b",
+   "ok": true,
+   "doc": {
+    "rows": [
+     {
+      "name": "root_is_root",
+      "means": "root is a root key",
+      "status": "verified",
+      "ground": "the-story",
+      "ground_kind": "act"
+     },
+     {
+      "name": "root_signed_alice",
+      "means": "root signed alice's key",
+      "status": "verified",
+      "ground": "the-story",
+      "ground_kind": "act"
+     },
+     {
+      "name": "alice_signed_bob",
+      "means": "alice signed bob's key",
+      "status": "verified",
+      "ground": "the-story",
+      "ground_kind": "act"
+     },
+     {
+      "name": "mallory2_signed_mallory1",
+      "means": "mallory2 signed mallory1's key",
+      "status": "verified",
+      "ground": "the-story",
+      "ground_kind": "act"
+     },
+     {
+      "name": "mallory1_signed_mallory2",
+      "means": "mallory1 signed mallory2's key",
+      "status": "verified",
+      "ground": "the-story",
+      "ground_kind": "act"
+     },
+     {
+      "name": "trusted_root",
+      "means": "root is trusted because it is a root key",
+      "status": "defined",
+      "ground": "root_is_root",
+      "ground_kind": "row"
+     },
+     {
+      "name": "trusted_alice",
+      "means": "alice is trusted because a trusted key (root) signed her",
+      "status": "defined",
+      "ground": "trusted_root & root_signed_alice",
+      "ground_kind": "row"
+     },
+     {
+      "name": "trusted_bob",
+      "means": "bob is trusted because a trusted key (alice) signed him",
+      "status": "defined",
+      "ground": "trusted_alice & alice_signed_bob",
+      "ground_kind": "row"
+     },
+     {
+      "name": "trusted_mallory1",
+      "means": "mallory1 is trusted iff mallory2 is trusted and signed mallory1",
+      "status": "defined",
+      "ground": "trusted_mallory2 & mallory2_signed_mallory1",
+      "ground_kind": "row"
+     },
+     {
+      "name": "trusted_mallory2",
+      "means": "mallory2 is trusted iff mallory1 is trusted and signed mallory2",
+      "status": "defined",
+      "ground": "trusted_mallory1 & mallory1_signed_mallory2",
+      "ground_kind": "row"
+     },
+     {
+      "name": "trusted_carol",
+      "means": "carol is trusted (false: no trusted signer and not a root)",
+      "status": "defined",
+      "ground": "F",
+      "ground_kind": "row"
+     }
+    ],
+    "claim": "trusted_bob & ~trusted_carol"
+   },
+   "topics": [],
+   "seconds": 103.8,
+   "verdict": [
+    [
+     "judge",
+     "EARNED"
+    ],
+    [
+     "passport",
+     [
+      "UNDERDETERMINED"
+     ]
+    ]
+   ],
+   "match": false
+  },
+  "map": {
+   "ok": false,
+   "error": "nvidia/nemotron-3.5-lightning-30b-a3b: ни одна модель не ответила — nvidia/nvidia/nemotron-3.5-lightning-30b-a3b: The read operation timed out",
+   "verdict": [
+    "NO DOCUMENT"
+   ],
+   "match": false
+  }
+ },
+ {
+  "example": 0,
+  "kind": "paradox",
+  "label": "Liar",
+  "ask": "This sentence is false.",
+  "want": [
+   [
+    "passport",
+    [
+     "PARADOX"
+    ]
+   ]
+  ],
+  "full": {
+   "model": "nvidia/nemotron-3-ultra-550b-a55b",
+   "ok": true,
+   "doc": {
+    "rows": [
+     {
+      "name": "L",
+      "means": "the sentence 'This sentence is false' is true",
+      "status": "defined",
+      "ground": "~Tr(L)"
+     }
+    ],
+    "claim": ""
+   },
+   "topics": [],
+   "seconds": 31.7,
+   "verdict": [
+    [
+     "passport",
+     [
+      "PARADOX"
+     ]
+    ]
+   ],
+   "match": true
+  },
+  "map": {
+   "model": "nvidia/nemotron-3-ultra-550b-a55b",
+   "ok": true,
+   "doc": {
+    "rows": [
+     {
+      "name": "L",
+      "means": "this sentence is false",
+      "status": "defined",
+      "ground": "~Tr(L)"
+     }
+    ],
+    "claim": ""
+   },
+   "topics": [],
+   "seconds": 30.0,
+   "verdict": [
+    [
+     "passport",
+     [
+      "PARADOX"
+     ]
+    ]
+   ],
+   "match": true
+  }
+ },
+ {
+  "example": 1,
+  "kind": "paradox",
+  "label": "Barber (the liar in a barber's apron)",
+  "ask": "The barber shaves exactly those who do not shave themselves. Does he shave himself?",
+  "want": [
+   [
+    "passport",
+    [
+     "PARADOX"
+    ]
+   ]
+  ],
+  "full": {
+   "model": "nvidia/nemotron-3-ultra-550b-a55b",
+   "ok": true,
+   "doc": {
+    "rows": [
+     {
+      "name": "barber_shaves_himself",
+      "means": "the barber shaves himself",
+      "status": "defined",
+      "ground": "~Tr(barber_shaves_himself)"
+     }
+    ],
+    "claim": ""
+   },
+   "topics": [],
+   "seconds": 40.5,
+   "verdict": [
+    [
+     "passport",
+     [
+      "PARADOX"
+     ]
+    ]
+   ],
+   "match": true
+  },
+  "map": {
+   "model": "nvidia/nemotron-3-ultra-550b-a55b",
+   "ok": true,
+   "doc": {
+    "rows": [
+     {
+      "name": "B",
+      "means": "the barber shaves himself",
+      "status": "defined",
+      "ground": "~Tr(B)"
+     }
+    ],
+    "claim": ""
+   },
+   "topics": [],
+   "seconds": 55.4,
+   "verdict": [
+    [
+     "passport",
+     [
+      "PARADOX"
+     ]
+    ]
+   ],
+   "match": true
+  }
+ },
+ {
+  "example": 2,
+  "kind": "paradox",
+  "label": "Grelling's 'heterological'",
+  "ask": "'Heterological' means 'not applying to itself'. Is 'heterological' heterological?",
+  "want": [
+   [
+    "passport",
+    [
+     "PARADOX"
+    ]
+   ]
+  ],
+  "full": {
+   "model": "nvidia/nemotron-3-ultra-550b-a55b",
+   "ok": true,
+   "doc": {
+    "rows": [
+     {
+      "name": "H",
+      "means": "the word 'heterological' does not apply to itself",
+      "status": "defined",
+      "ground": "~Tr(H)"
+     }
+    ],
+    "claim": ""
+   },
+   "topics": [],
+   "seconds": 20.9,
+   "verdict": [
+    [
+     "passport",
+     [
+      "PARADOX"
+     ]
+    ]
+   ],
+   "match": true
+  },
+  "map": {
+   "model": "nvidia/nemotron-3-ultra-550b-a55b",
+   "ok": true,
+   "doc": {
+    "rows": [
+     {
+      "name": "H",
+      "means": "the word 'heterological' applies to itself (i.e., 'heterological' is heterological)",
+      "status": "defined",
+      "ground": "~Tr(H)"
+     }
+    ],
+    "claim": ""
+   },
+   "topics": [],
+   "seconds": 37.5,
+   "verdict": [
+    [
+     "passport",
+     [
+      "PARADOX"
+     ]
+    ]
+   ],
+   "match": true
+  }
+ },
+ {
+  "example": 24,
+  "kind": "everyday",
+  "label": "Sensor",
+  "ask": "An unverified sensor reports overheating; if overheating, the shutdown fires. Will it fire? (Also try the one-line human syntax: assert overheat impl shutdown)",
+  "want": [
+   [
+    "judge",
+    "OPEN"
+   ]
+  ],
+  "full": {
+   "ok": false,
+   "error": "nvidia/nemotron-3.5-lightning-30b-a3b: ни одна модель не ответила — nvidia/nvidia/nemotron-3.5-lightning-30b-a3b: The read operation timed out",
+   "verdict": [
+    "NO DOCUMENT"
+   ],
+   "match": false
+  },
+  "map": {
+   "ok": false,
+   "error": "nvidia/nemotron-3.5-lightning-30b-a3b: ни одна модель не ответила — nvidia/nvidia/nemotron-3.5-lightning-30b-a3b: The read operation timed out",
+   "verdict": [
+    "NO DOCUMENT"
+   ],
+   "match": false
+  }
+ },
+ {
+  "example": 25,
+  "kind": "everyday",
+  "label": "Modus ponens (Carroll's tortoise)",
+  "ask": "The tortoise demands the rule itself be written as a premise: if (p implies q) and p, then q. True — but watch the completion table: it is a FRAME. A rule written down is certified, yet it moves nothing; a rule must be acted, not mailed.",
+  "want": [
+   [
+    "judge",
+    "EARNED IF STABLE"
+   ]
+  ],
+  "full": {
+   "model": "nvidia/nemotron-3-ultra-550b-a55b",
+   "ok": true,
+   "doc": {
+    "rows": [
+     {
+      "name": "tortoise_demand",
+      "means": "The tortoise demands that the inference rule itself be written as an explicit premise: if (p implies q) and p, then q",
+      "status": "verified",
+      "ground": "the-story",
+      "ground_kind": "act"
+     },
+     {
+      "name": "rule_as_premise",
+      "means": "The rule 'if (p implies q) and p, then q' written down as a premise in the argument",
+      "status": "defined",
+      "ground": "tortoise_demand"
+     },
+     {
+      "name": "completion_table",
+      "means": "The table that certifies the rule as a completed frame — a static record of the rule's form",
+      "status": "verified",
+      "ground": "the-story",
+      "ground_kind": "document"
+     },
+     {
+      "name": "rule_is_frame",
+      "means": "A rule written down is a frame: it is certified, static, and moves nothing on its own",
+      "status": "verified",
+      "ground": "the-story",
+      "ground_kind": "act"
+     },
+     {
+      "name": "rule_moves_nothing",
+      "means": "The written rule as a frame does not itself perform any inference; it merely records the form",
+      "status": "verified",
+      "ground": "the-story",
+      "ground_kind": "act"
+     },
+     {
+      "name": "rule_as_act",
+      "means": "A rule must be acted — enacted as an inference step — not merely mailed or recorded as a document",
+      "status": "verified",
+      "ground": "the-story",
+      "ground_kind": "act"
+     },
+     {
+      "name": "frame_vs_act",
+      "means": "The distinction between a rule as a certified frame (static, documented) and a rule as an enacted act (dynamic, inferential)",
+      "status": "verified",
+      "ground": "the-story",
+      "ground_kind": "act"
+     },
+     {
+      "name": "infinite_regress",
+      "means": "Writing the rule as a premise invites an infinite regress: each new premise requires another rule to apply it, which must itself be written as a premise",
+      "status": "unverified",
+      "ground": ""
+     }
+    ],
+    "claim": "rule_is_frame & rule_moves_nothing & rule_as_act & frame_vs_act"
+   },
+   "topics": [],
+   "seconds": 39.1,
+   "verdict": [
+    [
+     "judge",
+     "EARNED"
+    ]
+   ],
+   "match": false
+  },
+  "map": {
+   "model": "nvidia/nemotron-3-ultra-550b-a55b",
+   "ok": true,
+   "doc": {
+    "rows": [
+     {
+      "name": "tortoise_demand",
+      "means": "the tortoise demands that the rule itself be written as a premise",
+      "status": "verified",
+      "ground": "the-story",
+      "ground_kind": "document"
+     },
+     {
+      "name": "MP_is_true",
+      "means": "modus ponens is a valid rule of inference",
+      "status": "verified",
+      "ground": "proof",
+      "ground_kind": "act"
+     },
+     {
+      "name": "completion_table",
+      "means": "the completion table that shows the rule as a frame or schema",
+      "status": "unverified",
+      "ground": ""
+     },
+     {
+      "name": "rule_written",
+      "means": "the rule is written down and certified as a document",
+      "status": "unverified",
+      "ground": ""
+     },
+     {
+      "name": "rule_moves_nothing",
+      "means": "a rule that is merely written down moves nothing — it has no inferential force by itself",
+      "status": "unverified",
+      "ground": ""
+     },
+     {
+      "name": "rule_acted",
+      "means": "the rule is acted upon — applied in an actual inference step",
+      "status": "unverified",
+      "ground": ""
+     },
+     {
+      "name": "rule_not_mailed",
+      "means": "a rule must be acted, not merely mailed or transmitted as text",
+      "status": "unverified",
+      "ground": ""
+     }
+    ],
+    "claim": "tortoise_demand & MP_is_true & (rule_written -> ~rule_moves_nothing) & (rule_acted -> rule_moves_nothing) & ~(rule_written = rule_acted)"
+   },
+   "topics": [],
+   "seconds": 60.7,
+   "verdict": [
+    [
+     "judge",
+     "OPEN"
+    ]
+   ],
+   "match": false
+  }
+ },
+ {
+  "example": 26,
+  "kind": "audit",
+  "label": "a line against its ceiling",
+  "ask": "An invoice line of 1500 against a ceiling of 5000 — does it fit?",
+  "want": [
+   [
+    "numeric",
+    "EARNED"
+   ]
+  ],
+  "full": {
+   "model": "nvidia/nemotron-3-ultra-550b-a55b",
+   "ok": true,
+   "doc": {
+    "rows": [
+     {
+      "name": "line",
+      "means": "the invoice line amount",
+      "status": "verified",
+      "ground": "the-story",
+      "value": 1500,
+      "unit": "RUB"
+     },
+     {
+      "name": "ceiling",
+      "means": "the spending ceiling",
+      "status": "verified",
+      "ground": "the-story",
+      "value": 5000,
+      "unit": "RUB"
+     }
+    ],
+    "claim": "line <= ceiling"
+   },
+   "topics": [],
+   "seconds": 65.4,
+   "verdict": [
+    [
+     "numeric",
+     "EARNED"
+    ]
+   ],
+   "match": true
+  },
+  "map": {
+   "model": "nvidia/nemotron-3-ultra-550b-a55b",
+   "ok": true,
+   "doc": {
+    "rows": [
+     {
+      "name": "line",
+      "means": "the invoice line amount is 1500",
+      "status": "verified",
+      "ground": "the-story",
+      "value": 1500,
+      "unit": "RUB"
+     },
+     {
+      "name": "ceiling",
+      "means": "the ceiling amount is 5000",
+      "status": "verified",
+      "ground": "the-story",
+      "value": 5000,
+      "unit": "RUB"
+     }
+    ],
+    "claim": "line <= ceiling"
+   },
+   "topics": [],
+   "seconds": 19.5,
+   "verdict": [
+    [
+     "numeric",
+     "EARNED"
+    ]
+   ],
+   "match": true
+  }
+ },
+ {
+  "example": 27,
+  "kind": "audit",
+  "label": "two lines on ONE document — what falls together",
+  "ask": "Two lines resting on the same invoice — what falls if that invoice goes?",
+  "want": [
+   [
+    "numeric",
+    "EARNED"
+   ]
+  ],
+  "full": {
+   "model": "nvidia/nemotron-3-ultra-550b-a55b",
+   "ok": true,
+   "doc": {
+    "rows": [
+     {
+      "name": "invoice",
+      "means": "the invoice document exists and is valid",
+      "status": "verified",
+      "ground": "inv-17",
+      "ground_kind": "document"
+     },
+     {
+      "name": "line1",
+      "means": "the first line item on the invoice is correct",
+      "status": "verified",
+      "ground": "inv-17",
+      "ground_kind": "document",
+      "dimension": "evidence"
+     },
+     {
+      "name": "line2",
+      "means": "the second line item on the invoice is correct",
+      "status": "verified",
+      "ground": "inv-17",
+      "ground_kind": "document",
+      "dimension": "evidence"
+     },
+     {
+      "name": "invoice_fails",
+      "means": "the invoice is invalidated or withdrawn",
+      "status": "unverified",
+      "ground": ""
+     },
+     {
+      "name": "line1_stands",
+      "means": "line1 remains verified after the invoice fails",
+      "status": "unverified",
+      "ground": ""
+     },
+     {
+      "name": "line2_stands",
+      "means": "line2 remains verified after the invoice fails",
+      "status": "unverified",
+      "ground": ""
+     }
+    ],
+    "claim": "(invoice_fails -> (~(Tr(line1)) & ~(Tr(line2))))"
+   },
+   "topics": [],
+   "seconds": 58.9,
+   "verdict": [
+    "REFUSED"
+   ],
+   "match": false
+  },
+  "map": {
+   "model": "nvidia/nemotron-3-ultra-550b-a55b",
+   "ok": true,
+   "doc": {
+    "rows": [
+     {
+      "name": "invoice",
+      "means": "the invoice document exists and is valid",
+      "status": "unverified",
+      "ground": ""
+     },
+     {
+      "name": "line1",
+      "means": "the first line item on the invoice is correct and enforceable",
+      "status": "unverified",
+      "ground": "invoice",
+      "ground_kind": "document",
+      "dimension": "evidence"
+     },
+     {
+      "name": "line2",
+      "means": "the second line item on the invoice is correct and enforceable",
+      "status": "unverified",
+      "ground": "invoice",
+      "ground_kind": "document",
+      "dimension": "evidence"
+     },
+     {
+      "name": "invoice_fails",
+      "means": "the invoice is revoked, cancelled, or declared void",
+      "status": "unverified",
+      "ground": ""
+     }
+    ],
+    "claim": "((invoice_fails -> ~Tr(line1)) & (invoice_fails -> ~Tr(line2)))"
+   },
+   "topics": [],
+   "seconds": 37.6,
+   "verdict": [
+    "REFUSED"
+   ],
+   "match": false
+  }
+ },
+ {
+  "example": 28,
+  "kind": "audit",
+  "label": "a warranty that expires",
+  "ask": "A fee backed by a certificate that expires, against what was paid.",
+  "want": [
+   [
+    "numeric",
+    "EARNED"
+   ]
+  ],
+  "full": {
+   "model": "nvidia/nemotron-3-ultra-550b-a55b",
+   "ok": true,
+   "doc": {
+    "rows": [
+     {
+      "name": "fee",
+      "means": "the fee amount that is backed by the certificate",
+      "status": "unverified",
+      "value": "?",
+      "unit": "currency"
+     },
+     {
+      "name": "certificate",
+      "means": "the certificate that backs the fee",
+      "status": "unverified",
+      "ground": "the-story"
+     },
+     {
+      "name": "certificate_expires",
+      "means": "the event after which the certificate no longer backs the fee",
+      "status": "unverified",
+      "ground": "the-story"
+     },
+     {
+      "name": "paid",
+      "means": "the amount actually paid against the fee",
+      "status": "unverified",
+      "value": "?",
+      "unit": "currency"
+     },
+     {
+      "name": "payment_date",
+      "means": "the date when the payment was made",
+      "status": "unverified",
+      "ground": "the-story"
+     },
+     {
+      "name": "certificate_valid_at_payment",
+      "means": "the certificate is still valid at the time of payment (payment_date occurs before certificate_expires)",
+      "status": "unverified",
+      "ground": "the-story"
+     }
+    ],
+    "claim": "certificate_valid_at_payment -> paid >= fee"
+   },
+   "topics": [],
+   "seconds": 39.2,
+   "verdict": [
+    [
+     "numeric",
+     "OPEN"
+    ]
+   ],
+   "match": false
+  },
+  "map": {
+   "model": "nvidia/nemotron-3-ultra-550b-a55b",
+   "ok": true,
+   "doc": {
+    "rows": [
+     {
+      "name": "certificate",
+      "means": "the certificate that backs the fee and expires",
+      "status": "verified",
+      "ground": "the-story",
+      "ground_kind": "certificate",
+      "expires_on": "certificate_expiry"
+     },
+     {
+      "name": "certificate_expiry",
+      "means": "the event after which the certificate no longer backs the fee",
+      "status": "unverified"
+     },
+     {
+      "name": "fee",
+      "means": "the fee amount that is backed by the certificate",
+      "status": "unverified",
+      "value": "?",
+      "unit": "currency"
+     },
+     {
+      "name": "paid",
+      "means": "the amount that was actually paid",
+      "status": "unverified",
+      "value": "?",
+      "unit": "currency"
+     },
+     {
+      "name": "fee_covered",
+      "means": "the fee is fully covered by what was paid",
+      "status": "unverified"
+     }
+    ],
+    "claim": "paid >= fee & fee_covered = (paid >= fee)"
+   },
+   "topics": [],
+   "seconds": 72.9,
+   "verdict": [
+    "CRASH",
+    "ValueError"
+   ],
+   "match": false
+  }
+ },
+ {
+  "example": 31,
+  "kind": "numbers",
+  "label": "solve for x",
+  "ask": "x minus 10 is 20 — what is x?",
+  "want": [
+   [
+    "numeric",
+    "EARNED"
+   ]
+  ],
+  "full": {
+   "model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+   "ok": true,
+   "doc": {
+    "rows": [
+     {
+      "name": "x",
+      "means": "the value that satisfies x minus 10 equals 20",
+      "status": "unverified",
+      "value": "?"
+     }
+    ],
+    "claim": "x - 10 = 20"
+   },
+   "topics": [],
+   "seconds": 74.9,
+   "verdict": [
+    [
+     "numeric",
+     "EARNED"
+    ]
+   ],
+   "match": true
+  },
+  "map": {
+   "model": "nvidia/nemotron-3-ultra-550b-a55b",
+   "ok": true,
+   "doc": {
+    "rows": [
+     {
+      "name": "given",
+      "means": "x minus 10 equals 20",
+      "status": "verified",
+      "ground": "the-question",
+      "ground_kind": "act"
+     },
+     {
+      "name": "x",
+      "means": "the value of x",
+      "status": "unverified",
+      "value": "?"
+     }
+    ],
+    "claim": "x - 10 = 20"
+   },
+   "topics": [],
+   "seconds": 29.3,
+   "verdict": [
+    [
+     "numeric",
+     "EARNED"
+    ]
+   ],
+   "match": true
+  }
+ }
+]
