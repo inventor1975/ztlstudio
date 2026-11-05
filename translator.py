@@ -417,8 +417,12 @@ def any_key():
 # это эксплуатационное решение, которое нужно менять на месте и мгновенно, а
 # не через правку исходника и rsync.
 #   ZTL_PREFERRED="groq,nvidia"  -> сперва Groq
-_PREFERRED_DEFAULT = ["nvidia", "anthropic", "openai", "gemini", "deepseek", "xai",
-              "openrouter", "groq"]
+# GROQ FIRST — the curator, 2026-11-05: "groq, we always used its models; several, so that if one hits its limit
+# the others take over". MEASURED the same day: NVIDIA's kimi-k3 answered HTTP 410 (end of life 2026-10-15) and the
+# Anthropic fallback had no credit — the plain-language reading was dead locally. Groq limits each model on its own,
+# so llm() walks every model of a provider (providers.MODELS) before the next provider.
+_PREFERRED_DEFAULT = ["groq", "nvidia", "anthropic", "openai", "gemini", "deepseek", "xai",
+              "openrouter"]
 
 
 def _preferred():
@@ -446,40 +450,41 @@ def best_provider():
     return next(iter(sorted(have)), None)
 
 
+def _chain(cfg):
+    """The (provider, model) attempts in order. A person's choice is honoured: a provider AND a model chosen -> that
+    one only; a provider chosen -> its models in order; nothing chosen -> every provider with a key, each through
+    its models (providers.MODELS, first = default)."""
+    cfg = cfg or {}
+    prov, model = cfg.get("provider"), (cfg.get("model") or "").strip()
+    if prov and model:
+        return [(prov, model)]
+    if prov:
+        return [(prov, m) for m in providers.MODELS.get(prov, [""])]
+    have = {p["provider"] for p in providers.available() if p["has_key"]}
+    return [(p, m) for p in _preferred() if p in have for m in providers.MODELS.get(p, [""])]
+
+
 def llm(messages, cfg, temperature=0.2):
     """cfg: {provider, model, key} chosen in the UI (any field optional —
-    falls back to env / local key file / provider default)."""
+    falls back to env / local key file / provider default).
+
+    A CHAIN, not one call (2026-11-05): a model that refuses — its limit (429, raised at once, no sleeping), its
+    end of life (410), an overload (503), an empty answer — hands the request to the next model, and only when
+    every one has failed is the request refused, naming EVERY refusal, not the last (the first cause is otherwise
+    lost and looked for in the fallback). The last attempt may wait on a limit as before."""
     cfg = cfg or {}
-    prov = cfg.get("provider") or best_provider()
-    if not prov:                     # best_provider вернул None — ключей нет
+    chain = _chain(cfg)
+    if not chain:
         raise TranslatorError("нет ключа ни у одного провайдера — задай ключ в ⚙ Model")
-    try:
-        return providers.chat(
-            messages, provider=prov,
-            model=cfg.get("model", ""), key=cfg.get("key", ""),
-            temperature=temperature)
-    except providers.ProviderError as e:
-        # ЗАПАСНОЙ ПРОВАЙДЕР — слово куратора: «если не доступна, то запрос на ту,
-        # что сейчас там». Промерено 2026-08-30: каталог NVIDIA отдавал 503
-        # «temporarily overloaded» на 6 вызовах из 96, а часть моделей — 404
-        # «not found for account». Падать студией из-за чужой загрузки нельзя.
-        #
-        # Пробуем СЛЕДУЮЩЕГО по силе, у которого есть ключ, и только если и он
-        # не смог — говорим вслух ОБА отказа, а не последний: иначе первопричина
-        # теряется, а искать её потом будут в запасном.
-        if cfg.get("provider"):      # провайдера выбрал человек — не подменяем
-            raise TranslatorError(str(e))
-        have = {p["provider"] for p in providers.available() if p["has_key"]}
-        for nxt in _preferred():
-            if nxt == prov or nxt not in have:
-                continue
-            try:
-                return providers.chat(messages, provider=nxt,
-                                      temperature=temperature)
-            except providers.ProviderError as e2:
-                raise TranslatorError(
-                    f"{prov} не ответил ({e}); запасной {nxt} тоже ({e2})")
-        raise TranslatorError(str(e))
+    failed = []
+    for i, (prov, model) in enumerate(chain):
+        try:
+            return providers.chat(messages, provider=prov, model=model,
+                                  key=cfg.get("key", "") if prov == cfg.get("provider") else "",
+                                  temperature=temperature, wait_on_limit=(i == len(chain) - 1))
+        except providers.ProviderError as e:
+            failed.append(f"{prov}/{model or 'default'}: {str(e)[:160]}")
+    raise TranslatorError("ни одна модель не ответила — " + "; ".join(failed))
 
 
 def strip_fences(s):

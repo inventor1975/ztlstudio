@@ -397,6 +397,59 @@ def sec13_naive_sets_are_in_the_language():
     print("   every cell of znaive's four example universes reads the same in ZFL (T/F/Z and the passport);")
     print("   bad names, unknown names, broken JSON, an oversized universe, a name clash: E_SETS, at once.")
 
+def sec14_the_model_chain_moves_on():
+    print("-" * 72)
+    print("14. THE MODEL CHAIN (2026-11-05): Groq first, every model in turn, a limit moves on at once")
+    import providers
+    import translator
+    calls, real = [], providers.chat
+    have = {"groq", "nvidia"}
+    real_avail = providers.available
+    providers.available = lambda: [{"provider": p, "has_key": p in have} for p in providers.PROVIDERS]
+
+    def fake(script):
+        def chat(messages, provider, model="", key="", temperature=0.2, wait_on_limit=True):
+            calls.append((provider, model, wait_on_limit))
+            outcome = script.get((provider, model), "ok")
+            if outcome != "ok":
+                raise providers.ProviderError(outcome)
+            return f"answer from {provider}/{model}"
+        return chat
+    try:
+        g = providers.MODELS["groq"]
+        providers.chat = fake({("groq", g[0]): "HTTP 429: rate limit"})
+        out = translator.llm([{"role": "user", "content": "q"}], {})
+        assert out == f"answer from groq/{g[1]}" and calls == [("groq", g[0], False), ("groq", g[1], False)], calls
+        calls.clear()
+        providers.chat = fake({("groq", m): "HTTP 429: rate limit" for m in g})
+        out = translator.llm([{"role": "user", "content": "q"}], {})
+        assert out.startswith("answer from nvidia/") and [c[0] for c in calls] == ["groq"] * len(g) + ["nvidia"], calls
+        assert all(c[2] is False for c in calls), "no attempt before the last may sleep on a limit"
+        calls.clear()
+        chain = translator._chain({})
+        providers.chat = fake({k: "HTTP 429" for k in chain[:-1]})
+        translator.llm([{"role": "user", "content": "q"}], {})
+        assert len(calls) == len(chain) and calls[-1][2] is True, "the LAST attempt may wait on a limit"
+        calls.clear()
+        providers.chat = fake({k: "HTTP 410: Gone" for k in translator._chain({})})
+        try:
+            translator.llm([{"role": "user", "content": "q"}], {})
+            raise AssertionError("all failed, yet an answer")
+        except translator.TranslatorError as e:
+            assert all(m in str(e) for m in g), str(e)          # every refusal named, not the last
+        calls.clear()
+        providers.chat = fake({("groq", g[0]): "HTTP 429"})
+        try:
+            translator.llm([{"role": "user", "content": "q"}], {"provider": "groq", "model": g[0]})
+            raise AssertionError("a person's chosen model was replaced")
+        except translator.TranslatorError:
+            pass
+        assert calls == [("groq", g[0], True)], calls
+    finally:
+        providers.chat, providers.available = real, real_avail
+    print(f"   groq {g[0]} at its limit -> {g[1]} at once (no sleeping); all Groq at the limit -> NVIDIA;")
+    print("   every model refusing -> a refusal naming each; a person's chosen model is never replaced.")
+
 def sec4b_every_example_runs_and_json_types_are_taken_as_they_come():
     print("-" * 72)
     print("4b. THE CATALOGUE, AND WHAT ARRIVES FROM A MODEL")
@@ -870,6 +923,7 @@ if __name__ == "__main__":
     sec11b_the_cap_counts_repeated_atoms()
     sec12_a_bound_over_the_whole_box_by_certificate()
     sec13_naive_sets_are_in_the_language()
+    sec14_the_model_chain_moves_on()
     sec4b_every_example_runs_and_json_types_are_taken_as_they_come()
     sec5_the_spec_can_build_the_form_and_the_page()
     print("=" * 72)

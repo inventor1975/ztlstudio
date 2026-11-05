@@ -18,6 +18,7 @@ wins over the stored one.
 
 import json
 import os
+import threading
 import time
 import urllib.error
 import urllib.request
@@ -59,7 +60,7 @@ PROVIDERS = {
     # account», deepseek-v4 не уложился в минуту. Проверять живым вызовом, а не
     # присутствием в списке — список врёт про доступность.
     "nvidia": ("openai", "https://integrate.api.nvidia.com/v1/chat/completions",
-               "moonshotai/kimi-k3", "NVIDIA_API_KEY", ".nvidia_key",
+               "nvidia/nemotron-3-ultra-550b-a55b", "NVIDIA_API_KEY", ".nvidia_key",
                "NVIDIA (каталог build.nvidia.com)",
                "https://build.nvidia.com"),
 }
@@ -80,14 +81,21 @@ MODELS = {
     # being made the default: on the five-question battery it fills the table
     # correctly where llama-3.3-70b invents a row to hold the answer. Still
     # free, and the label no longer has to warn quite so loudly.
+    # MEASURED 2026-11-05 by a one-word call: gpt-oss-120b 0.6 s, qwen3.8-27b 1.8 s, gpt-oss-20b 0.6 s.
     # Groq снимает модели без предупреждения: llama-3.3-70b-versatile умерла
     # 2026-08-20 (HTTP 404, не 403 — 403 это отсутствующий User-Agent).
     # Живой список: GET https://api.groq.com/openai/v1/models
-    "groq":       ["openai/gpt-oss-120b", "qwen/qwen3.6-27b", "openai/gpt-oss-20b"],
+    # 2026-11-05 (the curator: "groq, several, if one hits its limit the others take over"): the live list
+    # (GET /models) — qwen3.6-27b is gone, qwen3.8-27b is there. Groq limits each MODEL separately, so a chain
+    # over three models survives one model's 429. translator.llm walks this list in order.
+    "groq":       ["openai/gpt-oss-120b", "qwen/qwen3.8-27b", "openai/gpt-oss-20b"],
     # Проверено живым вызовом 2026-08-30: kimi-k3 ответила за 1.9 с,
     # nemotron-3-super-120b за ~10 с (и трижды отдал 503 под нагрузкой).
-    "nvidia":     ["moonshotai/kimi-k3", "nvidia/nemotron-3-super-120b-a12b",
-                   "nvidia/nemotron-3-nano-30b-a3b"],
+    # 2026-11-05: kimi-k3 reached end of life on 2026-10-15 (HTTP 410), nemotron-3-nano is gone from the catalogue.
+    # LISTED is not AVAILABLE: MEASURED by a one-word call the same day — nemotron-3-super and kimi-k2.6 answer 404
+    # "not found for account", deepseek-v4.1-flash timed out at 90 s; nemotron-3-ultra (1.2 s) and
+    # nemotron-3.5-lightning (1.7 s) answered. The backup behind Groq.
+    "nvidia":     ["nvidia/nemotron-3-ultra-550b-a55b", "nvidia/nemotron-3.5-lightning-30b-a3b"],
 }
 
 
@@ -137,7 +145,9 @@ def available():
     return out
 
 
-def _post(url, body, headers):
+def _post(url, body, headers, wait_on_limit=True):
+    """wait_on_limit=False: a 429 is raised at once, so a CHAIN of models moves to the next one instead of
+    sleeping 15+30+45 s on this one (MEASURED 2026-08-31: the sleeps made a live request miss its 120 s)."""
     for attempt in range(4):
         try:
             req = urllib.request.Request(url, data=json.dumps(body).encode(),
@@ -145,7 +155,7 @@ def _post(url, body, headers):
             with urllib.request.urlopen(req, timeout=90) as r:
                 return json.loads(r.read().decode())
         except urllib.error.HTTPError as e:
-            if e.code == 429 and attempt < 3:       # rate limit: breathe
+            if e.code == 429 and attempt < 3 and wait_on_limit:       # rate limit: breathe
                 time.sleep(15 * (attempt + 1))
                 continue
             detail = ""
@@ -208,7 +218,15 @@ def _usage_add(provider, model, data):
         + int(u.get("completion_tokens") or u.get("output_tokens") or 0))
 
 
-def chat(messages, provider="groq", model="", key="", temperature=0.2):
+_LAST = threading.local()
+
+
+def last_used():
+    """(provider, model) of the last successful chat() in THIS thread — the studio names who answered."""
+    return getattr(_LAST, "pm", None)
+
+
+def chat(messages, provider="groq", model="", key="", temperature=0.2, wait_on_limit=True):
     """messages: [{role: system|user|assistant, content}]. Returns text."""
     if provider not in PROVIDERS:
         raise ProviderError(f"unknown provider: {provider}")
@@ -233,8 +251,9 @@ def chat(messages, provider="groq", model="", key="", temperature=0.2):
         headers = {"x-api-key": key, "anthropic-version": "2023-06-01",
                    "content-type": "application/json",
                    "user-agent": "ZTLStudio/1.0"}
-        data = _post(url, body, headers)
+        data = _post(url, body, headers, wait_on_limit)
         _usage_add(provider, model, data)
+        _LAST.pm = (provider, model)
         parts = data.get("content", [])
         return "".join(p.get("text", "") for p in parts).strip()
 
@@ -246,7 +265,7 @@ def chat(messages, provider="groq", model="", key="", temperature=0.2):
     if provider == "openrouter":
         headers["HTTP-Referer"] = "https://github.com/inventor1975/ZTL"
         headers["X-Title"] = "ZTLStudio"
-    data = _post(url, body, headers)
+    data = _post(url, body, headers, wait_on_limit)
     _usage_add(provider, model, data)
     # Безопасный разбор, как в anthropic-ветке. Пустой choices или content=null
     # (reasoning-only / отказ модели) раньше роняли жёсткую цепочку индексов.
@@ -256,4 +275,5 @@ def chat(messages, provider="groq", model="", key="", temperature=0.2):
     content = (choices[0].get("message") or {}).get("content")
     if content is None:
         raise ProviderError("провайдер вернул пустой ответ (reasoning-only/отказ?)")
+    _LAST.pm = (provider, model)
     return content.strip()

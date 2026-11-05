@@ -491,10 +491,14 @@ def api_v2fill(payload):
     """A question in plain language becomes a filled table. The model never
     decides anything — it fills cells, and the core judges them after."""
     translator = _v2("translator")
+    providers._LAST.pm = None
     try:
-        return translator.fill(payload.get("history", []),
-                                payload.get("lang", "en"),
-                                payload.get("cfg"))
+        r = translator.fill(payload.get("history", []),
+                            payload.get("lang", "en"),
+                            payload.get("cfg"))
+        if isinstance(r, dict) and providers.last_used():
+            r["by"] = "/".join(providers.last_used())     # which model of the chain answered (2026-11-05)
+        return r
     except translator.TranslatorError as e:
         return {"ok": False, "error": str(e)}
 
@@ -502,11 +506,16 @@ def api_v2fill(payload):
 def api_v2comment(payload):
     """Commentary on a verdict the model did not produce."""
     translator = _v2("translator")
+    providers._LAST.pm = None
     try:
-        return {"ok": True, "reply": translator.comment(
+        reply = translator.comment(
             payload.get("doc") or {}, payload.get("result") or {},
             payload.get("lang", "en"), payload.get("history", []),
-            payload.get("cfg"))}
+            payload.get("cfg"))
+        out = {"ok": True, "reply": reply}
+        if providers.last_used():
+            out["by"] = "/".join(providers.last_used())   # which model of the chain answered (2026-11-05)
+        return out
     except translator.TranslatorError as e:
         return {"ok": False, "error": str(e)}
 
