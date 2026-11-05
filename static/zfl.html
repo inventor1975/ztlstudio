@@ -30,12 +30,15 @@
 <tr><td><b>scale</b></td><td>what it rounds to</td><td>no</td><td>exact · whole · hundredths · thirds</td></tr>
 <tr class="adv"><td><b>separate measurements</b></td><td>each occurrence is its own act of measuring</td><td>no</td><td></td></tr>
 <tr class="adv"><td><b>a convention</b></td><td>no value to find until one is declared (a measure nobody named, a unit, a summation method)</td><td>no</td><td></td></tr>
+<tr class="adv"><td><b>degree</b></td><td>the probability that this statement is true: 0.3, or an interval [0.2, 0.4] when it is only known within bounds; verified = measured, unverified = told</td><td>no</td><td>0.3 · [0.2, 0.4] · 1/3</td></tr>
 </table>
 <h2>the document itself</h2><table><tr><th>column</th><th>what it is</th><th>required</th><th>options / examples</th></tr>
 <tr><td><b>admissible grounds</b></td><td>the grounds this document accepts, comma-separated. A row earning on a ground outside the list falls to unverified rather than to false. A tier may be given — &#x27;master:story, perebor:act&#x27;: story means &#x27;so it was said&#x27;, and what earns on it is marked. Empty: the gate says nothing</td><td>no</td><td>registry_extract:place, testimony:story · перебор:act, промер:act, мастер:story</td></tr>
 <tr><td><b>claim</b></td><td>what you are actually asserting</td><td>no</td><td>line &lt;= budget · rain -&gt; umbrella</td></tr>
 <tr><td><b>bounds over the whole box</b></td><td>up to two objects {&quot;bound&quot;: &quot;expression &lt;= number&quot; (or &gt;=), &quot;laws&quot;: [linear equalities fixing the ? rows], &quot;tree&quot;: optional certificate}. Interval rows are the box. Without a tree the studio searches one; the ZTL kernel checks it exactly. CHECKED = holds on the whole box; FAILS = a point where it is false; NOT FOUND = nothing claimed either way; REFUSED = with the reason</td><td>no</td><td>{&quot;bound&quot;: &quot;VL*I &lt;= 0.6&quot;, &quot;laws&quot;: [&quot;V - VL = I*Rs&quot;, &quot;VL = I*RL&quot;]}</td></tr>
 <tr><td><b>sets</b></td><td>sets by name, JSON: {&quot;S&quot;: {&quot;list&quot;: [names]} | {&quot;data&quot;: {name: &quot;T&quot;|&quot;F&quot;|&quot;Z&quot;}} | {&quot;abs&quot;: property of x}}. A property is a JSON formula: [&quot;in&quot;, a, S], [&quot;not&quot;, f], [&quot;and&quot;|&quot;or&quot;|&quot;imp&quot;|&quot;iff&quot;, f, g], [&quot;all&quot;|&quot;ex&quot;, &quot;y&quot;, f], [&quot;eq&quot;, S, T]; it may mention any set, itself included. Every set name is also a possible member. Each cell a ∈ S becomes a row a_in_S (a property&#x27;s cell is a defined row), so the claim can say bob_in_Trusted or in(bob, Trusted). Claims over the whole universe (all, ex): give {&quot;sets&quot;: {...}, &quot;claims&quot;: [...]} — judged in the report&#x27;s sets section</td><td>no</td><td>{&quot;a&quot;: {&quot;list&quot;: []}, &quot;R&quot;: {&quot;abs&quot;: [&quot;not&quot;, [&quot;in&quot;, &quot;x&quot;, &quot;x&quot;]]}}</td></tr>
+<tr><td><b>need</b></td><td>the probability the claim must have at least, e.g. 0.95: EARNED when its whole degree is at or above it, REFUTED when its whole degree is below, OPEN with what to narrow otherwise</td><td>no</td><td>0.95</td></tr>
+<tr><td><b>independent</b></td><td>stipulate that the claim&#x27;s statements are independent of one another (all of them): the degree narrows by the product rule; without it every joint is allowed</td><td>no</td><td>true</td></tr>
 <tr><td><b>ask</b></td><td>reserved: the full report is always shown (this field narrows nothing yet)</td><td>no</td><td>verdict · warranty · passport · stipulations · blast · brackets</td></tr>
 </table>
 <h2>operators</h2><table>
@@ -86,6 +89,7 @@
 <tr><td><code>E_CLAIM</code></td><td>the claim does not parse</td></tr>
 <tr><td><code>E_COMPARE_ROW</code></td><td>a comparison row that leads back to itself, or a statement definition leaning on a comparison row</td></tr>
 <tr><td><code>E_CONVENTION</code></td><td>a convention also marked as separate measurements, or on a row with no value</td></tr>
+<tr><td><code>E_DEGREE</code></td><td>a degree that is not a point or interval inside [0, 1], or on a refuted, defined or valued row</td></tr>
 <tr><td><code>E_DIM</code></td><td>a dimension outside the list — a ground either supports a claim or permits it</td></tr>
 <tr><td><code>E_DIM_CLASH</code></td><td>a ground carries one mark, not two: &#x27;authority&#x27; cannot be combined with an act, a certificate or another row</td></tr>
 <tr><td><code>E_DUPNAME</code></td><td>the same name twice</td></tr>
@@ -94,6 +98,7 @@
 <tr><td><code>E_FORMULA</code></td><td>the defining formula does not parse</td></tr>
 <tr><td><code>E_GROUND_SPACES</code></td><td>a ground with a space in it — a ground is one word, because it names a document</td></tr>
 <tr><td><code>E_KIND</code></td><td>a kind of ground outside the list</td></tr>
+<tr><td><code>E_NEED</code></td><td>a threshold that is not a degree inside [0, 1]</td></tr>
 <tr><td><code>E_NOGROUND</code></td><td>verified, refuted or defined, with nothing backing it</td></tr>
 <tr><td><code>E_NONAME</code></td><td>a row without a name</td></tr>
 <tr><td><code>E_NO_VALUE</code></td><td>a name the claim reads as a number has no value — give it a number, an interval, or ? if it is what the question asks for</td></tr>
@@ -134,12 +139,15 @@
 <tr><td><b>шкала</b></td><td>до чего округляем</td><td>нет</td><td>точно · целые · сотые · трети</td></tr>
 <tr class="adv"><td><b>отдельные измерения</b></td><td>каждое вхождение — свой акт измерения</td><td>нет</td><td></td></tr>
 <tr class="adv"><td><b>договорённость</b></td><td>значения нет, пока его не договорили (неназванная мера, единица, метод суммирования)</td><td>нет</td><td></td></tr>
+<tr class="adv"><td><b>степень</b></td><td>вероятность, что это утверждение истинно: 0.3 или интервал [0.2, 0.4], если известна лишь в пределах; проверено — измерена, не проверено — сообщена</td><td>нет</td><td>0.3 · [0.2, 0.4] · 1/3</td></tr>
 </table>
 <h2>сам документ</h2><table><tr><th>колонка</th><th>что это</th><th>обязательна</th><th>варианты / примеры</th></tr>
 <tr><td><b>допустимые основания</b></td><td>основания, которые этот документ признаёт, через запятую. Строка, заработавшая на основании вне списка, падает в непроверенное, а не в ложь. Можно указать ярус — «master:story, perebor:act»: story значит «так сказано», и заработавшее на нём будет помечено. Пусто — ворота молчат</td><td>нет</td><td>registry_extract:place, testimony:story · перебор:act, промер:act, мастер:story</td></tr>
 <tr><td><b>утверждение</b></td><td>что мы, собственно, заявляем</td><td>нет</td><td>line &lt;= budget · rain -&gt; umbrella</td></tr>
 <tr><td><b>границы на всей коробке</b></td><td>до двух объектов {&quot;bound&quot;: &quot;выражение &lt;= число&quot; (или &gt;=), &quot;laws&quot;: [линейные равенства для строк ?], &quot;tree&quot;: сертификат, если есть}. Строки-интервалы задают коробку. Без дерева студия ищет его сама; ядро ZTL проверяет точно. CHECKED — верно на всей коробке; FAILS — точка, где неверно; NOT FOUND — ничего не утверждается; REFUSED — с причиной</td><td>нет</td><td>{&quot;bound&quot;: &quot;VL*I &lt;= 0.6&quot;, &quot;laws&quot;: [&quot;V - VL = I*Rs&quot;, &quot;VL = I*RL&quot;]}</td></tr>
 <tr><td><b>множества</b></td><td>множества по именам, JSON: {&quot;S&quot;: {&quot;list&quot;: [имена]} | {&quot;data&quot;: {имя: &quot;T&quot;|&quot;F&quot;|&quot;Z&quot;}} | {&quot;abs&quot;: свойство x}}. Свойство — формула JSON: [&quot;in&quot;, a, S], [&quot;not&quot;, f], [&quot;and&quot;|&quot;or&quot;|&quot;imp&quot;|&quot;iff&quot;, f, g], [&quot;all&quot;|&quot;ex&quot;, &quot;y&quot;, f], [&quot;eq&quot;, S, T]; оно может упоминать любое множество, в том числе само себя. Каждое имя множества — ещё и возможный элемент. Каждая клетка a ∈ S становится строкой a_in_S (клетка свойства — определённая строка), и в утверждении можно писать bob_in_Trusted или in(bob, Trusted). Утверждения обо всём универсуме (all, ex): {&quot;sets&quot;: {...}, &quot;claims&quot;: [...]} — их судит раздел отчёта «множества»</td><td>нет</td><td>{&quot;a&quot;: {&quot;list&quot;: []}, &quot;R&quot;: {&quot;abs&quot;: [&quot;not&quot;, [&quot;in&quot;, &quot;x&quot;, &quot;x&quot;]]}}</td></tr>
+<tr><td><b>порог</b></td><td>вероятность, которую утверждение должно иметь не меньше, например 0.95: заработано, если вся степень не ниже порога, опровергнуто — если вся ниже, иначе открыто и названо, что сузить</td><td>нет</td><td>0.95</td></tr>
+<tr><td><b>независимы</b></td><td>договориться, что утверждения в формуле независимы друг от друга (все): степень сужается по правилу произведения; без этого допускается любая совместность</td><td>нет</td><td>true</td></tr>
 <tr><td><b>спросить</b></td><td>зарезервировано: отчёт всегда показывается целиком (поле пока ничего не сужает)</td><td>нет</td><td>verdict · warranty · passport · stipulations · blast · brackets</td></tr>
 </table>
 <h2>операторы</h2><table>
@@ -190,6 +198,7 @@
 <tr><td><code>E_CLAIM</code></td><td>утверждение не разбирается</td></tr>
 <tr><td><code>E_COMPARE_ROW</code></td><td>строка-сравнение, ведущая сама к себе, или определение-высказывание, опирающееся на строку-сравнение</td></tr>
 <tr><td><code>E_CONVENTION</code></td><td>договорённость, помеченная ещё и как отдельные измерения, или на строке без значения</td></tr>
+<tr><td><code>E_DEGREE</code></td><td>степень вне [0, 1] или не число/интервал, либо на опровергнутой, определённой строке или строке-величине</td></tr>
 <tr><td><code>E_DIM</code></td><td>измерение вне списка — основание либо подпирает утверждение, либо даёт на него право</td></tr>
 <tr><td><code>E_DIM_CLASH</code></td><td>основание несёт одну пометку, а не две: «разрешение» не сочетается с актом, сертификатом или другой строкой</td></tr>
 <tr><td><code>E_DUPNAME</code></td><td>имя повторяется</td></tr>
@@ -198,6 +207,7 @@
 <tr><td><code>E_FORMULA</code></td><td>определяющая формула не разбирается</td></tr>
 <tr><td><code>E_GROUND_SPACES</code></td><td>основание с пробелом — оно одно слово, потому что называет документ</td></tr>
 <tr><td><code>E_KIND</code></td><td>вид основания вне списка</td></tr>
+<tr><td><code>E_NEED</code></td><td>порог — не степень внутри [0, 1]</td></tr>
 <tr><td><code>E_NOGROUND</code></td><td>проверено, опровергнуто или определено — но без основания</td></tr>
 <tr><td><code>E_NONAME</code></td><td>строка без имени</td></tr>
 <tr><td><code>E_NO_VALUE</code></td><td>имя, которое утверждение читает как число, без величины — дайте число, интервал или ?, если его и ищут</td></tr>
@@ -238,12 +248,15 @@
 <tr><td><b>шкала</b></td><td>до чого округлюємо</td><td>ні</td><td>цілі · соті · третини</td></tr>
 <tr class="adv"><td><b>окремі виміри</b></td><td>число з вибірки, а не одне вимірювання</td><td>ні</td><td></td></tr>
 <tr class="adv"><td><b>домовленість</b></td><td>значення немає, доки його не домовились (неназвана міра, одиниця)</td><td>ні</td><td></td></tr>
+<tr class="adv"><td><b>ступінь</b></td><td>ймовірність, що це твердження істинне: 0.3 або інтервал [0.2, 0.4]</td><td>ні</td><td>0.3 · [0.2, 0.4] · 1/3</td></tr>
 </table>
 <h2>сам документ</h2><table><tr><th>стовпець</th><th>що це</th><th>обов&#x27;язково</th><th>варіанти / приклади</th></tr>
 <tr><td><b>допустимі підстави</b></td><td>через кому; порожньо — ворота мовчать</td><td>ні</td><td>registry_extract:place, testimony:story · перебор:act, промер:act, мастер:story</td></tr>
 <tr><td><b>claim</b></td><td>what you are actually asserting</td><td>ні</td><td>line &lt;= budget · rain -&gt; umbrella</td></tr>
 <tr><td><b>bounds over the whole box</b></td><td>up to two objects {&quot;bound&quot;: &quot;expression &lt;= number&quot; (or &gt;=), &quot;laws&quot;: [linear equalities fixing the ? rows], &quot;tree&quot;: optional certificate}. Interval rows are the box. Without a tree the studio searches one; the ZTL kernel checks it exactly. CHECKED = holds on the whole box; FAILS = a point where it is false; NOT FOUND = nothing claimed either way; REFUSED = with the reason</td><td>ні</td><td>{&quot;bound&quot;: &quot;VL*I &lt;= 0.6&quot;, &quot;laws&quot;: [&quot;V - VL = I*Rs&quot;, &quot;VL = I*RL&quot;]}</td></tr>
 <tr><td><b>sets</b></td><td>sets by name, JSON: {&quot;S&quot;: {&quot;list&quot;: [names]} | {&quot;data&quot;: {name: &quot;T&quot;|&quot;F&quot;|&quot;Z&quot;}} | {&quot;abs&quot;: property of x}}. A property is a JSON formula: [&quot;in&quot;, a, S], [&quot;not&quot;, f], [&quot;and&quot;|&quot;or&quot;|&quot;imp&quot;|&quot;iff&quot;, f, g], [&quot;all&quot;|&quot;ex&quot;, &quot;y&quot;, f], [&quot;eq&quot;, S, T]; it may mention any set, itself included. Every set name is also a possible member. Each cell a ∈ S becomes a row a_in_S (a property&#x27;s cell is a defined row), so the claim can say bob_in_Trusted or in(bob, Trusted). Claims over the whole universe (all, ex): give {&quot;sets&quot;: {...}, &quot;claims&quot;: [...]} — judged in the report&#x27;s sets section</td><td>ні</td><td>{&quot;a&quot;: {&quot;list&quot;: []}, &quot;R&quot;: {&quot;abs&quot;: [&quot;not&quot;, [&quot;in&quot;, &quot;x&quot;, &quot;x&quot;]]}}</td></tr>
+<tr><td><b>need</b></td><td>the probability the claim must have at least, e.g. 0.95: EARNED when its whole degree is at or above it, REFUTED when its whole degree is below, OPEN with what to narrow otherwise</td><td>ні</td><td>0.95</td></tr>
+<tr><td><b>independent</b></td><td>stipulate that the claim&#x27;s statements are independent of one another (all of them): the degree narrows by the product rule; without it every joint is allowed</td><td>ні</td><td>true</td></tr>
 <tr><td><b>ask</b></td><td>reserved: the full report is always shown (this field narrows nothing yet)</td><td>ні</td><td>verdict · warranty · passport · stipulations · blast · brackets</td></tr>
 </table>
 <h2>оператори</h2><table>
@@ -294,6 +307,7 @@
 <tr><td><code>E_CLAIM</code></td><td>the claim does not parse</td></tr>
 <tr><td><code>E_COMPARE_ROW</code></td><td>a comparison row that leads back to itself, or a statement definition leaning on a comparison row</td></tr>
 <tr><td><code>E_CONVENTION</code></td><td>a convention also marked as separate measurements, or on a row with no value</td></tr>
+<tr><td><code>E_DEGREE</code></td><td>a degree that is not a point or interval inside [0, 1], or on a refuted, defined or valued row</td></tr>
 <tr><td><code>E_DIM</code></td><td>a dimension outside the list — a ground either supports a claim or permits it</td></tr>
 <tr><td><code>E_DIM_CLASH</code></td><td>a ground carries one mark, not two: &#x27;authority&#x27; cannot be combined with an act, a certificate or another row</td></tr>
 <tr><td><code>E_DUPNAME</code></td><td>the same name twice</td></tr>
@@ -302,6 +316,7 @@
 <tr><td><code>E_FORMULA</code></td><td>the defining formula does not parse</td></tr>
 <tr><td><code>E_GROUND_SPACES</code></td><td>a ground with a space in it — a ground is one word, because it names a document</td></tr>
 <tr><td><code>E_KIND</code></td><td>a kind of ground outside the list</td></tr>
+<tr><td><code>E_NEED</code></td><td>a threshold that is not a degree inside [0, 1]</td></tr>
 <tr><td><code>E_NOGROUND</code></td><td>verified, refuted or defined, with nothing backing it</td></tr>
 <tr><td><code>E_NONAME</code></td><td>a row without a name</td></tr>
 <tr><td><code>E_NO_VALUE</code></td><td>a name the claim reads as a number has no value — give it a number, an interval, or ? if it is what the question asks for</td></tr>
@@ -342,12 +357,15 @@
 <tr><td><b>סולם</b></td><td>לאן מעגלים</td><td>לא</td><td>שלמים · מאיות · שלישים</td></tr>
 <tr class="adv"><td><b>מדידות נפרדות</b></td><td>מספר מתוך מדגם, לא מדידה אחת</td><td>לא</td><td></td></tr>
 <tr class="adv"><td><b>מוסכמה</b></td><td>אין ערך למצוא עד שקובעים אחד (מידה שלא נקבעה, יחידה)</td><td>לא</td><td></td></tr>
+<tr class="adv"><td><b>דרגה</b></td><td>ההסתברות שהטענה נכונה: 0.3, או מרווח [0.2, 0.4]</td><td>לא</td><td>0.3 · [0.2, 0.4] · 1/3</td></tr>
 </table>
 <h2>המסמך עצמו</h2><table><tr><th>עמודה</th><th>מה זה</th><th>חובה</th><th>אפשרויות / דוגמאות</th></tr>
 <tr><td><b>אסמכתאות קבילות</b></td><td>מופרדות בפסיק; ריק — השער שותק</td><td>לא</td><td>registry_extract:place, testimony:story · перебор:act, промер:act, мастер:story</td></tr>
 <tr><td><b>claim</b></td><td>what you are actually asserting</td><td>לא</td><td>line &lt;= budget · rain -&gt; umbrella</td></tr>
 <tr><td><b>bounds over the whole box</b></td><td>up to two objects {&quot;bound&quot;: &quot;expression &lt;= number&quot; (or &gt;=), &quot;laws&quot;: [linear equalities fixing the ? rows], &quot;tree&quot;: optional certificate}. Interval rows are the box. Without a tree the studio searches one; the ZTL kernel checks it exactly. CHECKED = holds on the whole box; FAILS = a point where it is false; NOT FOUND = nothing claimed either way; REFUSED = with the reason</td><td>לא</td><td>{&quot;bound&quot;: &quot;VL*I &lt;= 0.6&quot;, &quot;laws&quot;: [&quot;V - VL = I*Rs&quot;, &quot;VL = I*RL&quot;]}</td></tr>
 <tr><td><b>sets</b></td><td>sets by name, JSON: {&quot;S&quot;: {&quot;list&quot;: [names]} | {&quot;data&quot;: {name: &quot;T&quot;|&quot;F&quot;|&quot;Z&quot;}} | {&quot;abs&quot;: property of x}}. A property is a JSON formula: [&quot;in&quot;, a, S], [&quot;not&quot;, f], [&quot;and&quot;|&quot;or&quot;|&quot;imp&quot;|&quot;iff&quot;, f, g], [&quot;all&quot;|&quot;ex&quot;, &quot;y&quot;, f], [&quot;eq&quot;, S, T]; it may mention any set, itself included. Every set name is also a possible member. Each cell a ∈ S becomes a row a_in_S (a property&#x27;s cell is a defined row), so the claim can say bob_in_Trusted or in(bob, Trusted). Claims over the whole universe (all, ex): give {&quot;sets&quot;: {...}, &quot;claims&quot;: [...]} — judged in the report&#x27;s sets section</td><td>לא</td><td>{&quot;a&quot;: {&quot;list&quot;: []}, &quot;R&quot;: {&quot;abs&quot;: [&quot;not&quot;, [&quot;in&quot;, &quot;x&quot;, &quot;x&quot;]]}}</td></tr>
+<tr><td><b>need</b></td><td>the probability the claim must have at least, e.g. 0.95: EARNED when its whole degree is at or above it, REFUTED when its whole degree is below, OPEN with what to narrow otherwise</td><td>לא</td><td>0.95</td></tr>
+<tr><td><b>independent</b></td><td>stipulate that the claim&#x27;s statements are independent of one another (all of them): the degree narrows by the product rule; without it every joint is allowed</td><td>לא</td><td>true</td></tr>
 <tr><td><b>ask</b></td><td>reserved: the full report is always shown (this field narrows nothing yet)</td><td>לא</td><td>verdict · warranty · passport · stipulations · blast · brackets</td></tr>
 </table>
 <h2>אופרטורים</h2><table>
@@ -398,6 +416,7 @@
 <tr><td><code>E_CLAIM</code></td><td>the claim does not parse</td></tr>
 <tr><td><code>E_COMPARE_ROW</code></td><td>a comparison row that leads back to itself, or a statement definition leaning on a comparison row</td></tr>
 <tr><td><code>E_CONVENTION</code></td><td>a convention also marked as separate measurements, or on a row with no value</td></tr>
+<tr><td><code>E_DEGREE</code></td><td>a degree that is not a point or interval inside [0, 1], or on a refuted, defined or valued row</td></tr>
 <tr><td><code>E_DIM</code></td><td>a dimension outside the list — a ground either supports a claim or permits it</td></tr>
 <tr><td><code>E_DIM_CLASH</code></td><td>a ground carries one mark, not two: &#x27;authority&#x27; cannot be combined with an act, a certificate or another row</td></tr>
 <tr><td><code>E_DUPNAME</code></td><td>the same name twice</td></tr>
@@ -406,6 +425,7 @@
 <tr><td><code>E_FORMULA</code></td><td>the defining formula does not parse</td></tr>
 <tr><td><code>E_GROUND_SPACES</code></td><td>a ground with a space in it — a ground is one word, because it names a document</td></tr>
 <tr><td><code>E_KIND</code></td><td>a kind of ground outside the list</td></tr>
+<tr><td><code>E_NEED</code></td><td>a threshold that is not a degree inside [0, 1]</td></tr>
 <tr><td><code>E_NOGROUND</code></td><td>verified, refuted or defined, with nothing backing it</td></tr>
 <tr><td><code>E_NONAME</code></td><td>a row without a name</td></tr>
 <tr><td><code>E_NO_VALUE</code></td><td>a name the claim reads as a number has no value — give it a number, an interval, or ? if it is what the question asks for</td></tr>
@@ -446,12 +466,15 @@
 <tr><td><b>Skala</b></td><td>worauf gerundet wird</td><td>nein</td><td>ganze · Hundertstel · Drittel</td></tr>
 <tr class="adv"><td><b>Einzelmessungen</b></td><td>eine Zahl aus einer Stichprobe, keine einzelne Messung</td><td>nein</td><td></td></tr>
 <tr class="adv"><td><b>eine Konvention</b></td><td>kein Wert zu finden, bis einer festgelegt wird (ein ungenanntes Maß, eine Einheit)</td><td>nein</td><td></td></tr>
+<tr class="adv"><td><b>Grad</b></td><td>die Wahrscheinlichkeit, dass diese Aussage wahr ist: 0.3 oder ein Intervall [0.2, 0.4]</td><td>nein</td><td>0.3 · [0.2, 0.4] · 1/3</td></tr>
 </table>
 <h2>das Dokument selbst</h2><table><tr><th>Spalte</th><th>was es ist</th><th>Pflicht</th><th>Optionen / Beispiele</th></tr>
 <tr><td><b>zulässige Grundlagen</b></td><td>kommagetrennt; leer heißt: das Tor schweigt</td><td>nein</td><td>registry_extract:place, testimony:story · перебор:act, промер:act, мастер:story</td></tr>
 <tr><td><b>claim</b></td><td>what you are actually asserting</td><td>nein</td><td>line &lt;= budget · rain -&gt; umbrella</td></tr>
 <tr><td><b>bounds over the whole box</b></td><td>up to two objects {&quot;bound&quot;: &quot;expression &lt;= number&quot; (or &gt;=), &quot;laws&quot;: [linear equalities fixing the ? rows], &quot;tree&quot;: optional certificate}. Interval rows are the box. Without a tree the studio searches one; the ZTL kernel checks it exactly. CHECKED = holds on the whole box; FAILS = a point where it is false; NOT FOUND = nothing claimed either way; REFUSED = with the reason</td><td>nein</td><td>{&quot;bound&quot;: &quot;VL*I &lt;= 0.6&quot;, &quot;laws&quot;: [&quot;V - VL = I*Rs&quot;, &quot;VL = I*RL&quot;]}</td></tr>
 <tr><td><b>sets</b></td><td>sets by name, JSON: {&quot;S&quot;: {&quot;list&quot;: [names]} | {&quot;data&quot;: {name: &quot;T&quot;|&quot;F&quot;|&quot;Z&quot;}} | {&quot;abs&quot;: property of x}}. A property is a JSON formula: [&quot;in&quot;, a, S], [&quot;not&quot;, f], [&quot;and&quot;|&quot;or&quot;|&quot;imp&quot;|&quot;iff&quot;, f, g], [&quot;all&quot;|&quot;ex&quot;, &quot;y&quot;, f], [&quot;eq&quot;, S, T]; it may mention any set, itself included. Every set name is also a possible member. Each cell a ∈ S becomes a row a_in_S (a property&#x27;s cell is a defined row), so the claim can say bob_in_Trusted or in(bob, Trusted). Claims over the whole universe (all, ex): give {&quot;sets&quot;: {...}, &quot;claims&quot;: [...]} — judged in the report&#x27;s sets section</td><td>nein</td><td>{&quot;a&quot;: {&quot;list&quot;: []}, &quot;R&quot;: {&quot;abs&quot;: [&quot;not&quot;, [&quot;in&quot;, &quot;x&quot;, &quot;x&quot;]]}}</td></tr>
+<tr><td><b>need</b></td><td>the probability the claim must have at least, e.g. 0.95: EARNED when its whole degree is at or above it, REFUTED when its whole degree is below, OPEN with what to narrow otherwise</td><td>nein</td><td>0.95</td></tr>
+<tr><td><b>independent</b></td><td>stipulate that the claim&#x27;s statements are independent of one another (all of them): the degree narrows by the product rule; without it every joint is allowed</td><td>nein</td><td>true</td></tr>
 <tr><td><b>ask</b></td><td>reserved: the full report is always shown (this field narrows nothing yet)</td><td>nein</td><td>verdict · warranty · passport · stipulations · blast · brackets</td></tr>
 </table>
 <h2>Operatoren</h2><table>
@@ -502,6 +525,7 @@
 <tr><td><code>E_CLAIM</code></td><td>the claim does not parse</td></tr>
 <tr><td><code>E_COMPARE_ROW</code></td><td>a comparison row that leads back to itself, or a statement definition leaning on a comparison row</td></tr>
 <tr><td><code>E_CONVENTION</code></td><td>a convention also marked as separate measurements, or on a row with no value</td></tr>
+<tr><td><code>E_DEGREE</code></td><td>a degree that is not a point or interval inside [0, 1], or on a refuted, defined or valued row</td></tr>
 <tr><td><code>E_DIM</code></td><td>a dimension outside the list — a ground either supports a claim or permits it</td></tr>
 <tr><td><code>E_DIM_CLASH</code></td><td>a ground carries one mark, not two: &#x27;authority&#x27; cannot be combined with an act, a certificate or another row</td></tr>
 <tr><td><code>E_DUPNAME</code></td><td>the same name twice</td></tr>
@@ -510,6 +534,7 @@
 <tr><td><code>E_FORMULA</code></td><td>the defining formula does not parse</td></tr>
 <tr><td><code>E_GROUND_SPACES</code></td><td>a ground with a space in it — a ground is one word, because it names a document</td></tr>
 <tr><td><code>E_KIND</code></td><td>a kind of ground outside the list</td></tr>
+<tr><td><code>E_NEED</code></td><td>a threshold that is not a degree inside [0, 1]</td></tr>
 <tr><td><code>E_NOGROUND</code></td><td>verified, refuted or defined, with nothing backing it</td></tr>
 <tr><td><code>E_NONAME</code></td><td>a row without a name</td></tr>
 <tr><td><code>E_NO_VALUE</code></td><td>a name the claim reads as a number has no value — give it a number, an interval, or ? if it is what the question asks for</td></tr>
@@ -550,12 +575,15 @@
 <tr><td><b>échelle</b></td><td>jusqu&#x27;où l&#x27;on arrondit</td><td>non</td><td>entiers · centièmes · tiers</td></tr>
 <tr class="adv"><td><b>mesures séparées</b></td><td>un nombre issu d&#x27;un échantillon, pas d&#x27;une seule mesure</td><td>non</td><td></td></tr>
 <tr class="adv"><td><b>une convention</b></td><td>pas de valeur à trouver tant qu&#x27;on n&#x27;en fixe pas une (une mesure non nommée, une unité)</td><td>non</td><td></td></tr>
+<tr class="adv"><td><b>degré</b></td><td>la probabilité que cet énoncé soit vrai : 0.3, ou un intervalle [0.2, 0.4]</td><td>non</td><td>0.3 · [0.2, 0.4] · 1/3</td></tr>
 </table>
 <h2>le document lui-même</h2><table><tr><th>colonne</th><th>ce que c&#x27;est</th><th>obligatoire</th><th>options / exemples</th></tr>
 <tr><td><b>fondements admis</b></td><td>separes par des virgules ; vide : la porte se tait</td><td>non</td><td>registry_extract:place, testimony:story · перебор:act, промер:act, мастер:story</td></tr>
 <tr><td><b>claim</b></td><td>what you are actually asserting</td><td>non</td><td>line &lt;= budget · rain -&gt; umbrella</td></tr>
 <tr><td><b>bounds over the whole box</b></td><td>up to two objects {&quot;bound&quot;: &quot;expression &lt;= number&quot; (or &gt;=), &quot;laws&quot;: [linear equalities fixing the ? rows], &quot;tree&quot;: optional certificate}. Interval rows are the box. Without a tree the studio searches one; the ZTL kernel checks it exactly. CHECKED = holds on the whole box; FAILS = a point where it is false; NOT FOUND = nothing claimed either way; REFUSED = with the reason</td><td>non</td><td>{&quot;bound&quot;: &quot;VL*I &lt;= 0.6&quot;, &quot;laws&quot;: [&quot;V - VL = I*Rs&quot;, &quot;VL = I*RL&quot;]}</td></tr>
 <tr><td><b>sets</b></td><td>sets by name, JSON: {&quot;S&quot;: {&quot;list&quot;: [names]} | {&quot;data&quot;: {name: &quot;T&quot;|&quot;F&quot;|&quot;Z&quot;}} | {&quot;abs&quot;: property of x}}. A property is a JSON formula: [&quot;in&quot;, a, S], [&quot;not&quot;, f], [&quot;and&quot;|&quot;or&quot;|&quot;imp&quot;|&quot;iff&quot;, f, g], [&quot;all&quot;|&quot;ex&quot;, &quot;y&quot;, f], [&quot;eq&quot;, S, T]; it may mention any set, itself included. Every set name is also a possible member. Each cell a ∈ S becomes a row a_in_S (a property&#x27;s cell is a defined row), so the claim can say bob_in_Trusted or in(bob, Trusted). Claims over the whole universe (all, ex): give {&quot;sets&quot;: {...}, &quot;claims&quot;: [...]} — judged in the report&#x27;s sets section</td><td>non</td><td>{&quot;a&quot;: {&quot;list&quot;: []}, &quot;R&quot;: {&quot;abs&quot;: [&quot;not&quot;, [&quot;in&quot;, &quot;x&quot;, &quot;x&quot;]]}}</td></tr>
+<tr><td><b>need</b></td><td>the probability the claim must have at least, e.g. 0.95: EARNED when its whole degree is at or above it, REFUTED when its whole degree is below, OPEN with what to narrow otherwise</td><td>non</td><td>0.95</td></tr>
+<tr><td><b>independent</b></td><td>stipulate that the claim&#x27;s statements are independent of one another (all of them): the degree narrows by the product rule; without it every joint is allowed</td><td>non</td><td>true</td></tr>
 <tr><td><b>ask</b></td><td>reserved: the full report is always shown (this field narrows nothing yet)</td><td>non</td><td>verdict · warranty · passport · stipulations · blast · brackets</td></tr>
 </table>
 <h2>opérateurs</h2><table>
@@ -606,6 +634,7 @@
 <tr><td><code>E_CLAIM</code></td><td>the claim does not parse</td></tr>
 <tr><td><code>E_COMPARE_ROW</code></td><td>a comparison row that leads back to itself, or a statement definition leaning on a comparison row</td></tr>
 <tr><td><code>E_CONVENTION</code></td><td>a convention also marked as separate measurements, or on a row with no value</td></tr>
+<tr><td><code>E_DEGREE</code></td><td>a degree that is not a point or interval inside [0, 1], or on a refuted, defined or valued row</td></tr>
 <tr><td><code>E_DIM</code></td><td>a dimension outside the list — a ground either supports a claim or permits it</td></tr>
 <tr><td><code>E_DIM_CLASH</code></td><td>a ground carries one mark, not two: &#x27;authority&#x27; cannot be combined with an act, a certificate or another row</td></tr>
 <tr><td><code>E_DUPNAME</code></td><td>the same name twice</td></tr>
@@ -614,6 +643,7 @@
 <tr><td><code>E_FORMULA</code></td><td>the defining formula does not parse</td></tr>
 <tr><td><code>E_GROUND_SPACES</code></td><td>a ground with a space in it — a ground is one word, because it names a document</td></tr>
 <tr><td><code>E_KIND</code></td><td>a kind of ground outside the list</td></tr>
+<tr><td><code>E_NEED</code></td><td>a threshold that is not a degree inside [0, 1]</td></tr>
 <tr><td><code>E_NOGROUND</code></td><td>verified, refuted or defined, with nothing backing it</td></tr>
 <tr><td><code>E_NONAME</code></td><td>a row without a name</td></tr>
 <tr><td><code>E_NO_VALUE</code></td><td>a name the claim reads as a number has no value — give it a number, an interval, or ? if it is what the question asks for</td></tr>
@@ -654,12 +684,15 @@
 <tr><td><b>escala</b></td><td>hasta dónde redondeamos</td><td>no</td><td>enteros · centésimas · tercios</td></tr>
 <tr class="adv"><td><b>mediciones separadas</b></td><td>un número de una muestra, no una sola medición</td><td>no</td><td></td></tr>
 <tr class="adv"><td><b>una convención</b></td><td>no hay valor que hallar hasta que se fija uno (una medida sin nombrar, una unidad)</td><td>no</td><td></td></tr>
+<tr class="adv"><td><b>grado</b></td><td>la probabilidad de que este enunciado sea verdadero: 0.3, o un intervalo [0.2, 0.4]</td><td>no</td><td>0.3 · [0.2, 0.4] · 1/3</td></tr>
 </table>
 <h2>el documento mismo</h2><table><tr><th>columna</th><th>qué es</th><th>obligatorio</th><th>opciones / ejemplos</th></tr>
 <tr><td><b>fundamentos admitidos</b></td><td>separados por comas; vacio: la puerta calla</td><td>no</td><td>registry_extract:place, testimony:story · перебор:act, промер:act, мастер:story</td></tr>
 <tr><td><b>claim</b></td><td>what you are actually asserting</td><td>no</td><td>line &lt;= budget · rain -&gt; umbrella</td></tr>
 <tr><td><b>bounds over the whole box</b></td><td>up to two objects {&quot;bound&quot;: &quot;expression &lt;= number&quot; (or &gt;=), &quot;laws&quot;: [linear equalities fixing the ? rows], &quot;tree&quot;: optional certificate}. Interval rows are the box. Without a tree the studio searches one; the ZTL kernel checks it exactly. CHECKED = holds on the whole box; FAILS = a point where it is false; NOT FOUND = nothing claimed either way; REFUSED = with the reason</td><td>no</td><td>{&quot;bound&quot;: &quot;VL*I &lt;= 0.6&quot;, &quot;laws&quot;: [&quot;V - VL = I*Rs&quot;, &quot;VL = I*RL&quot;]}</td></tr>
 <tr><td><b>sets</b></td><td>sets by name, JSON: {&quot;S&quot;: {&quot;list&quot;: [names]} | {&quot;data&quot;: {name: &quot;T&quot;|&quot;F&quot;|&quot;Z&quot;}} | {&quot;abs&quot;: property of x}}. A property is a JSON formula: [&quot;in&quot;, a, S], [&quot;not&quot;, f], [&quot;and&quot;|&quot;or&quot;|&quot;imp&quot;|&quot;iff&quot;, f, g], [&quot;all&quot;|&quot;ex&quot;, &quot;y&quot;, f], [&quot;eq&quot;, S, T]; it may mention any set, itself included. Every set name is also a possible member. Each cell a ∈ S becomes a row a_in_S (a property&#x27;s cell is a defined row), so the claim can say bob_in_Trusted or in(bob, Trusted). Claims over the whole universe (all, ex): give {&quot;sets&quot;: {...}, &quot;claims&quot;: [...]} — judged in the report&#x27;s sets section</td><td>no</td><td>{&quot;a&quot;: {&quot;list&quot;: []}, &quot;R&quot;: {&quot;abs&quot;: [&quot;not&quot;, [&quot;in&quot;, &quot;x&quot;, &quot;x&quot;]]}}</td></tr>
+<tr><td><b>need</b></td><td>the probability the claim must have at least, e.g. 0.95: EARNED when its whole degree is at or above it, REFUTED when its whole degree is below, OPEN with what to narrow otherwise</td><td>no</td><td>0.95</td></tr>
+<tr><td><b>independent</b></td><td>stipulate that the claim&#x27;s statements are independent of one another (all of them): the degree narrows by the product rule; without it every joint is allowed</td><td>no</td><td>true</td></tr>
 <tr><td><b>ask</b></td><td>reserved: the full report is always shown (this field narrows nothing yet)</td><td>no</td><td>verdict · warranty · passport · stipulations · blast · brackets</td></tr>
 </table>
 <h2>operadores</h2><table>
@@ -710,6 +743,7 @@
 <tr><td><code>E_CLAIM</code></td><td>the claim does not parse</td></tr>
 <tr><td><code>E_COMPARE_ROW</code></td><td>a comparison row that leads back to itself, or a statement definition leaning on a comparison row</td></tr>
 <tr><td><code>E_CONVENTION</code></td><td>a convention also marked as separate measurements, or on a row with no value</td></tr>
+<tr><td><code>E_DEGREE</code></td><td>a degree that is not a point or interval inside [0, 1], or on a refuted, defined or valued row</td></tr>
 <tr><td><code>E_DIM</code></td><td>a dimension outside the list — a ground either supports a claim or permits it</td></tr>
 <tr><td><code>E_DIM_CLASH</code></td><td>a ground carries one mark, not two: &#x27;authority&#x27; cannot be combined with an act, a certificate or another row</td></tr>
 <tr><td><code>E_DUPNAME</code></td><td>the same name twice</td></tr>
@@ -718,6 +752,7 @@
 <tr><td><code>E_FORMULA</code></td><td>the defining formula does not parse</td></tr>
 <tr><td><code>E_GROUND_SPACES</code></td><td>a ground with a space in it — a ground is one word, because it names a document</td></tr>
 <tr><td><code>E_KIND</code></td><td>a kind of ground outside the list</td></tr>
+<tr><td><code>E_NEED</code></td><td>a threshold that is not a degree inside [0, 1]</td></tr>
 <tr><td><code>E_NOGROUND</code></td><td>verified, refuted or defined, with nothing backing it</td></tr>
 <tr><td><code>E_NONAME</code></td><td>a row without a name</td></tr>
 <tr><td><code>E_NO_VALUE</code></td><td>a name the claim reads as a number has no value — give it a number, an interval, or ? if it is what the question asks for</td></tr>

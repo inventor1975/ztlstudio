@@ -127,6 +127,8 @@ TOPIC_MAP = {
     "grounds": "which kinds of ground this document accepts (a registry): when the person says which sources count "
                "and which do not ('only signed records', 'testimony is not enough')",
     "functions": "exp, ln, log10, sin, cos, tan, atan, pow, pi, integral(f, x, a, b) inside comparisons",
+    "degrees": "probabilities of statements (ZTL-I): 'how likely', 'with probability 0.9', 'at least 95%', risk; "
+               "the row column `degree` and the document fields `need` and `independent`",
 }
 
 
@@ -139,6 +141,13 @@ def topic_texts(lang="en"):
             eg = ("; e.g. " + " | ".join(str(e) for e in f.get("eg") or [])) if f.get("eg") else ""
             out[f["key"]] = f'Document field "{f["key"]}" (optional, beside "rows" and "claim") — {f["help"]}{eg}'
     out["functions"] = TOPIC_FUNCTIONS_LINE
+    col = {c["key"]: c for c in spec["columns"]}.get("degree")
+    doc = {f["key"]: f for f in spec["document"]}
+    if col and "need" in doc and "independent" in doc:
+        out["degrees"] = (f'Row column "degree" — {col["help"]}. Document field "need" — {doc["need"]["help"]}. '
+                          f'Document field "independent" — {doc["independent"]["help"]}. The report then gives the '
+                          f'claim\'s degree as an interval: the least and the greatest probability over every way the '
+                          f'statements may be joined; never assume independence unless the person says so.')
     return out
 
 
