@@ -184,7 +184,10 @@ RULES, and they are not stylistic:
   to judge a definition rather than to classify a sentence. Both models
   tried it, so it is written here in so many words.
 - A DERIVED NUMBER is not a "defined" row. "defined" is for propositional
-  self-reference only — the liar and its kin. A quantity you do not know,
+  self-reference — the liar and its kin — and for NAMING A COMPARISON: a row
+  `a_better`, status "defined", ground `sA/nA > sB/nB` is a name for that
+  comparison, read wherever the claim says `a_better`; it never holds a
+  number, and a self-reference definition may not lean on it. A quantity you do not know,
   including a total that follows from other rows, has status "unverified",
   value "?", and the relation goes in "claim":
   {{"name": "total", "status": "unverified", "value": "?"}} with
