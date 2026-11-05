@@ -114,8 +114,11 @@ TOPIC_FUNCTIONS_LINE = _functions_line()
 #   full (default)  every topic's text is in the system prompt;
 #   map             one line per topic (what it is for, when it is needed); the model asks for the texts it needs
 #                   with its FIRST reply {"read_topics": [...]} and gets them before it writes the document.
-# ZTL_FILL_GUIDE=map switches the map on; the default stays full until an A/B on a free model shows the map is not
-# worse (bench/fill_guide_ab.py).
+# MEASURED 2026-11-05 on the catalogue (12 cases, the translator sees only ask_en, a match = the catalogue
+# document's primary verdict): NVIDIA nemotron full 5/12, map 5/12 (2 and 4 time-outs; the model never asked for a
+# topic); Sonnet full 6/12, map 8/12 (asked: sets x2, bounds, functions — only where needed). One run each, n = 12:
+# "not worse", the agreed criterion, not "better". So the map is the default; ZTL_FILL_GUIDE=full brings the full
+# texts back.
 TOPIC_MAP = {
     "sets": "sets defined by a list, by cells, or by a PROPERTY (self-reference allowed): membership questions, "
             "'the set of all ...', Russell-type sets, groups of trusted or allowed names",
@@ -140,7 +143,7 @@ def topic_texts(lang="en"):
 
 
 def _guide_mode():
-    return "map" if os.environ.get("ZTL_FILL_GUIDE", "full") == "map" else "full"
+    return "full" if os.environ.get("ZTL_FILL_GUIDE", "map") == "full" else "map"
 
 
 def guide(lang="en", mode=None):

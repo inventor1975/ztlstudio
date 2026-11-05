@@ -701,6 +701,11 @@ def coerce(doc):
         for k, v in r.items():
             if k in ("sample", "convention"):
                 row[k] = bool(v)
+            elif k == "value" and isinstance(v, (list, tuple)) and len(v) == 2 \
+                    and all(isinstance(e, (int, float, str)) and not isinstance(e, bool) for e in v):
+                # AN INTERVAL WRITTEN AS A JSON ARRAY (2026-11-05: models write [0, "inf"] as often as "[0,inf]";
+                # str() of the list put quotes into the sheet and the row died as unreadable) — the same interval
+                row[k] = "[" + ",".join(str(e).strip() for e in v) + "]"
             elif v is None:
                 row[k] = ""
             elif isinstance(v, bool):
