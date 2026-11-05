@@ -86,20 +86,79 @@ def schema(lang="en"):
                  + ", ".join(zfl.OPERATOR_WORDS)
                  + ". They are the connectives themselves; a row named after "
                    "one can never be referred to in a formula.")
-    # ФУНКЦИИ — из того же списка ядра (zfl.FUNCTION_WORDS), не пересказом.
-    lines.append("Functions in a comparison: "
+    # ФУНКЦИИ — тема `functions` (TOPIC_FUNCTIONS_LINE ниже), из того же списка ядра (zfl.FUNCTION_WORDS).
+    return "\n".join(lines)
+
+
+TOPIC_FUNCTIONS_LINE = None      # set below (the line is built from zfl's own lists)
+
+
+def _functions_line():
+    return ("Functions in a comparison: "
                  + ", ".join(w for w in zfl.FUNCTION_WORDS if w not in ("integral", "pi"))
                  + " (radians for the trigonometry); `pi` is the constant; "
                    "`integral(f, x, a, b)` is the definite integral of f over x "
                    "from a to b — x is the variable of integration, NOT a row, and "
                    "must not be the name of a row; a and b may be rows with ranges. "
                    "Never use these words as row names either.")
-    return "\n".join(lines)
+
+
+TOPIC_FUNCTIONS_LINE = _functions_line()
+
+
+# THE GUIDE AS A MAP OF TOPICS (2026-11-05, the curator's "все да"; the ZTL Engineer's guide_map, 03.11).
+# Measured first: the fill prompt was ~7.8k characters (~2k tokens) and taught only the row columns and the claim —
+# the document fields `sets`, `bounds` and `grounds` were never described to the model at all, so naive sets and
+# bound certificates were unreachable from the AI side (built, not wired). They are wired here, from zfl.DOC_FIELDS'
+# own help text, as TOPICS. Two ways to hand them over:
+#   full (default)  every topic's text is in the system prompt;
+#   map             one line per topic (what it is for, when it is needed); the model asks for the texts it needs
+#                   with its FIRST reply {"read_topics": [...]} and gets them before it writes the document.
+# ZTL_FILL_GUIDE=map switches the map on; the default stays full until an A/B on a free model shows the map is not
+# worse (bench/fill_guide_ab.py).
+TOPIC_MAP = {
+    "sets": "sets defined by a list, by cells, or by a PROPERTY (self-reference allowed): membership questions, "
+            "'the set of all ...', Russell-type sets, groups of trusted or allowed names",
+    "bounds": "a bound over a whole box of interval values, proved by a certificate: 'is X at most N for EVERY value "
+              "in these ranges', worst case over tolerances",
+    "grounds": "which kinds of ground this document accepts (a registry): when the person says which sources count "
+               "and which do not ('only signed records', 'testimony is not enough')",
+    "functions": "exp, ln, log10, sin, cos, tan, atan, pow, pi, integral(f, x, a, b) inside comparisons",
+}
+
+
+def topic_texts(lang="en"):
+    """{topic: full text}, built from the spec (zfl.DOC_FIELDS help and examples), never a second description"""
+    spec = zfl.form_spec(lang)
+    out = {}
+    for f in spec["document"]:
+        if f["key"] in ("sets", "bounds", "grounds"):
+            eg = ("; e.g. " + " | ".join(str(e) for e in f.get("eg") or [])) if f.get("eg") else ""
+            out[f["key"]] = f'Document field "{f["key"]}" (optional, beside "rows" and "claim") — {f["help"]}{eg}'
+    out["functions"] = TOPIC_FUNCTIONS_LINE
+    return out
+
+
+def _guide_mode():
+    return "map" if os.environ.get("ZTL_FILL_GUIDE", "full") == "map" else "full"
+
+
+def guide(lang="en", mode=None):
+    """the part of the system prompt that carries the topics: all their texts (full), or the map (map)"""
+    mode = mode or _guide_mode()
+    texts = topic_texts(lang)
+    if mode == "full":
+        return "\n".join(texts[k] for k in TOPIC_MAP)
+    return ("MORE OF THE LANGUAGE, ON REQUEST — one line per topic. If the question needs any of them, your FIRST "
+            "reply must be ONLY the JSON {\"read_topics\": [\"topic\", ...]} and you will be given their full "
+            "text; otherwise write the document at once.\n"
+            + "\n".join(f"  {k}: {v}" for k, v in TOPIC_MAP.items()))
 
 
 FILL_SYS = """You turn a person's question into one ZFL v2 document.
 
 {schema}
+{guide}
 
 RULES, and they are not stylistic:
 - Reply with the JSON object ALONE. No prose, no code fence.
@@ -271,7 +330,7 @@ def fill(history, lang="en", cfg=None):
     """A question in, a validated document out — with one repair attempt on
     the validator's own machine-readable issues, which is what those codes
     were built for."""
-    sysmsg = FILL_SYS.format(schema=schema(lang),
+    sysmsg = FILL_SYS.format(schema=schema(lang), guide=guide(lang),
                              language=LANG_NAME.get(lang, "English"))
     msgs = [{"role": "system", "content": sysmsg}] + [dict(m) for m in history]
     if msgs[-1]["role"] == "user":
@@ -279,6 +338,21 @@ def fill(history, lang="en", cfg=None):
             f"\n\n[Write every \"means\" gloss in "
             f"{LANG_NAME.get(lang, 'English')}.]")
     raw = strip_fences(llm(msgs, cfg))
+    # THE MAP: a first reply that asks for topics gets their texts, then writes the document (one extra call, only
+    # when the model asks; in full mode it never needs to)
+    topics_read = []
+    try:
+        ask = json.loads(raw)
+    except Exception:
+        ask = None
+    if isinstance(ask, dict) and isinstance(ask.get("read_topics"), list) and "rows" not in ask:
+        texts = topic_texts(lang)
+        topics_read = [t for t in ask["read_topics"] if t in texts][:len(texts)]
+        msgs = msgs + [{"role": "assistant", "content": raw},
+                       {"role": "user", "content": ("\n\n".join(texts[t] for t in topics_read)
+                                                    or "No such topic. ") + "\n\nNow write the document: the JSON "
+                                                    "object alone."}]
+        raw = strip_fences(llm(msgs, cfg))
     doc, issues = _parse(raw)
     if doc is not None:
         issues = _refusal(doc)
@@ -339,7 +413,7 @@ def fill(history, lang="en", cfg=None):
                 doc, raw, issues = doc2, raw2, issues2
                 зеркало = backread.прочитано(doc)
             return {"ok": True, "doc": doc, "repaired": False,
-                    "mirrored": True, "back_reading": зеркало,
+                    "mirrored": True, "back_reading": зеркало, "topics_read": topics_read,
                     "issues": issues + _invented_grounds(doc, history)}
     msgs += [{"role": "assistant", "content": raw},
              {"role": "user", "content":
@@ -350,7 +424,7 @@ def fill(history, lang="en", cfg=None):
     doc2, parse_issues = _parse(raw2)
     if doc2 is None:
         return {"ok": False, "issues": parse_issues}
-    return {"ok": True, "doc": doc2, "repaired": True,
+    return {"ok": True, "doc": doc2, "repaired": True, "topics_read": topics_read,
             "issues": _refusal(doc2) + _invented_grounds(doc2, history)}
 
 
