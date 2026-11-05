@@ -7,7 +7,7 @@
 // buttons and headings that are not part of the language.
 
 const UI = {
-  en: { advanced: "advanced", tools: "two more checkers", reference: "what is ZFL? (the language)", addrow: "add a row",
+  en: { advanced: "advanced", tools: "two more checkers", setsl: "sets (JSON, optional)", setsview: "sets — the naive view", setsin: "members", setsout: "not members", setsq: "undecided — passport", setsclaims: "claims over the universe", reference: "what is ZFL? (the language)", addrow: "add a row",
           mirror: "what the core read from your table",
           mirrorsilent: "silent",
           mirrornone: "No instrument took this up. The table was parsed; nothing answered.",
@@ -52,7 +52,7 @@ const UI = {
                + "visitor). Press \u00abuse my own AI\u00bb above to carry on "
                + "with your own key \u2014 or keep working without it: the "
                + "table and the verdict never needed the AI." },
-  ru: { advanced: "дополнительно", tools: "ещё два прибора", reference: "что такое ZFL? (язык)",
+  ru: { advanced: "дополнительно", tools: "ещё два прибора", setsl: "множества (JSON, по желанию)", setsview: "множества — наивный взгляд", setsin: "элементы", setsout: "не элементы", setsq: "не решено — паспорт", setsclaims: "утверждения обо всём универсуме", reference: "что такое ZFL? (язык)",
           mirror: "что ядро прочитало из вашей таблицы",
           mirrorsilent: "промолчали",
           mirrornone: "Ни один прибор не взялся. Таблица разобрана; отвечать некому.",
@@ -97,7 +97,7 @@ const UI = {
                + "посетителя). Нажмите «свой ИИ» вверху и продолжите со "
                + "своим ключом — или работайте без него: таблица и вердикт "
                + "в ИИ никогда не нуждались." },
-  uk: { advanced: "додатково", tools: "ще два прилади", reference: "що таке ZFL? (мова)",
+  uk: { advanced: "додатково", tools: "ще два прилади", setsl: "множини (JSON, за бажанням)", setsview: "множини — наївний погляд", setsin: "елементи", setsout: "не елементи", setsq: "не вирішено — паспорт", setsclaims: "твердження про весь універсум", reference: "що таке ZFL? (мова)",
           mirror: "що ядро прочитало з вашої таблиці",
           mirrorsilent: "промовчали",
           mirrornone: "Жоден прилад не взявся. Таблицю розібрано; відповідати нікому.",
@@ -138,7 +138,7 @@ const UI = {
                + "відвідувача). Натисніть «свій ШІ» вгорі й продовжте зі "
                + "своїм ключем — або працюйте без нього: таблиця і вердикт "
                + "у ШІ ніколи не потребували." },
-  he: { advanced: "מתקדם", tools: "שני בודקים נוספים", reference: "מהי ZFL? (השפה)",
+  he: { advanced: "מתקדם", tools: "שני בודקים נוספים", setsl: "קבוצות (JSON, לא חובה)", setsview: "קבוצות — המבט הנאיבי", setsin: "איברים", setsout: "לא איברים", setsq: "לא הוכרע — דרכון", setsclaims: "טענות על כל העולם", reference: "מהי ZFL? (השפה)",
           mirror: "מה שהליבה קראה מהטבלה שלך",
           mirrorsilent: "שתקו",
           mirrornone: "אף מכשיר לא נטל זאת. הטבלה נותחה; אין מי שיענה.",
@@ -177,7 +177,7 @@ const UI = {
         limit: "ה־AI החינמי מוצה (20 בקשות ל־10 דקות למבקר). לחצו על "
                + "«ה־AI שלי» למעלה והמשיכו עם מפתח משלכם — או עבדו בלעדיו: "
                + "הטבלה והפסק מעולם לא נזקקו ל־AI." },
-  de: { advanced: "erweitert", tools: "zwei weitere Prüfer", reference: "Was ist ZFL? (die Sprache)",
+  de: { advanced: "erweitert", tools: "zwei weitere Prüfer", setsl: "Mengen (JSON, optional)", setsview: "Mengen — die naive Sicht", setsin: "Elemente", setsout: "keine Elemente", setsq: "unentschieden — Pass", setsclaims: "Aussagen über das ganze Universum", reference: "Was ist ZFL? (die Sprache)",
           mirror: "was der Kern aus Ihrer Tabelle gelesen hat",
           mirrorsilent: "schwiegen",
           mirrornone: "Kein Instrument hat sich zuständig gefühlt. Die Tabelle wurde gelesen; niemand antwortet.",
@@ -219,7 +219,7 @@ const UI = {
                + "je Besucher). Klicken Sie oben auf «eigene KI» und machen Sie "
                + "mit Ihrem Schlüssel weiter — oder arbeiten Sie ohne: Tabelle "
                + "und Urteil haben die KI nie gebraucht." },
-  fr: { advanced: "avancé", tools: "deux autres vérificateurs", reference: "qu'est-ce que ZFL ? (le langage)",
+  fr: { advanced: "avancé", tools: "deux autres vérificateurs", setsl: "ensembles (JSON, facultatif)", setsview: "ensembles — la vue naïve", setsin: "éléments", setsout: "non-éléments", setsq: "indécis — passeport", setsclaims: "affirmations sur tout l'univers", reference: "qu'est-ce que ZFL ? (le langage)",
           mirror: "ce que le noyau a lu dans votre tableau",
           mirrorsilent: "silencieux",
           mirrornone: "Aucun instrument ne s'en est saisi. Le tableau a été analysé ; personne ne répond.",
@@ -261,7 +261,7 @@ const UI = {
                + "visiteur). Cliquez sur «mon IA» en haut et continuez avec "
                + "votre clé — ou travaillez sans : le tableau et le verdict "
                + "n'ont jamais eu besoin de l'IA." },
-  es: { advanced: "avanzado", tools: "dos verificadores más", reference: "¿qué es ZFL? (el lenguaje)",
+  es: { advanced: "avanzado", tools: "dos verificadores más", setsl: "conjuntos (JSON, opcional)", setsview: "conjuntos — la vista ingenua", setsin: "miembros", setsout: "no miembros", setsq: "sin decidir — pasaporte", setsclaims: "afirmaciones sobre todo el universo", reference: "¿qué es ZFL? (el lenguaje)",
           mirror: "lo que el núcleo leyó de su tabla",
           mirrorsilent: "callaron",
           mirrornone: "Ningún instrumento se hizo cargo. La tabla se analizó; nadie responde.",
@@ -432,12 +432,21 @@ function collect() {
   const doc = { rows: ROWS.filter(r => (r.name || "").trim()).map(clean),
            grounds: ($("grounds") || {}).value || "",
            claim: $("claim").value };
+  // NAIVE SETS (2026-11-05): sent as typed — JSON text the door parses, so a typo comes back as an E_SETS issue
+  const st = (($("sets") || {}).value || "").trim();
+  if (st) {
+    try { doc.sets = JSON.parse(st); } catch (e) { doc.sets = st; }
+  }
   const cb = (($("certbound") || {}).value || "").trim();
   if (cb) {
     const laws = (($("certlaws") || {}).value || "").split(";").map(x => x.trim()).filter(Boolean);
     doc.bounds = { bound: cb, ...(laws.length ? { laws } : {}) };
   }
   return doc;
+}
+
+function setSets(doc) {
+  if ($("sets")) $("sets").value = doc.sets ? JSON.stringify(doc.sets) : "";
 }
 
 function setCert(doc) {
@@ -486,6 +495,16 @@ function showReport(r) {
         [t("component"), t("kind"), t("detail")],
         rep.passport.map(p => [esc(p.component.join(", ")),
                                verdictSpan(p.kind), esc(p.detail)])) : "")));
+  }
+  if (rep.sets && rep.sets.ok) {
+    const S = rep.sets;
+    out.push(panel(t("setsview"), table(
+      ["", t("setsin"), t("setsout"), t("setsq")],
+      S.sets.map(x => [`<b>${esc(x.set)}</b>`, esc(x.in.join(", ")), esc(x.out.join(", ")),
+                       x.quarantined.map(q => `${esc(q.member)} ${verdictSpan(q.passport)}`).join("<br>")])) +
+      (S.claims.length ? `<p><b>${esc(t("setsclaims"))}</b></p>` + table(["", ""],
+        S.claims.map(c => [`<code>${esc(JSON.stringify(c.claim))}</code>`, verdictSpan(c.disposition) +
+          (c.residue && c.residue.length ? ` <span class="muted">(${esc(c.residue.join(", "))})</span>` : "")])) : "")));
   }
   if (rep.bounds) {
     const v = { CHECKED: "T", FAILS: "F", "NOT FOUND": "Z", REFUSED: "Z" };
@@ -672,6 +691,7 @@ function loadExample(kind, n) {
   ROWS = JSON.parse(JSON.stringify(item.doc.rows));
   $("claim").value = item.doc.claim || "";
   setCert(item.doc);
+  setSets(item.doc);
   // the QUESTION goes into the chat, so the commentary below has something
   // to be an answer TO. Not everyone knows what "Jourdain's postcard" is,
   // and a verdict with no question above it explains nothing.
@@ -712,6 +732,7 @@ async function ask() {
   ROWS = r.doc.rows || [];
   $("claim").value = r.doc.claim || "";
   setCert(r.doc);
+  setSets(r.doc);
   HISTORY.push({ role: "assistant", content: JSON.stringify(r.doc) });
   drawGrid();
   run();
