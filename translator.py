@@ -228,6 +228,11 @@ RULES, and they are not stylistic:
   a person, a document or a measurement, and never for something you only
   believe or remember — those stay "unverified". The studio tells the person
   that the row rests on your proof, so they can redo it.
+- A SEARCH THAT FOUND NOTHING proves no "none" and no "for all": a row that
+  rests on one gets ground_kind "search" (it is read as not verified), or the
+  row states the bound the search covered ("no case among the 2 000 records
+  checked") and is grounded as that. A search that FOUND something grounds the
+  found thing (a document or an act), not "search".
 - WHEN THE QUESTION HAS SEVERAL READINGS — several measures, units, methods,
   premises, ways to count — LAY EVERY READING; never pick one silently. Give
   each its own row (a hidden-premise row, or a quantity marked `convention`

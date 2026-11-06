@@ -23,7 +23,7 @@
 <tr><td><b>status</b></td><td>where it stands with us</td><td>always</td><td>verified · refuted · not verified · defined</td></tr>
 <tr><td><b>ground</b></td><td>what backs it, or the formula defining it</td><td>in context</td><td>inv-17 · ~Tr(L)</td></tr>
 <tr class="adv"><td><b>dimension</b></td><td>does this SUPPORT the claim or PERMIT it</td><td>no</td><td>evidence (supports) · authority (permits)</td></tr>
-<tr><td><b>kind of ground</b></td><td>a document unless you say otherwise</td><td>no</td><td>document · act (nothing to withdraw) · certificate (expires) · another row</td></tr>
+<tr><td><b>kind of ground</b></td><td>a document unless you say otherwise</td><td>no</td><td>document · act (nothing to withdraw) · certificate (expires) · another row · search that found nothing (proves no &#x27;none&#x27;)</td></tr>
 <tr><td><b>expires at</b></td><td>the name of the event after which this ground no longer holds — another row</td><td>no</td><td>court_judgment · registry_recheck</td></tr>
 <tr><td><b>value</b></td><td>a number, an interval [0,10], or ? for the quantity the question asks for (it is solved for, not measured); an unknown input is an interval, e.g. [0,inf]</td><td>no</td><td>1500 · [0,10] · ?</td></tr>
 <tr><td><b>unit</b></td><td>only with a value; metres never meet roubles</td><td>no</td><td>RUB · m · m2</td></tr>
@@ -120,6 +120,7 @@
 <tr><td><code>E_VALUE_SET</code></td><td>a choice between values, {0,10} — that is two rows, not one quantity</td></tr>
 <tr><td><code>W_EPOCH_NUMERIC</code></td><td>a clock beside a claim that compares numbers: the time layer reads statements only, so the claim is not read across the clock</td></tr>
 <tr><td><code>W_NO_GLOSS</code></td><td>no gloss, so nobody can check the name means what it seems to</td></tr>
+<tr><td><code>W_SEARCH_NOT_PROOF</code></td><td>a verified row whose ground is a search that found nothing: it proves no &#x27;none&#x27; and no &#x27;for all&#x27;, so the row is read as not verified — prove it, or ground the bound the search covered</td></tr>
 <tr><td><code>W_SOLVED</code></td><td>a `?` value was read as the question and solved: EARNED is the established answer to &#x27;which values satisfy the claim&#x27;, not a statement about the actual value — to ask whether the claim holds for a real input you do not know yet, give its range, e.g. [0,inf]</td></tr>
 <tr><td><code>W_UNIT_NO_VALUE</code></td><td>a unit with no value</td></tr>
 </table></div><div class='lang' id='ru' dir='ltr' hidden><h1>ZFL — Zero-trust Formal Language, язык студии (ZTL — сама логика, ZFL — то, как для неё пишут)</h1>
@@ -133,7 +134,7 @@
 <tr><td><b>статус</b></td><td>откуда оно у нас</td><td>всегда</td><td>проверено · опровергнуто · не проверено · определено</td></tr>
 <tr><td><b>основание</b></td><td>чем подтверждено или как определено</td><td>по условию</td><td>inv-17 · ~Tr(L)</td></tr>
 <tr class="adv"><td><b>измерение</b></td><td>оно ПОДПИРАЕТ утверждение или РАЗРЕШАЕТ его</td><td>нет</td><td>опора (подпирает) · разрешение (даёт право)</td></tr>
-<tr><td><b>вид основания</b></td><td>документ, если не сказано иное</td><td>нет</td><td>документ · акт (отзывать нечего) · сертификат (истекает) · другая строка</td></tr>
+<tr><td><b>вид основания</b></td><td>документ, если не сказано иное</td><td>нет</td><td>документ · акт (отзывать нечего) · сертификат (истекает) · другая строка · поиск, ничего не нашедший (не доказывает «нет»)</td></tr>
 <tr><td><b>истекает при</b></td><td>имя события, после которого это основание больше не держит — другая строка</td><td>нет</td><td>court_judgment · registry_recheck</td></tr>
 <tr><td><b>величина</b></td><td>число, интервал [0,10] или ? для искомой величины (её решают, а не измеряют); неизвестное входное значение — интервал, например [0,inf]</td><td>нет</td><td>1500 · [0,10] · ?</td></tr>
 <tr><td><b>единица</b></td><td>только с величиной; метры не встречаются с рублями</td><td>нет</td><td>RUB · m · m2</td></tr>
@@ -230,6 +231,7 @@
 <tr><td><code>E_VALUE_SET</code></td><td>выбор между величинами, {0,10} — это две строки, а не одна величина</td></tr>
 <tr><td><code>W_EPOCH_NUMERIC</code></td><td>часы рядом с утверждением, сравнивающим числа: слой времени читает только высказывания, поэтому утверждение через срок не прочитано</td></tr>
 <tr><td><code>W_NO_GLOSS</code></td><td>нет пояснения — некому проверить, то ли значит имя</td></tr>
+<tr><td><code>W_SEARCH_NOT_PROOF</code></td><td>проверенная строка на поиске, ничего не нашедшем: он не доказывает ни «нет», ни «для всех», строка читается как непроверенная — докажите или обоснуйте границу, которую поиск покрыл</td></tr>
 <tr><td><code>W_SOLVED</code></td><td>величина `?` прочитана как вопрос и найдена: EARNED — установленный ответ на «какие значения подходят», а не утверждение о настоящем значении — чтобы спросить, выполняется ли утверждение для реального неизвестного входа, дайте его интервал, например [0,inf]</td></tr>
 <tr><td><code>W_UNIT_NO_VALUE</code></td><td>единица без величины</td></tr>
 </table></div><div class='lang' id='uk' dir='ltr' hidden><h1>ZFL — Zero-trust Formal Language, мова студії (ZTL — це логіка; ZFL — як для неї писати)</h1>
@@ -243,7 +245,7 @@
 <tr><td><b>статус</b></td><td>звідки воно в нас</td><td>завжди</td><td>перевірено · спростовано · не перевірено · визначено</td></tr>
 <tr><td><b>підстава</b></td><td>чим підтверджено або як визначено</td><td>за контекстом</td><td>inv-17 · ~Tr(L)</td></tr>
 <tr class="adv"><td><b>вимір</b></td><td>воно ПІДПИРАЄ твердження чи ДОЗВОЛЯЄ його</td><td>ні</td><td>опора (підпирає) · дозвіл (дає право)</td></tr>
-<tr><td><b>вид підстави</b></td><td>документ, якщо не сказано інакше</td><td>ні</td><td>документ · акт (відкликати нічого) · сертифікат (спливає) · інший рядок</td></tr>
+<tr><td><b>вид підстави</b></td><td>документ, якщо не сказано інакше</td><td>ні</td><td>документ · акт (відкликати нічого) · сертифікат (спливає) · інший рядок · пошук, що нічого не знайшов (не доводить «немає»)</td></tr>
 <tr><td><b>спливає при</b></td><td>ім&#x27;я події, після якої ця підстава більше не тримає — інший рядок</td><td>ні</td><td>court_judgment · registry_recheck</td></tr>
 <tr><td><b>величина</b></td><td>число, інтервал [0,10] або ? для шуканої величини (її розв&#x27;язують, а не вимірюють); невідоме вхідне значення — інтервал, напр. [0,inf]</td><td>ні</td><td>1500 · [0,10] · ?</td></tr>
 <tr><td><b>одиниця</b></td><td>лише з величиною; метри не зустрічаються з гривнями</td><td>ні</td><td>RUB · m · m2</td></tr>
@@ -340,6 +342,7 @@
 <tr><td><code>E_VALUE_SET</code></td><td>a choice between values, {0,10} — that is two rows, not one quantity</td></tr>
 <tr><td><code>W_EPOCH_NUMERIC</code></td><td>a clock beside a claim that compares numbers: the time layer reads statements only, so the claim is not read across the clock</td></tr>
 <tr><td><code>W_NO_GLOSS</code></td><td>no gloss, so nobody can check the name means what it seems to</td></tr>
+<tr><td><code>W_SEARCH_NOT_PROOF</code></td><td>a verified row whose ground is a search that found nothing: it proves no &#x27;none&#x27; and no &#x27;for all&#x27;, so the row is read as not verified — prove it, or ground the bound the search covered</td></tr>
 <tr><td><code>W_SOLVED</code></td><td>a `?` value was read as the question and solved: EARNED is the established answer to &#x27;which values satisfy the claim&#x27;, not a statement about the actual value — to ask whether the claim holds for a real input you do not know yet, give its range, e.g. [0,inf]</td></tr>
 <tr><td><code>W_UNIT_NO_VALUE</code></td><td>a unit with no value</td></tr>
 </table></div><div class='lang' id='he' dir='rtl' hidden><h1>ZFL — Zero-trust Formal Language, שפת הסטודיו (ZTL היא הלוגיקה; ZFL היא איך כותבים עבורה)</h1>
@@ -353,7 +356,7 @@
 <tr><td><b>מעמד</b></td><td>מאיפה זה הגיע אלינו</td><td>תמיד</td><td>מאומת · הופרך · לא אומת · מוגדר</td></tr>
 <tr><td><b>אסמכתא</b></td><td>מה מאשש אותו, או הנוסחה שמגדירה אותו</td><td>לפי ההקשר</td><td>inv-17 · ~Tr(L)</td></tr>
 <tr class="adv"><td><b>ממד</b></td><td>האם זה תומך בטענה או מתיר אותה</td><td>לא</td><td>תמיכה (מבססת) · סמכות (מתירה)</td></tr>
-<tr><td><b>סוג האסמכתא</b></td><td>מסמך, אלא אם נאמר אחרת</td><td>לא</td><td>מסמך · מעשה (אין מה לבטל) · אישור (פג תוקף) · שורה אחרת</td></tr>
+<tr><td><b>סוג האסמכתא</b></td><td>מסמך, אלא אם נאמר אחרת</td><td>לא</td><td>מסמך · מעשה (אין מה לבטל) · אישור (פג תוקף) · שורה אחרת · חיפוש שלא מצא דבר (אינו מוכיח „אין“)</td></tr>
 <tr><td><b>פג בעת</b></td><td>שם האירוע שאחריו האסמכתא כבר אינה מחזיקה — שורה אחרת</td><td>לא</td><td>court_judgment · registry_recheck</td></tr>
 <tr><td><b>ערך</b></td><td>מספר, תחום [0,10] או ? לגודל המבוקש (פותרים אותו, לא מודדים); ערך קלט לא ידוע הוא תחום, למשל [0,inf]</td><td>לא</td><td>1500 · [0,10] · ?</td></tr>
 <tr><td><b>יחידה</b></td><td>רק עם ערך; מטרים לא נפגשים עם שקלים</td><td>לא</td><td>RUB · m · m2</td></tr>
@@ -450,6 +453,7 @@
 <tr><td><code>E_VALUE_SET</code></td><td>a choice between values, {0,10} — that is two rows, not one quantity</td></tr>
 <tr><td><code>W_EPOCH_NUMERIC</code></td><td>a clock beside a claim that compares numbers: the time layer reads statements only, so the claim is not read across the clock</td></tr>
 <tr><td><code>W_NO_GLOSS</code></td><td>no gloss, so nobody can check the name means what it seems to</td></tr>
+<tr><td><code>W_SEARCH_NOT_PROOF</code></td><td>a verified row whose ground is a search that found nothing: it proves no &#x27;none&#x27; and no &#x27;for all&#x27;, so the row is read as not verified — prove it, or ground the bound the search covered</td></tr>
 <tr><td><code>W_SOLVED</code></td><td>a `?` value was read as the question and solved: EARNED is the established answer to &#x27;which values satisfy the claim&#x27;, not a statement about the actual value — to ask whether the claim holds for a real input you do not know yet, give its range, e.g. [0,inf]</td></tr>
 <tr><td><code>W_UNIT_NO_VALUE</code></td><td>a unit with no value</td></tr>
 </table></div><div class='lang' id='de' dir='ltr' hidden><h1>ZFL — Zero-trust Formal Language, die Sprache des Studios (ZTL ist die Logik; ZFL ist, wie man dafür schreibt)</h1>
@@ -463,7 +467,7 @@
 <tr><td><b>Status</b></td><td>woher wir es haben</td><td>immer</td><td>geprüft · widerlegt · ungeprüft · definiert</td></tr>
 <tr><td><b>Grundlage</b></td><td>was es belegt, oder die definierende Formel</td><td>je nach Kontext</td><td>inv-17 · ~Tr(L)</td></tr>
 <tr class="adv"><td><b>Dimension</b></td><td>STÜTZT es die Aussage oder ERLAUBT es sie</td><td>nein</td><td>Stütze (belegt) · Befugnis (erlaubt)</td></tr>
-<tr><td><b>Art der Grundlage</b></td><td>ein Dokument, sofern nicht anders gesagt</td><td>nein</td><td>Dokument · Handlung (nichts zurückzunehmen) · Zertifikat (läuft ab) · andere Zeile</td></tr>
+<tr><td><b>Art der Grundlage</b></td><td>ein Dokument, sofern nicht anders gesagt</td><td>nein</td><td>Dokument · Handlung (nichts zurückzunehmen) · Zertifikat (läuft ab) · andere Zeile · Suche ohne Fund (beweist kein „keins“)</td></tr>
 <tr><td><b>erlischt bei</b></td><td>Name des Ereignisses, nach dem diese Grundlage nicht mehr trägt — eine andere Zeile</td><td>nein</td><td>court_judgment · registry_recheck</td></tr>
 <tr><td><b>Wert</b></td><td>Zahl, Intervall [0,10] oder ? für die gesuchte Größe (sie wird gelöst, nicht gemessen); ein unbekannter Eingabewert ist ein Intervall, z. B. [0,inf]</td><td>nein</td><td>1500 · [0,10] · ?</td></tr>
 <tr><td><b>Einheit</b></td><td>nur mit einem Wert; Meter treffen nie auf Euro</td><td>nein</td><td>RUB · m · m2</td></tr>
@@ -560,6 +564,7 @@
 <tr><td><code>E_VALUE_SET</code></td><td>a choice between values, {0,10} — that is two rows, not one quantity</td></tr>
 <tr><td><code>W_EPOCH_NUMERIC</code></td><td>a clock beside a claim that compares numbers: the time layer reads statements only, so the claim is not read across the clock</td></tr>
 <tr><td><code>W_NO_GLOSS</code></td><td>no gloss, so nobody can check the name means what it seems to</td></tr>
+<tr><td><code>W_SEARCH_NOT_PROOF</code></td><td>a verified row whose ground is a search that found nothing: it proves no &#x27;none&#x27; and no &#x27;for all&#x27;, so the row is read as not verified — prove it, or ground the bound the search covered</td></tr>
 <tr><td><code>W_SOLVED</code></td><td>a `?` value was read as the question and solved: EARNED is the established answer to &#x27;which values satisfy the claim&#x27;, not a statement about the actual value — to ask whether the claim holds for a real input you do not know yet, give its range, e.g. [0,inf]</td></tr>
 <tr><td><code>W_UNIT_NO_VALUE</code></td><td>a unit with no value</td></tr>
 </table></div><div class='lang' id='fr' dir='ltr' hidden><h1>ZFL — Zero-trust Formal Language, le langage du studio (ZTL est la logique ; ZFL est la façon d&#x27;écrire pour elle)</h1>
@@ -573,7 +578,7 @@
 <tr><td><b>statut</b></td><td>d&#x27;où cela nous vient</td><td>toujours</td><td>vérifié · réfuté · non vérifié · défini</td></tr>
 <tr><td><b>fondement</b></td><td>ce qui l&#x27;atteste, ou la formule qui le définit</td><td>selon le contexte</td><td>inv-17 · ~Tr(L)</td></tr>
 <tr class="adv"><td><b>dimension</b></td><td>cela SOUTIENT l&#x27;affirmation ou l&#x27;AUTORISE</td><td>non</td><td>appui (soutient) · autorité (autorise)</td></tr>
-<tr><td><b>type de fondement</b></td><td>un document, sauf mention contraire</td><td>non</td><td>document · acte (rien à retirer) · certificat (expire) · autre ligne</td></tr>
+<tr><td><b>type de fondement</b></td><td>un document, sauf mention contraire</td><td>non</td><td>document · acte (rien à retirer) · certificat (expire) · autre ligne · recherche sans résultat (ne prouve aucun « aucun »)</td></tr>
 <tr><td><b>expire à</b></td><td>le nom de l&#x27;événement après lequel ce fondement ne tient plus — une autre ligne</td><td>non</td><td>court_judgment · registry_recheck</td></tr>
 <tr><td><b>valeur</b></td><td>nombre, intervalle [0,10] ou ? pour la grandeur cherchée (elle est résolue, pas mesurée) ; une entrée inconnue est un intervalle, p. ex. [0,inf]</td><td>non</td><td>1500 · [0,10] · ?</td></tr>
 <tr><td><b>unité</b></td><td>seulement avec une valeur ; les mètres ne rencontrent pas les euros</td><td>non</td><td>RUB · m · m2</td></tr>
@@ -670,6 +675,7 @@
 <tr><td><code>E_VALUE_SET</code></td><td>a choice between values, {0,10} — that is two rows, not one quantity</td></tr>
 <tr><td><code>W_EPOCH_NUMERIC</code></td><td>a clock beside a claim that compares numbers: the time layer reads statements only, so the claim is not read across the clock</td></tr>
 <tr><td><code>W_NO_GLOSS</code></td><td>no gloss, so nobody can check the name means what it seems to</td></tr>
+<tr><td><code>W_SEARCH_NOT_PROOF</code></td><td>a verified row whose ground is a search that found nothing: it proves no &#x27;none&#x27; and no &#x27;for all&#x27;, so the row is read as not verified — prove it, or ground the bound the search covered</td></tr>
 <tr><td><code>W_SOLVED</code></td><td>a `?` value was read as the question and solved: EARNED is the established answer to &#x27;which values satisfy the claim&#x27;, not a statement about the actual value — to ask whether the claim holds for a real input you do not know yet, give its range, e.g. [0,inf]</td></tr>
 <tr><td><code>W_UNIT_NO_VALUE</code></td><td>a unit with no value</td></tr>
 </table></div><div class='lang' id='es' dir='ltr' hidden><h1>ZFL — Zero-trust Formal Language, el lenguaje del estudio (ZTL es la lógica; ZFL es cómo se escribe para ella)</h1>
@@ -683,7 +689,7 @@
 <tr><td><b>estado</b></td><td>de dónde nos viene</td><td>siempre</td><td>verificado · refutado · sin verificar · definido</td></tr>
 <tr><td><b>fundamento</b></td><td>qué lo respalda, o la fórmula que lo define</td><td>según el contexto</td><td>inv-17 · ~Tr(L)</td></tr>
 <tr class="adv"><td><b>dimensión</b></td><td>¿SOSTIENE la afirmación o la PERMITE?</td><td>no</td><td>apoyo (sostiene) · autoridad (permite)</td></tr>
-<tr><td><b>tipo de fundamento</b></td><td>un documento, salvo que se diga otra cosa</td><td>no</td><td>documento · acto (nada que retirar) · certificado (caduca) · otra fila</td></tr>
+<tr><td><b>tipo de fundamento</b></td><td>un documento, salvo que se diga otra cosa</td><td>no</td><td>documento · acto (nada que retirar) · certificado (caduca) · otra fila · búsqueda sin hallazgo (no prueba un «ninguno»)</td></tr>
 <tr><td><b>expira en</b></td><td>el nombre del evento tras el cual este fundamento ya no sostiene — otra fila</td><td>no</td><td>court_judgment · registry_recheck</td></tr>
 <tr><td><b>valor</b></td><td>número, intervalo [0,10] o ? para la magnitud buscada (se resuelve, no se mide); un dato desconocido es un intervalo, p. ej. [0,inf]</td><td>no</td><td>1500 · [0,10] · ?</td></tr>
 <tr><td><b>unidad</b></td><td>solo con un valor; los metros no se cruzan con los euros</td><td>no</td><td>RUB · m · m2</td></tr>
@@ -780,6 +786,7 @@
 <tr><td><code>E_VALUE_SET</code></td><td>a choice between values, {0,10} — that is two rows, not one quantity</td></tr>
 <tr><td><code>W_EPOCH_NUMERIC</code></td><td>a clock beside a claim that compares numbers: the time layer reads statements only, so the claim is not read across the clock</td></tr>
 <tr><td><code>W_NO_GLOSS</code></td><td>no gloss, so nobody can check the name means what it seems to</td></tr>
+<tr><td><code>W_SEARCH_NOT_PROOF</code></td><td>a verified row whose ground is a search that found nothing: it proves no &#x27;none&#x27; and no &#x27;for all&#x27;, so the row is read as not verified — prove it, or ground the bound the search covered</td></tr>
 <tr><td><code>W_SOLVED</code></td><td>a `?` value was read as the question and solved: EARNED is the established answer to &#x27;which values satisfy the claim&#x27;, not a statement about the actual value — to ask whether the claim holds for a real input you do not know yet, give its range, e.g. [0,inf]</td></tr>
 <tr><td><code>W_UNIT_NO_VALUE</code></td><td>a unit with no value</td></tr>
 </table></div>
