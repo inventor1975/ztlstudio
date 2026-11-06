@@ -7,7 +7,7 @@
 // buttons and headings that are not part of the language.
 
 const UI = {
-  en: { searchnp: "on a search that found nothing — proves no 'none'", indepgroups: "or groups, JSON", chance: "chance (a degree between 0 and 1) — no document settles it", degree: "degree — how probable", needl: "threshold (need, optional)", indepl: "the statements are independent (a convention)", degiv: "over every joint of the statements", degstable: "if each unverified statement means one thing throughout", degind: "stipulated independent", degneed: "needed", degrests: "rests on degrees that were told, not checked",
+  en: { classicalsafe: "every input is checked: classical reasoning is safe here", searchnp: "on a search that found nothing — proves no 'none'", indepgroups: "or groups, JSON", chance: "chance (a degree between 0 and 1) — no document settles it", degree: "degree — how probable", needl: "threshold (need, optional)", indepl: "the statements are independent (a convention)", degiv: "over every joint of the statements", degstable: "if each unverified statement means one thing throughout", degind: "stipulated independent", degneed: "needed", degrests: "rests on degrees that were told, not checked",
         advanced: "advanced", tools: "two more checkers", setsl: "sets (JSON, optional)", setsview: "sets — the naive view", setsin: "members", setsout: "not members", setsq: "undecided — passport", setsclaims: "claims over the universe", reference: "what is ZFL? (the language)", addrow: "add a row",
           mirror: "what the core read from your table",
           mirrorsilent: "silent",
@@ -53,7 +53,7 @@ const UI = {
                + "visitor). Press \u00abuse my own AI\u00bb above to carry on "
                + "with your own key \u2014 or keep working without it: the "
                + "table and the verdict never needed the AI." },
-  ru: { searchnp: "на поиске, ничего не нашедшем — не доказывает «нет»", indepgroups: "или группы, JSON", chance: "случай (степень между 0 и 1) — никакой документ его не решит", degree: "степень — насколько вероятно", needl: "порог (need, по желанию)", indepl: "утверждения независимы (договорённость)", degiv: "по всем совместным распределениям утверждений", degstable: "если каждое непроверенное утверждение везде значит одно", degind: "по договорённости о независимости", degneed: "нужно", degrests: "держится на сообщённых, а не проверенных степенях",
+  ru: { classicalsafe: "все входы проверены: здесь классические рассуждения безопасны", searchnp: "на поиске, ничего не нашедшем — не доказывает «нет»", indepgroups: "или группы, JSON", chance: "случай (степень между 0 и 1) — никакой документ его не решит", degree: "степень — насколько вероятно", needl: "порог (need, по желанию)", indepl: "утверждения независимы (договорённость)", degiv: "по всем совместным распределениям утверждений", degstable: "если каждое непроверенное утверждение везде значит одно", degind: "по договорённости о независимости", degneed: "нужно", degrests: "держится на сообщённых, а не проверенных степенях",
         advanced: "дополнительно", tools: "ещё два прибора", setsl: "множества (JSON, по желанию)", setsview: "множества — наивный взгляд", setsin: "элементы", setsout: "не элементы", setsq: "не решено — паспорт", setsclaims: "утверждения обо всём универсуме", reference: "что такое ZFL? (язык)",
           mirror: "что ядро прочитало из вашей таблицы",
           mirrorsilent: "промолчали",
@@ -99,7 +99,7 @@ const UI = {
                + "посетителя). Нажмите «свой ИИ» вверху и продолжите со "
                + "своим ключом — или работайте без него: таблица и вердикт "
                + "в ИИ никогда не нуждались." },
-  uk: { searchnp: "на пошуку, що нічого не знайшов — не доводить «немає»", indepgroups: "або групи, JSON", chance: "випадок (ступінь між 0 і 1) — жоден документ його не вирішить", degree: "ступінь — наскільки ймовірно", needl: "поріг (need, за бажанням)", indepl: "твердження незалежні (домовленість)", degiv: "за всіма спільними розподілами тверджень", degstable: "якщо кожне неперевірене твердження всюди означає одне", degind: "за домовленістю про незалежність", degneed: "потрібно", degrests: "тримається на повідомлених, а не перевірених ступенях",
+  uk: { classicalsafe: "усі входи перевірено: тут класичні міркування безпечні", searchnp: "на пошуку, що нічого не знайшов — не доводить «немає»", indepgroups: "або групи, JSON", chance: "випадок (ступінь між 0 і 1) — жоден документ його не вирішить", degree: "ступінь — наскільки ймовірно", needl: "поріг (need, за бажанням)", indepl: "твердження незалежні (домовленість)", degiv: "за всіма спільними розподілами тверджень", degstable: "якщо кожне неперевірене твердження всюди означає одне", degind: "за домовленістю про незалежність", degneed: "потрібно", degrests: "тримається на повідомлених, а не перевірених ступенях",
         advanced: "додатково", tools: "ще два прилади", setsl: "множини (JSON, за бажанням)", setsview: "множини — наївний погляд", setsin: "елементи", setsout: "не елементи", setsq: "не вирішено — паспорт", setsclaims: "твердження про весь універсум", reference: "що таке ZFL? (мова)",
           mirror: "що ядро прочитало з вашої таблиці",
           mirrorsilent: "промовчали",
@@ -141,7 +141,7 @@ const UI = {
                + "відвідувача). Натисніть «свій ШІ» вгорі й продовжте зі "
                + "своїм ключем — або працюйте без нього: таблиця і вердикт "
                + "у ШІ ніколи не потребували." },
-  he: { searchnp: "על חיפוש שלא מצא דבר — אינו מוכיח „אין“", indepgroups: "או קבוצות, JSON", chance: "מקרה (דרגה בין 0 ל-1) — שום מסמך לא יכריע אותו", degree: "דרגה — עד כמה סביר", needl: "סף (need, לא חובה)", indepl: "הטענות בלתי תלויות (מוסכמה)", degiv: "על פני כל ההתפלגויות המשותפות של הטענות", degstable: "אם כל טענה שלא אומתה פירושה אחד לאורך כל הדרך", degind: "בהנחת אי-תלות מוסכמת", degneed: "נדרש", degrests: "נשען על דרגות שנמסרו, לא נבדקו",
+  he: { classicalsafe: "כל הקלטים נבדקו: כאן הסקה קלאסית בטוחה", searchnp: "על חיפוש שלא מצא דבר — אינו מוכיח „אין“", indepgroups: "או קבוצות, JSON", chance: "מקרה (דרגה בין 0 ל-1) — שום מסמך לא יכריע אותו", degree: "דרגה — עד כמה סביר", needl: "סף (need, לא חובה)", indepl: "הטענות בלתי תלויות (מוסכמה)", degiv: "על פני כל ההתפלגויות המשותפות של הטענות", degstable: "אם כל טענה שלא אומתה פירושה אחד לאורך כל הדרך", degind: "בהנחת אי-תלות מוסכמת", degneed: "נדרש", degrests: "נשען על דרגות שנמסרו, לא נבדקו",
         advanced: "מתקדם", tools: "שני בודקים נוספים", setsl: "קבוצות (JSON, לא חובה)", setsview: "קבוצות — המבט הנאיבי", setsin: "איברים", setsout: "לא איברים", setsq: "לא הוכרע — דרכון", setsclaims: "טענות על כל העולם", reference: "מהי ZFL? (השפה)",
           mirror: "מה שהליבה קראה מהטבלה שלך",
           mirrorsilent: "שתקו",
@@ -181,7 +181,7 @@ const UI = {
         limit: "ה־AI החינמי מוצה (20 בקשות ל־10 דקות למבקר). לחצו על "
                + "«ה־AI שלי» למעלה והמשיכו עם מפתח משלכם — או עבדו בלעדיו: "
                + "הטבלה והפסק מעולם לא נזקקו ל־AI." },
-  de: { searchnp: "auf einer Suche ohne Fund — beweist kein „keins“", indepgroups: "oder Gruppen, JSON", chance: "Zufall (ein Grad zwischen 0 und 1) — kein Dokument entscheidet ihn", degree: "Grad — wie wahrscheinlich", needl: "Schwelle (need, optional)", indepl: "die Aussagen sind unabhängig (Konvention)", degiv: "über jede gemeinsame Verteilung der Aussagen", degstable: "falls jede ungeprüfte Aussage überall dasselbe bedeutet", degind: "bei vereinbarter Unabhängigkeit", degneed: "nötig", degrests: "beruht auf mitgeteilten, nicht geprüften Graden",
+  de: { classicalsafe: "jede Eingabe ist geprüft: klassisches Schließen ist hier sicher", searchnp: "auf einer Suche ohne Fund — beweist kein „keins“", indepgroups: "oder Gruppen, JSON", chance: "Zufall (ein Grad zwischen 0 und 1) — kein Dokument entscheidet ihn", degree: "Grad — wie wahrscheinlich", needl: "Schwelle (need, optional)", indepl: "die Aussagen sind unabhängig (Konvention)", degiv: "über jede gemeinsame Verteilung der Aussagen", degstable: "falls jede ungeprüfte Aussage überall dasselbe bedeutet", degind: "bei vereinbarter Unabhängigkeit", degneed: "nötig", degrests: "beruht auf mitgeteilten, nicht geprüften Graden",
         advanced: "erweitert", tools: "zwei weitere Prüfer", setsl: "Mengen (JSON, optional)", setsview: "Mengen — die naive Sicht", setsin: "Elemente", setsout: "keine Elemente", setsq: "unentschieden — Pass", setsclaims: "Aussagen über das ganze Universum", reference: "Was ist ZFL? (die Sprache)",
           mirror: "was der Kern aus Ihrer Tabelle gelesen hat",
           mirrorsilent: "schwiegen",
@@ -224,7 +224,7 @@ const UI = {
                + "je Besucher). Klicken Sie oben auf «eigene KI» und machen Sie "
                + "mit Ihrem Schlüssel weiter — oder arbeiten Sie ohne: Tabelle "
                + "und Urteil haben die KI nie gebraucht." },
-  fr: { searchnp: "sur une recherche sans résultat — ne prouve aucun « aucun »", indepgroups: "ou des groupes, JSON", chance: "hasard (un degré entre 0 et 1) — aucun document ne le tranche", degree: "degré — à quel point probable", needl: "seuil (need, facultatif)", indepl: "les énoncés sont indépendants (convention)", degiv: "sur toute loi jointe des énoncés", degstable: "si chaque énoncé non vérifié garde un seul sens partout", degind: "indépendance stipulée", degneed: "requis", degrests: "repose sur des degrés annoncés, non vérifiés",
+  fr: { classicalsafe: "toutes les entrées sont vérifiées : le raisonnement classique est sûr ici", searchnp: "sur une recherche sans résultat — ne prouve aucun « aucun »", indepgroups: "ou des groupes, JSON", chance: "hasard (un degré entre 0 et 1) — aucun document ne le tranche", degree: "degré — à quel point probable", needl: "seuil (need, facultatif)", indepl: "les énoncés sont indépendants (convention)", degiv: "sur toute loi jointe des énoncés", degstable: "si chaque énoncé non vérifié garde un seul sens partout", degind: "indépendance stipulée", degneed: "requis", degrests: "repose sur des degrés annoncés, non vérifiés",
         advanced: "avancé", tools: "deux autres vérificateurs", setsl: "ensembles (JSON, facultatif)", setsview: "ensembles — la vue naïve", setsin: "éléments", setsout: "non-éléments", setsq: "indécis — passeport", setsclaims: "affirmations sur tout l'univers", reference: "qu'est-ce que ZFL ? (le langage)",
           mirror: "ce que le noyau a lu dans votre tableau",
           mirrorsilent: "silencieux",
@@ -267,7 +267,7 @@ const UI = {
                + "visiteur). Cliquez sur «mon IA» en haut et continuez avec "
                + "votre clé — ou travaillez sans : le tableau et le verdict "
                + "n'ont jamais eu besoin de l'IA." },
-  es: { searchnp: "sobre una búsqueda sin hallazgo — no prueba un «ninguno»", indepgroups: "o grupos, JSON", chance: "azar (un grado entre 0 y 1) — ningún documento lo decide", degree: "grado — cuán probable", needl: "umbral (need, opcional)", indepl: "los enunciados son independientes (convención)", degiv: "sobre toda distribución conjunta de los enunciados", degstable: "si cada enunciado no verificado significa lo mismo en todas partes", degind: "independencia estipulada", degneed: "necesario", degrests: "descansa en grados comunicados, no verificados",
+  es: { classicalsafe: "todas las entradas están verificadas: aquí el razonamiento clásico es seguro", searchnp: "sobre una búsqueda sin hallazgo — no prueba un «ninguno»", indepgroups: "o grupos, JSON", chance: "azar (un grado entre 0 y 1) — ningún documento lo decide", degree: "grado — cuán probable", needl: "umbral (need, opcional)", indepl: "los enunciados son independientes (convención)", degiv: "sobre toda distribución conjunta de los enunciados", degstable: "si cada enunciado no verificado significa lo mismo en todas partes", degind: "independencia estipulada", degneed: "necesario", degrests: "descansa en grados comunicados, no verificados",
         advanced: "avanzado", tools: "dos verificadores más", setsl: "conjuntos (JSON, opcional)", setsview: "conjuntos — la vista ingenua", setsin: "miembros", setsout: "no miembros", setsq: "sin decidir — pasaporte", setsclaims: "afirmaciones sobre todo el universo", reference: "¿qué es ZFL? (el lenguaje)",
           mirror: "lo que el núcleo leyó de su tabla",
           mirrorsilent: "callaron",
@@ -598,6 +598,7 @@ function showReport(r) {
                                          !(rep.judge.search_not_proof || []).includes(n)))) +
       ((rep.judge.chance || []).length
         ? `<p class="muted">${esc(t("chance"))}: ` + esc(rep.judge.chance.join(", ")) + "</p>" : "") +
+      (rep.judge.classical_safe ? `<p class="muted">${esc(t("classicalsafe"))}</p>` : "") +
       ((rep.judge.search_not_proof || []).length
         ? `<p class="muted">${esc(t("searchnp"))}: ` + esc(rep.judge.search_not_proof.join(", ")) + "</p>" : "") +
       (rep.judge.why ? `<p class="muted">${esc(t("why"))}: ${esc(rep.judge.why)}</p>` : "")));
