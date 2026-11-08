@@ -85,7 +85,7 @@ def связь_мимо_приборов(doc: dict) -> list:
     return беда
 
 
-def факты(doc: dict) -> dict:
+def факты(doc: dict, r: dict = None) -> dict:
     """То же зеркало, но СТРУКТУРОЙ, а не словами.
 
     ПОЧЕМУ ДВЕ ФОРМЫ. Текст нужен модели: она читает его как читал бы человек,
@@ -99,7 +99,8 @@ def факты(doc: dict) -> dict:
     перевод уже есть.
     """
     doc = zfl.coerce(doc)
-    r = zfl.run(doc)
+    if r is None:                  # the judge's answer, when the caller has it (2026-11-08: the studio judged THREE times
+        r = zfl.run(doc)           # per request — 36.8 s for the pump on the server, 13.4 s for one judgement there)
     применились = [k for k, v in (r.get("applies") or {}).items() if v]
     claim = (doc.get("claim") or "").strip()
     паспорт_молчит = not (r.get("applies") or {}).get("passport")
@@ -130,9 +131,10 @@ def факты(doc: dict) -> dict:
     }
 
 
-def прочитано(doc: dict) -> str:
+def прочитано(doc: dict, r: dict = None) -> str:
     doc = zfl.coerce(doc)
-    r = zfl.run(doc)
+    if r is None:
+        r = zfl.run(doc)
     строки = []
 
     строки.append("ЧТО ЯДРО ПРОЧИТАЛО ИЗ ВАШЕЙ ТАБЛИЦЫ")
