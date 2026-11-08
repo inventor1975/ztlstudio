@@ -25,7 +25,7 @@
 <tr class="adv"><td><b>dimension</b></td><td>does this SUPPORT the claim or PERMIT it</td><td>no</td><td>evidence (supports) · authority (permits)</td></tr>
 <tr><td><b>kind of ground</b></td><td>a document unless you say otherwise</td><td>no</td><td>document · act (nothing to withdraw) · certificate (expires) · another row · search that found nothing (proves no &#x27;none&#x27;)</td></tr>
 <tr><td><b>expires at</b></td><td>the name of the event after which this ground no longer holds — another row</td><td>no</td><td>court_judgment · registry_recheck</td></tr>
-<tr><td><b>value</b></td><td>a number, an interval [0,10], or ? for the quantity the question asks for (it is solved for, not measured); ? in [0,2] searches it in [0,2] (for a system: the complete answer there); an unknown input is an interval, e.g. [0,inf]</td><td>no</td><td>1500 · [0,10] · ? · ? in [0,2]</td></tr>
+<tr><td><b>value</b></td><td>a number, an interval [0,10], or ? for the quantity the question asks for (it is solved for, not measured); ? in [0,2] searches it in [0,2] (the complete answer there); an unknown input is an interval, e.g. [0,inf]</td><td>no</td><td>1500 · [0,10] · ? · ? in [0,2]</td></tr>
 <tr><td><b>unit</b></td><td>only with a value; metres never meet roubles</td><td>no</td><td>RUB · m · m2</td></tr>
 <tr><td><b>scale</b></td><td>what it rounds to</td><td>no</td><td>exact · whole · hundredths · thirds</td></tr>
 <tr class="adv"><td><b>separate measurements</b></td><td>each occurrence is its own act of measuring</td><td>no</td><td></td></tr>
@@ -75,7 +75,7 @@
 <tr><td><code>1500</code></td><td>a number you have measured or read off a document</td></tr>
 <tr><td><code>[0,10]</code></td><td>a box: somewhere in this range, and the machine keeps the range rather than picking a point. Both ends are INCLUDED; for a strict bound put it in the claim — `x &gt; 0`. Write it backwards, [10,0], and you get E: the row names nothing, which is a verdict rather than a typo</td></tr>
 <tr><td><code>?</code></td><td>A QUESTION. You do not know it and you are asking. If the rest of the table determines it, the solver answers with the value AND the provenance it inherited — `x = 30, earned`. If it does not, you get told what would settle it.</td></tr>
-<tr><td><code>? in [0,2]</code></td><td>the quantity the question asks for, SEARCHED in [0,2]. For a system (two or more such rows and as many equations in the claim) the whole region is examined and the answer is complete: every solution there, each the only one in its cube, or none (refuted); for one unknown the region is not used yet, and the answer says so</td></tr>
+<tr><td><code>? in [0,2]</code></td><td>the quantity the question asks for, SEARCHED in [0,2]. Where the exact solver proves nothing — one such row and one equation, or a system (as many rows as equations) — the whole region is examined and the answer is complete: every solution there, each the only one in its interval (cube), or none (refuted); an exact answer (x*x = 2 -&gt; ±√2) is kept, and the region said unused</td></tr>
 </table>
 <h2>a worked example</h2><table><tr><th>column</th><th>means</th><th>status</th><th>ground</th><th>value</th></tr>
 <tr><td>line</td><td>the invoice line</td><td>verified</td><td>inv-17</td><td>1500</td></tr>
@@ -121,10 +121,10 @@
 <tr><td><code>E_VALUE_SET</code></td><td>a choice between values, {0,10} — that is two rows, not one quantity</td></tr>
 <tr><td><code>W_EPOCH_NUMERIC</code></td><td>a clock beside a claim that compares numbers: the time layer reads statements only, so the claim is not read across the clock</td></tr>
 <tr><td><code>W_NO_GLOSS</code></td><td>no gloss, so nobody can check the name means what it seems to</td></tr>
-<tr><td><code>W_REGION_UNUSED</code></td><td>a search region (? in [a, b]) is read for a system — two or more ? values and as many equations, every unknown with its region; here it was not used — or it was searched but not exhausted and no solution was certified in it (curves that only touch: nothing is claimed)</td></tr>
+<tr><td><code>W_REGION_UNUSED</code></td><td>a search region (? in [a, b]) is read where the exact solver proved nothing — as many equations as ? values, every unknown with its region; here it was not used — or it was searched but not exhausted and no solution was certified in it (curves that only touch: nothing is claimed)</td></tr>
 <tr><td><code>W_SEARCH_NOT_PROOF</code></td><td>a verified row whose ground is a search that found nothing: it proves no &#x27;none&#x27; and no &#x27;for all&#x27;, so the row is read as not verified — prove it, or ground the bound the search covered</td></tr>
 <tr><td><code>W_SOLVED</code></td><td>a `?` value was read as the question and solved: EARNED is the established answer to &#x27;which values satisfy the claim&#x27;, not a statement about the actual value — to ask whether the claim holds for a real input you do not know yet, give its range, e.g. [0,inf]</td></tr>
-<tr><td><code>W_SYSTEM_ALL</code></td><td>every unknown of the system carried a search region (? in [a, b]) and the region was exhausted: the answer lists ALL the solutions there, each the only one in its cube (none: the claim is refuted in the region); a cube may reach out of the region</td></tr>
+<tr><td><code>W_SYSTEM_ALL</code></td><td>every unknown (of the system, or the one unknown) carried a search region (? in [a, b]) and the region was exhausted: the answer lists ALL the solutions there, each the only one in its cube (none: the claim is refuted in the region); a cube may reach out of the region</td></tr>
 <tr><td><code>W_SYSTEM_LOCAL</code></td><td>several `?` values and a claim of as many equations were read as a SYSTEM and solved: each unknown&#x27;s interval is a cube holding a solution, the only one there (Krawczyk&#x27;s test, checked exactly); solutions outside the cube are not excluded — a system may have more than one</td></tr>
 <tr><td><code>W_UNIT_NO_VALUE</code></td><td>a unit with no value</td></tr>
 </table></div><div class='lang' id='ru' dir='ltr' hidden><h1>ZFL — Zero-trust Formal Language, язык студии (ZTL — сама логика, ZFL — то, как для неё пишут)</h1>
@@ -140,7 +140,7 @@
 <tr class="adv"><td><b>измерение</b></td><td>оно ПОДПИРАЕТ утверждение или РАЗРЕШАЕТ его</td><td>нет</td><td>опора (подпирает) · разрешение (даёт право)</td></tr>
 <tr><td><b>вид основания</b></td><td>документ, если не сказано иное</td><td>нет</td><td>документ · акт (отзывать нечего) · сертификат (истекает) · другая строка · поиск, ничего не нашедший (не доказывает «нет»)</td></tr>
 <tr><td><b>истекает при</b></td><td>имя события, после которого это основание больше не держит — другая строка</td><td>нет</td><td>court_judgment · registry_recheck</td></tr>
-<tr><td><b>величина</b></td><td>число, интервал [0,10] или ? для искомой величины (её решают, а не измеряют); ? in [0,2] ищет её в [0,2] (для системы — полный ответ там); неизвестное входное значение — интервал, например [0,inf]</td><td>нет</td><td>1500 · [0,10] · ? · ? in [0,2]</td></tr>
+<tr><td><b>величина</b></td><td>число, интервал [0,10] или ? для искомой величины (её решают, а не измеряют); ? in [0,2] ищет её в [0,2] (полный ответ там); неизвестное входное значение — интервал, например [0,inf]</td><td>нет</td><td>1500 · [0,10] · ? · ? in [0,2]</td></tr>
 <tr><td><b>единица</b></td><td>только с величиной; метры не встречаются с рублями</td><td>нет</td><td>RUB · m · m2</td></tr>
 <tr><td><b>шкала</b></td><td>до чего округляем</td><td>нет</td><td>точно · целые · сотые · трети</td></tr>
 <tr class="adv"><td><b>отдельные измерения</b></td><td>каждое вхождение — свой акт измерения</td><td>нет</td><td></td></tr>
@@ -190,7 +190,7 @@
 <tr><td><code>1500</code></td><td>число, которое вы измерили или прочли в документе</td></tr>
 <tr><td><code>[0,10]</code></td><td>коробка: где-то в этих пределах, и машина хранит пределы, а не выбирает точку. Обе границы ВКЛЮЧЕНЫ; строгую границу пишите в утверждении — `x &gt; 0`. Напишете наоборот, [10,0], получите E: строка не называет ничего, и это вердикт, а не опечатка</td></tr>
 <tr><td><code>?</code></td><td>ВОПРОС. Вы его не знаете и спрашиваете. Если остальная таблица его определяет, решатель отвечает величиной И происхождением, которое она унаследовала — `x = 30, заработано`. Если не определяет — вам скажут, что это решит.</td></tr>
-<tr><td><code>? in [0,2]</code></td><td>искомая величина, которую ИЩУТ в [0,2]. Для системы (две и более такие строки и столько же уравнений в утверждении) осматривается вся область, и ответ полный: все решения в ней, каждое единственное в своём кубе, или ни одного (опровергнуто); для одной неизвестной область пока не используется, и ответ об этом говорит</td></tr>
+<tr><td><code>? in [0,2]</code></td><td>искомая величина, которую ИЩУТ в [0,2]. Где точный решатель ничего не доказывает — одна такая строка и одно уравнение или система (строк столько же, сколько уравнений), — осматривается вся область, и ответ полный: все решения в ней, каждое единственное в своём отрезке (кубе), или ни одного (опровергнуто); точный ответ (x*x = 2 -&gt; ±√2) остаётся, а область помечается неиспользованной</td></tr>
 </table>
 <h2>разобранный пример</h2><table><tr><th>колонка</th><th>значит</th><th>статус</th><th>основание</th><th>величина</th></tr>
 <tr><td>line</td><td>the invoice line</td><td>verified</td><td>inv-17</td><td>1500</td></tr>
@@ -236,10 +236,10 @@
 <tr><td><code>E_VALUE_SET</code></td><td>выбор между величинами, {0,10} — это две строки, а не одна величина</td></tr>
 <tr><td><code>W_EPOCH_NUMERIC</code></td><td>часы рядом с утверждением, сравнивающим числа: слой времени читает только высказывания, поэтому утверждение через срок не прочитано</td></tr>
 <tr><td><code>W_NO_GLOSS</code></td><td>нет пояснения — некому проверить, то ли значит имя</td></tr>
-<tr><td><code>W_REGION_UNUSED</code></td><td>область поиска (? in [a, b]) читается для системы — двух и более величин ? и стольких же уравнений, у каждой неизвестной своя область; здесь она не использована — или обыскана, но не исчерпана, и решения в ней не заверено (кривые лишь касаются: ничего не утверждается)</td></tr>
+<tr><td><code>W_REGION_UNUSED</code></td><td>область поиска (? in [a, b]) читается там, где точный решатель ничего не доказал, — столько же уравнений, сколько величин ?, у каждой своя область; здесь она не использована — или обыскана, но не исчерпана, и решения в ней не заверено (кривые лишь касаются: ничего не утверждается)</td></tr>
 <tr><td><code>W_SEARCH_NOT_PROOF</code></td><td>проверенная строка на поиске, ничего не нашедшем: он не доказывает ни «нет», ни «для всех», строка читается как непроверенная — докажите или обоснуйте границу, которую поиск покрыл</td></tr>
 <tr><td><code>W_SOLVED</code></td><td>величина `?` прочитана как вопрос и найдена: EARNED — установленный ответ на «какие значения подходят», а не утверждение о настоящем значении — чтобы спросить, выполняется ли утверждение для реального неизвестного входа, дайте его интервал, например [0,inf]</td></tr>
-<tr><td><code>W_SYSTEM_ALL</code></td><td>у каждой неизвестной системы была область поиска (? in [a, b]), и область исчерпана: ответ перечисляет ВСЕ решения в ней, каждое единственное в своём кубе (ни одного — утверждение опровергнуто в области); куб может выходить за область</td></tr>
+<tr><td><code>W_SYSTEM_ALL</code></td><td>у каждой неизвестной (системы или единственной) была область поиска (? in [a, b]), и область исчерпана: ответ перечисляет ВСЕ решения в ней, каждое единственное в своём кубе (ни одного — утверждение опровергнуто в области); куб может выходить за область</td></tr>
 <tr><td><code>W_SYSTEM_LOCAL</code></td><td>несколько величин `?` и утверждение из стольких же уравнений прочитаны как СИСТЕМА и решены: интервалы неизвестных — куб, в котором есть решение, и оно там единственное (тест Кравчика, проверен точно); решения вне куба не исключены — у системы их может быть несколько</td></tr>
 <tr><td><code>W_UNIT_NO_VALUE</code></td><td>единица без величины</td></tr>
 </table></div><div class='lang' id='uk' dir='ltr' hidden><h1>ZFL — Zero-trust Formal Language, мова студії (ZTL — це логіка; ZFL — як для неї писати)</h1>
@@ -255,7 +255,7 @@
 <tr class="adv"><td><b>вимір</b></td><td>воно ПІДПИРАЄ твердження чи ДОЗВОЛЯЄ його</td><td>ні</td><td>опора (підпирає) · дозвіл (дає право)</td></tr>
 <tr><td><b>вид підстави</b></td><td>документ, якщо не сказано інакше</td><td>ні</td><td>документ · акт (відкликати нічого) · сертифікат (спливає) · інший рядок · пошук, що нічого не знайшов (не доводить «немає»)</td></tr>
 <tr><td><b>спливає при</b></td><td>ім&#x27;я події, після якої ця підстава більше не тримає — інший рядок</td><td>ні</td><td>court_judgment · registry_recheck</td></tr>
-<tr><td><b>величина</b></td><td>число, інтервал [0,10] або ? для шуканої величини (її розв&#x27;язують, а не вимірюють); ? in [0,2] шукає її в [0,2] (для системи — повна відповідь там); невідоме вхідне значення — інтервал, напр. [0,inf]</td><td>ні</td><td>1500 · [0,10] · ? · ? in [0,2]</td></tr>
+<tr><td><b>величина</b></td><td>число, інтервал [0,10] або ? для шуканої величини (її розв&#x27;язують, а не вимірюють); ? in [0,2] шукає її в [0,2] (повна відповідь там); невідоме вхідне значення — інтервал, напр. [0,inf]</td><td>ні</td><td>1500 · [0,10] · ? · ? in [0,2]</td></tr>
 <tr><td><b>одиниця</b></td><td>лише з величиною; метри не зустрічаються з гривнями</td><td>ні</td><td>RUB · m · m2</td></tr>
 <tr><td><b>шкала</b></td><td>до чого округлюємо</td><td>ні</td><td>цілі · соті · третини</td></tr>
 <tr class="adv"><td><b>окремі виміри</b></td><td>число з вибірки, а не одне вимірювання</td><td>ні</td><td></td></tr>
@@ -305,7 +305,7 @@
 <tr><td><code>1500</code></td><td>a number you have measured or read off a document</td></tr>
 <tr><td><code>[0,10]</code></td><td>a box: somewhere in this range, and the machine keeps the range rather than picking a point. Both ends are INCLUDED; for a strict bound put it in the claim — `x &gt; 0`. Write it backwards, [10,0], and you get E: the row names nothing, which is a verdict rather than a typo</td></tr>
 <tr><td><code>?</code></td><td>A QUESTION. You do not know it and you are asking. If the rest of the table determines it, the solver answers with the value AND the provenance it inherited — `x = 30, earned`. If it does not, you get told what would settle it.</td></tr>
-<tr><td><code>? in [0,2]</code></td><td>the quantity the question asks for, SEARCHED in [0,2]. For a system (two or more such rows and as many equations in the claim) the whole region is examined and the answer is complete: every solution there, each the only one in its cube, or none (refuted); for one unknown the region is not used yet, and the answer says so</td></tr>
+<tr><td><code>? in [0,2]</code></td><td>the quantity the question asks for, SEARCHED in [0,2]. Where the exact solver proves nothing — one such row and one equation, or a system (as many rows as equations) — the whole region is examined and the answer is complete: every solution there, each the only one in its interval (cube), or none (refuted); an exact answer (x*x = 2 -&gt; ±√2) is kept, and the region said unused</td></tr>
 </table>
 <h2>розібраний приклад</h2><table><tr><th>стовпець</th><th>означає</th><th>статус</th><th>підстава</th><th>величина</th></tr>
 <tr><td>line</td><td>the invoice line</td><td>verified</td><td>inv-17</td><td>1500</td></tr>
@@ -351,10 +351,10 @@
 <tr><td><code>E_VALUE_SET</code></td><td>a choice between values, {0,10} — that is two rows, not one quantity</td></tr>
 <tr><td><code>W_EPOCH_NUMERIC</code></td><td>a clock beside a claim that compares numbers: the time layer reads statements only, so the claim is not read across the clock</td></tr>
 <tr><td><code>W_NO_GLOSS</code></td><td>no gloss, so nobody can check the name means what it seems to</td></tr>
-<tr><td><code>W_REGION_UNUSED</code></td><td>a search region (? in [a, b]) is read for a system — two or more ? values and as many equations, every unknown with its region; here it was not used — or it was searched but not exhausted and no solution was certified in it (curves that only touch: nothing is claimed)</td></tr>
+<tr><td><code>W_REGION_UNUSED</code></td><td>a search region (? in [a, b]) is read where the exact solver proved nothing — as many equations as ? values, every unknown with its region; here it was not used — or it was searched but not exhausted and no solution was certified in it (curves that only touch: nothing is claimed)</td></tr>
 <tr><td><code>W_SEARCH_NOT_PROOF</code></td><td>a verified row whose ground is a search that found nothing: it proves no &#x27;none&#x27; and no &#x27;for all&#x27;, so the row is read as not verified — prove it, or ground the bound the search covered</td></tr>
 <tr><td><code>W_SOLVED</code></td><td>a `?` value was read as the question and solved: EARNED is the established answer to &#x27;which values satisfy the claim&#x27;, not a statement about the actual value — to ask whether the claim holds for a real input you do not know yet, give its range, e.g. [0,inf]</td></tr>
-<tr><td><code>W_SYSTEM_ALL</code></td><td>every unknown of the system carried a search region (? in [a, b]) and the region was exhausted: the answer lists ALL the solutions there, each the only one in its cube (none: the claim is refuted in the region); a cube may reach out of the region</td></tr>
+<tr><td><code>W_SYSTEM_ALL</code></td><td>every unknown (of the system, or the one unknown) carried a search region (? in [a, b]) and the region was exhausted: the answer lists ALL the solutions there, each the only one in its cube (none: the claim is refuted in the region); a cube may reach out of the region</td></tr>
 <tr><td><code>W_SYSTEM_LOCAL</code></td><td>several `?` values and a claim of as many equations were read as a SYSTEM and solved: each unknown&#x27;s interval is a cube holding a solution, the only one there (Krawczyk&#x27;s test, checked exactly); solutions outside the cube are not excluded — a system may have more than one</td></tr>
 <tr><td><code>W_UNIT_NO_VALUE</code></td><td>a unit with no value</td></tr>
 </table></div><div class='lang' id='he' dir='rtl' hidden><h1>ZFL — Zero-trust Formal Language, שפת הסטודיו (ZTL היא הלוגיקה; ZFL היא איך כותבים עבורה)</h1>
@@ -370,7 +370,7 @@
 <tr class="adv"><td><b>ממד</b></td><td>האם זה תומך בטענה או מתיר אותה</td><td>לא</td><td>תמיכה (מבססת) · סמכות (מתירה)</td></tr>
 <tr><td><b>סוג האסמכתא</b></td><td>מסמך, אלא אם נאמר אחרת</td><td>לא</td><td>מסמך · מעשה (אין מה לבטל) · אישור (פג תוקף) · שורה אחרת · חיפוש שלא מצא דבר (אינו מוכיח „אין“)</td></tr>
 <tr><td><b>פג בעת</b></td><td>שם האירוע שאחריו האסמכתא כבר אינה מחזיקה — שורה אחרת</td><td>לא</td><td>court_judgment · registry_recheck</td></tr>
-<tr><td><b>ערך</b></td><td>מספר, תחום [0,10] או ? לגודל המבוקש (פותרים אותו, לא מודדים); ? in [0,2] מחפש אותו ב-[0,2] (במערכת: התשובה המלאה שם); ערך קלט לא ידוע הוא תחום, למשל [0,inf]</td><td>לא</td><td>1500 · [0,10] · ? · ? in [0,2]</td></tr>
+<tr><td><b>ערך</b></td><td>מספר, תחום [0,10] או ? לגודל המבוקש (פותרים אותו, לא מודדים); ? in [0,2] מחפש אותו ב-[0,2] (התשובה המלאה שם); ערך קלט לא ידוע הוא תחום, למשל [0,inf]</td><td>לא</td><td>1500 · [0,10] · ? · ? in [0,2]</td></tr>
 <tr><td><b>יחידה</b></td><td>רק עם ערך; מטרים לא נפגשים עם שקלים</td><td>לא</td><td>RUB · m · m2</td></tr>
 <tr><td><b>סולם</b></td><td>לאן מעגלים</td><td>לא</td><td>שלמים · מאיות · שלישים</td></tr>
 <tr class="adv"><td><b>מדידות נפרדות</b></td><td>מספר מתוך מדגם, לא מדידה אחת</td><td>לא</td><td></td></tr>
@@ -420,7 +420,7 @@
 <tr><td><code>1500</code></td><td>a number you have measured or read off a document</td></tr>
 <tr><td><code>[0,10]</code></td><td>a box: somewhere in this range, and the machine keeps the range rather than picking a point. Both ends are INCLUDED; for a strict bound put it in the claim — `x &gt; 0`. Write it backwards, [10,0], and you get E: the row names nothing, which is a verdict rather than a typo</td></tr>
 <tr><td><code>?</code></td><td>A QUESTION. You do not know it and you are asking. If the rest of the table determines it, the solver answers with the value AND the provenance it inherited — `x = 30, earned`. If it does not, you get told what would settle it.</td></tr>
-<tr><td><code>? in [0,2]</code></td><td>the quantity the question asks for, SEARCHED in [0,2]. For a system (two or more such rows and as many equations in the claim) the whole region is examined and the answer is complete: every solution there, each the only one in its cube, or none (refuted); for one unknown the region is not used yet, and the answer says so</td></tr>
+<tr><td><code>? in [0,2]</code></td><td>the quantity the question asks for, SEARCHED in [0,2]. Where the exact solver proves nothing — one such row and one equation, or a system (as many rows as equations) — the whole region is examined and the answer is complete: every solution there, each the only one in its interval (cube), or none (refuted); an exact answer (x*x = 2 -&gt; ±√2) is kept, and the region said unused</td></tr>
 </table>
 <h2>דוגמה מפורטת</h2><table><tr><th>עמודה</th><th>פירושו</th><th>מעמד</th><th>אסמכתא</th><th>ערך</th></tr>
 <tr><td>line</td><td>the invoice line</td><td>verified</td><td>inv-17</td><td>1500</td></tr>
@@ -466,10 +466,10 @@
 <tr><td><code>E_VALUE_SET</code></td><td>a choice between values, {0,10} — that is two rows, not one quantity</td></tr>
 <tr><td><code>W_EPOCH_NUMERIC</code></td><td>a clock beside a claim that compares numbers: the time layer reads statements only, so the claim is not read across the clock</td></tr>
 <tr><td><code>W_NO_GLOSS</code></td><td>no gloss, so nobody can check the name means what it seems to</td></tr>
-<tr><td><code>W_REGION_UNUSED</code></td><td>a search region (? in [a, b]) is read for a system — two or more ? values and as many equations, every unknown with its region; here it was not used — or it was searched but not exhausted and no solution was certified in it (curves that only touch: nothing is claimed)</td></tr>
+<tr><td><code>W_REGION_UNUSED</code></td><td>a search region (? in [a, b]) is read where the exact solver proved nothing — as many equations as ? values, every unknown with its region; here it was not used — or it was searched but not exhausted and no solution was certified in it (curves that only touch: nothing is claimed)</td></tr>
 <tr><td><code>W_SEARCH_NOT_PROOF</code></td><td>a verified row whose ground is a search that found nothing: it proves no &#x27;none&#x27; and no &#x27;for all&#x27;, so the row is read as not verified — prove it, or ground the bound the search covered</td></tr>
 <tr><td><code>W_SOLVED</code></td><td>a `?` value was read as the question and solved: EARNED is the established answer to &#x27;which values satisfy the claim&#x27;, not a statement about the actual value — to ask whether the claim holds for a real input you do not know yet, give its range, e.g. [0,inf]</td></tr>
-<tr><td><code>W_SYSTEM_ALL</code></td><td>every unknown of the system carried a search region (? in [a, b]) and the region was exhausted: the answer lists ALL the solutions there, each the only one in its cube (none: the claim is refuted in the region); a cube may reach out of the region</td></tr>
+<tr><td><code>W_SYSTEM_ALL</code></td><td>every unknown (of the system, or the one unknown) carried a search region (? in [a, b]) and the region was exhausted: the answer lists ALL the solutions there, each the only one in its cube (none: the claim is refuted in the region); a cube may reach out of the region</td></tr>
 <tr><td><code>W_SYSTEM_LOCAL</code></td><td>several `?` values and a claim of as many equations were read as a SYSTEM and solved: each unknown&#x27;s interval is a cube holding a solution, the only one there (Krawczyk&#x27;s test, checked exactly); solutions outside the cube are not excluded — a system may have more than one</td></tr>
 <tr><td><code>W_UNIT_NO_VALUE</code></td><td>a unit with no value</td></tr>
 </table></div><div class='lang' id='de' dir='ltr' hidden><h1>ZFL — Zero-trust Formal Language, die Sprache des Studios (ZTL ist die Logik; ZFL ist, wie man dafür schreibt)</h1>
@@ -485,7 +485,7 @@
 <tr class="adv"><td><b>Dimension</b></td><td>STÜTZT es die Aussage oder ERLAUBT es sie</td><td>nein</td><td>Stütze (belegt) · Befugnis (erlaubt)</td></tr>
 <tr><td><b>Art der Grundlage</b></td><td>ein Dokument, sofern nicht anders gesagt</td><td>nein</td><td>Dokument · Handlung (nichts zurückzunehmen) · Zertifikat (läuft ab) · andere Zeile · Suche ohne Fund (beweist kein „keins“)</td></tr>
 <tr><td><b>erlischt bei</b></td><td>Name des Ereignisses, nach dem diese Grundlage nicht mehr trägt — eine andere Zeile</td><td>nein</td><td>court_judgment · registry_recheck</td></tr>
-<tr><td><b>Wert</b></td><td>Zahl, Intervall [0,10] oder ? für die gesuchte Größe (sie wird gelöst, nicht gemessen); ? in [0,2] sucht sie in [0,2] (bei einem System: die vollständige Antwort dort); ein unbekannter Eingabewert ist ein Intervall, z. B. [0,inf]</td><td>nein</td><td>1500 · [0,10] · ? · ? in [0,2]</td></tr>
+<tr><td><b>Wert</b></td><td>Zahl, Intervall [0,10] oder ? für die gesuchte Größe (sie wird gelöst, nicht gemessen); ? in [0,2] sucht sie in [0,2] (die vollständige Antwort dort); ein unbekannter Eingabewert ist ein Intervall, z. B. [0,inf]</td><td>nein</td><td>1500 · [0,10] · ? · ? in [0,2]</td></tr>
 <tr><td><b>Einheit</b></td><td>nur mit einem Wert; Meter treffen nie auf Euro</td><td>nein</td><td>RUB · m · m2</td></tr>
 <tr><td><b>Skala</b></td><td>worauf gerundet wird</td><td>nein</td><td>ganze · Hundertstel · Drittel</td></tr>
 <tr class="adv"><td><b>Einzelmessungen</b></td><td>eine Zahl aus einer Stichprobe, keine einzelne Messung</td><td>nein</td><td></td></tr>
@@ -535,7 +535,7 @@
 <tr><td><code>1500</code></td><td>a number you have measured or read off a document</td></tr>
 <tr><td><code>[0,10]</code></td><td>a box: somewhere in this range, and the machine keeps the range rather than picking a point. Both ends are INCLUDED; for a strict bound put it in the claim — `x &gt; 0`. Write it backwards, [10,0], and you get E: the row names nothing, which is a verdict rather than a typo</td></tr>
 <tr><td><code>?</code></td><td>A QUESTION. You do not know it and you are asking. If the rest of the table determines it, the solver answers with the value AND the provenance it inherited — `x = 30, earned`. If it does not, you get told what would settle it.</td></tr>
-<tr><td><code>? in [0,2]</code></td><td>the quantity the question asks for, SEARCHED in [0,2]. For a system (two or more such rows and as many equations in the claim) the whole region is examined and the answer is complete: every solution there, each the only one in its cube, or none (refuted); for one unknown the region is not used yet, and the answer says so</td></tr>
+<tr><td><code>? in [0,2]</code></td><td>the quantity the question asks for, SEARCHED in [0,2]. Where the exact solver proves nothing — one such row and one equation, or a system (as many rows as equations) — the whole region is examined and the answer is complete: every solution there, each the only one in its interval (cube), or none (refuted); an exact answer (x*x = 2 -&gt; ±√2) is kept, and the region said unused</td></tr>
 </table>
 <h2>ein durchgerechnetes Beispiel</h2><table><tr><th>Spalte</th><th>bedeutet</th><th>Status</th><th>Grundlage</th><th>Wert</th></tr>
 <tr><td>line</td><td>the invoice line</td><td>verified</td><td>inv-17</td><td>1500</td></tr>
@@ -581,10 +581,10 @@
 <tr><td><code>E_VALUE_SET</code></td><td>a choice between values, {0,10} — that is two rows, not one quantity</td></tr>
 <tr><td><code>W_EPOCH_NUMERIC</code></td><td>a clock beside a claim that compares numbers: the time layer reads statements only, so the claim is not read across the clock</td></tr>
 <tr><td><code>W_NO_GLOSS</code></td><td>no gloss, so nobody can check the name means what it seems to</td></tr>
-<tr><td><code>W_REGION_UNUSED</code></td><td>a search region (? in [a, b]) is read for a system — two or more ? values and as many equations, every unknown with its region; here it was not used — or it was searched but not exhausted and no solution was certified in it (curves that only touch: nothing is claimed)</td></tr>
+<tr><td><code>W_REGION_UNUSED</code></td><td>a search region (? in [a, b]) is read where the exact solver proved nothing — as many equations as ? values, every unknown with its region; here it was not used — or it was searched but not exhausted and no solution was certified in it (curves that only touch: nothing is claimed)</td></tr>
 <tr><td><code>W_SEARCH_NOT_PROOF</code></td><td>a verified row whose ground is a search that found nothing: it proves no &#x27;none&#x27; and no &#x27;for all&#x27;, so the row is read as not verified — prove it, or ground the bound the search covered</td></tr>
 <tr><td><code>W_SOLVED</code></td><td>a `?` value was read as the question and solved: EARNED is the established answer to &#x27;which values satisfy the claim&#x27;, not a statement about the actual value — to ask whether the claim holds for a real input you do not know yet, give its range, e.g. [0,inf]</td></tr>
-<tr><td><code>W_SYSTEM_ALL</code></td><td>every unknown of the system carried a search region (? in [a, b]) and the region was exhausted: the answer lists ALL the solutions there, each the only one in its cube (none: the claim is refuted in the region); a cube may reach out of the region</td></tr>
+<tr><td><code>W_SYSTEM_ALL</code></td><td>every unknown (of the system, or the one unknown) carried a search region (? in [a, b]) and the region was exhausted: the answer lists ALL the solutions there, each the only one in its cube (none: the claim is refuted in the region); a cube may reach out of the region</td></tr>
 <tr><td><code>W_SYSTEM_LOCAL</code></td><td>several `?` values and a claim of as many equations were read as a SYSTEM and solved: each unknown&#x27;s interval is a cube holding a solution, the only one there (Krawczyk&#x27;s test, checked exactly); solutions outside the cube are not excluded — a system may have more than one</td></tr>
 <tr><td><code>W_UNIT_NO_VALUE</code></td><td>a unit with no value</td></tr>
 </table></div><div class='lang' id='fr' dir='ltr' hidden><h1>ZFL — Zero-trust Formal Language, le langage du studio (ZTL est la logique ; ZFL est la façon d&#x27;écrire pour elle)</h1>
@@ -600,7 +600,7 @@
 <tr class="adv"><td><b>dimension</b></td><td>cela SOUTIENT l&#x27;affirmation ou l&#x27;AUTORISE</td><td>non</td><td>appui (soutient) · autorité (autorise)</td></tr>
 <tr><td><b>type de fondement</b></td><td>un document, sauf mention contraire</td><td>non</td><td>document · acte (rien à retirer) · certificat (expire) · autre ligne · recherche sans résultat (ne prouve aucun « aucun »)</td></tr>
 <tr><td><b>expire à</b></td><td>le nom de l&#x27;événement après lequel ce fondement ne tient plus — une autre ligne</td><td>non</td><td>court_judgment · registry_recheck</td></tr>
-<tr><td><b>valeur</b></td><td>nombre, intervalle [0,10] ou ? pour la grandeur cherchée (elle est résolue, pas mesurée) ; ? in [0,2] la cherche dans [0,2] (pour un système : la réponse complète là) ; une entrée inconnue est un intervalle, p. ex. [0,inf]</td><td>non</td><td>1500 · [0,10] · ? · ? in [0,2]</td></tr>
+<tr><td><b>valeur</b></td><td>nombre, intervalle [0,10] ou ? pour la grandeur cherchée (elle est résolue, pas mesurée) ; ? in [0,2] la cherche dans [0,2] (la réponse complète là) ; une entrée inconnue est un intervalle, p. ex. [0,inf]</td><td>non</td><td>1500 · [0,10] · ? · ? in [0,2]</td></tr>
 <tr><td><b>unité</b></td><td>seulement avec une valeur ; les mètres ne rencontrent pas les euros</td><td>non</td><td>RUB · m · m2</td></tr>
 <tr><td><b>échelle</b></td><td>jusqu&#x27;où l&#x27;on arrondit</td><td>non</td><td>entiers · centièmes · tiers</td></tr>
 <tr class="adv"><td><b>mesures séparées</b></td><td>un nombre issu d&#x27;un échantillon, pas d&#x27;une seule mesure</td><td>non</td><td></td></tr>
@@ -650,7 +650,7 @@
 <tr><td><code>1500</code></td><td>a number you have measured or read off a document</td></tr>
 <tr><td><code>[0,10]</code></td><td>a box: somewhere in this range, and the machine keeps the range rather than picking a point. Both ends are INCLUDED; for a strict bound put it in the claim — `x &gt; 0`. Write it backwards, [10,0], and you get E: the row names nothing, which is a verdict rather than a typo</td></tr>
 <tr><td><code>?</code></td><td>A QUESTION. You do not know it and you are asking. If the rest of the table determines it, the solver answers with the value AND the provenance it inherited — `x = 30, earned`. If it does not, you get told what would settle it.</td></tr>
-<tr><td><code>? in [0,2]</code></td><td>the quantity the question asks for, SEARCHED in [0,2]. For a system (two or more such rows and as many equations in the claim) the whole region is examined and the answer is complete: every solution there, each the only one in its cube, or none (refuted); for one unknown the region is not used yet, and the answer says so</td></tr>
+<tr><td><code>? in [0,2]</code></td><td>the quantity the question asks for, SEARCHED in [0,2]. Where the exact solver proves nothing — one such row and one equation, or a system (as many rows as equations) — the whole region is examined and the answer is complete: every solution there, each the only one in its interval (cube), or none (refuted); an exact answer (x*x = 2 -&gt; ±√2) is kept, and the region said unused</td></tr>
 </table>
 <h2>un exemple traité</h2><table><tr><th>colonne</th><th>signifie</th><th>statut</th><th>fondement</th><th>valeur</th></tr>
 <tr><td>line</td><td>the invoice line</td><td>verified</td><td>inv-17</td><td>1500</td></tr>
@@ -696,10 +696,10 @@
 <tr><td><code>E_VALUE_SET</code></td><td>a choice between values, {0,10} — that is two rows, not one quantity</td></tr>
 <tr><td><code>W_EPOCH_NUMERIC</code></td><td>a clock beside a claim that compares numbers: the time layer reads statements only, so the claim is not read across the clock</td></tr>
 <tr><td><code>W_NO_GLOSS</code></td><td>no gloss, so nobody can check the name means what it seems to</td></tr>
-<tr><td><code>W_REGION_UNUSED</code></td><td>a search region (? in [a, b]) is read for a system — two or more ? values and as many equations, every unknown with its region; here it was not used — or it was searched but not exhausted and no solution was certified in it (curves that only touch: nothing is claimed)</td></tr>
+<tr><td><code>W_REGION_UNUSED</code></td><td>a search region (? in [a, b]) is read where the exact solver proved nothing — as many equations as ? values, every unknown with its region; here it was not used — or it was searched but not exhausted and no solution was certified in it (curves that only touch: nothing is claimed)</td></tr>
 <tr><td><code>W_SEARCH_NOT_PROOF</code></td><td>a verified row whose ground is a search that found nothing: it proves no &#x27;none&#x27; and no &#x27;for all&#x27;, so the row is read as not verified — prove it, or ground the bound the search covered</td></tr>
 <tr><td><code>W_SOLVED</code></td><td>a `?` value was read as the question and solved: EARNED is the established answer to &#x27;which values satisfy the claim&#x27;, not a statement about the actual value — to ask whether the claim holds for a real input you do not know yet, give its range, e.g. [0,inf]</td></tr>
-<tr><td><code>W_SYSTEM_ALL</code></td><td>every unknown of the system carried a search region (? in [a, b]) and the region was exhausted: the answer lists ALL the solutions there, each the only one in its cube (none: the claim is refuted in the region); a cube may reach out of the region</td></tr>
+<tr><td><code>W_SYSTEM_ALL</code></td><td>every unknown (of the system, or the one unknown) carried a search region (? in [a, b]) and the region was exhausted: the answer lists ALL the solutions there, each the only one in its cube (none: the claim is refuted in the region); a cube may reach out of the region</td></tr>
 <tr><td><code>W_SYSTEM_LOCAL</code></td><td>several `?` values and a claim of as many equations were read as a SYSTEM and solved: each unknown&#x27;s interval is a cube holding a solution, the only one there (Krawczyk&#x27;s test, checked exactly); solutions outside the cube are not excluded — a system may have more than one</td></tr>
 <tr><td><code>W_UNIT_NO_VALUE</code></td><td>a unit with no value</td></tr>
 </table></div><div class='lang' id='es' dir='ltr' hidden><h1>ZFL — Zero-trust Formal Language, el lenguaje del estudio (ZTL es la lógica; ZFL es cómo se escribe para ella)</h1>
@@ -715,7 +715,7 @@
 <tr class="adv"><td><b>dimensión</b></td><td>¿SOSTIENE la afirmación o la PERMITE?</td><td>no</td><td>apoyo (sostiene) · autoridad (permite)</td></tr>
 <tr><td><b>tipo de fundamento</b></td><td>un documento, salvo que se diga otra cosa</td><td>no</td><td>documento · acto (nada que retirar) · certificado (caduca) · otra fila · búsqueda sin hallazgo (no prueba un «ninguno»)</td></tr>
 <tr><td><b>expira en</b></td><td>el nombre del evento tras el cual este fundamento ya no sostiene — otra fila</td><td>no</td><td>court_judgment · registry_recheck</td></tr>
-<tr><td><b>valor</b></td><td>número, intervalo [0,10] o ? para la magnitud buscada (se resuelve, no se mide); ? in [0,2] la busca en [0,2] (en un sistema: la respuesta completa allí); un dato desconocido es un intervalo, p. ej. [0,inf]</td><td>no</td><td>1500 · [0,10] · ? · ? in [0,2]</td></tr>
+<tr><td><b>valor</b></td><td>número, intervalo [0,10] o ? para la magnitud buscada (se resuelve, no se mide); ? in [0,2] la busca en [0,2] (la respuesta completa allí); un dato desconocido es un intervalo, p. ej. [0,inf]</td><td>no</td><td>1500 · [0,10] · ? · ? in [0,2]</td></tr>
 <tr><td><b>unidad</b></td><td>solo con un valor; los metros no se cruzan con los euros</td><td>no</td><td>RUB · m · m2</td></tr>
 <tr><td><b>escala</b></td><td>hasta dónde redondeamos</td><td>no</td><td>enteros · centésimas · tercios</td></tr>
 <tr class="adv"><td><b>mediciones separadas</b></td><td>un número de una muestra, no una sola medición</td><td>no</td><td></td></tr>
@@ -765,7 +765,7 @@
 <tr><td><code>1500</code></td><td>a number you have measured or read off a document</td></tr>
 <tr><td><code>[0,10]</code></td><td>a box: somewhere in this range, and the machine keeps the range rather than picking a point. Both ends are INCLUDED; for a strict bound put it in the claim — `x &gt; 0`. Write it backwards, [10,0], and you get E: the row names nothing, which is a verdict rather than a typo</td></tr>
 <tr><td><code>?</code></td><td>A QUESTION. You do not know it and you are asking. If the rest of the table determines it, the solver answers with the value AND the provenance it inherited — `x = 30, earned`. If it does not, you get told what would settle it.</td></tr>
-<tr><td><code>? in [0,2]</code></td><td>the quantity the question asks for, SEARCHED in [0,2]. For a system (two or more such rows and as many equations in the claim) the whole region is examined and the answer is complete: every solution there, each the only one in its cube, or none (refuted); for one unknown the region is not used yet, and the answer says so</td></tr>
+<tr><td><code>? in [0,2]</code></td><td>the quantity the question asks for, SEARCHED in [0,2]. Where the exact solver proves nothing — one such row and one equation, or a system (as many rows as equations) — the whole region is examined and the answer is complete: every solution there, each the only one in its interval (cube), or none (refuted); an exact answer (x*x = 2 -&gt; ±√2) is kept, and the region said unused</td></tr>
 </table>
 <h2>un ejemplo resuelto</h2><table><tr><th>columna</th><th>significa</th><th>estado</th><th>fundamento</th><th>valor</th></tr>
 <tr><td>line</td><td>the invoice line</td><td>verified</td><td>inv-17</td><td>1500</td></tr>
@@ -811,10 +811,10 @@
 <tr><td><code>E_VALUE_SET</code></td><td>a choice between values, {0,10} — that is two rows, not one quantity</td></tr>
 <tr><td><code>W_EPOCH_NUMERIC</code></td><td>a clock beside a claim that compares numbers: the time layer reads statements only, so the claim is not read across the clock</td></tr>
 <tr><td><code>W_NO_GLOSS</code></td><td>no gloss, so nobody can check the name means what it seems to</td></tr>
-<tr><td><code>W_REGION_UNUSED</code></td><td>a search region (? in [a, b]) is read for a system — two or more ? values and as many equations, every unknown with its region; here it was not used — or it was searched but not exhausted and no solution was certified in it (curves that only touch: nothing is claimed)</td></tr>
+<tr><td><code>W_REGION_UNUSED</code></td><td>a search region (? in [a, b]) is read where the exact solver proved nothing — as many equations as ? values, every unknown with its region; here it was not used — or it was searched but not exhausted and no solution was certified in it (curves that only touch: nothing is claimed)</td></tr>
 <tr><td><code>W_SEARCH_NOT_PROOF</code></td><td>a verified row whose ground is a search that found nothing: it proves no &#x27;none&#x27; and no &#x27;for all&#x27;, so the row is read as not verified — prove it, or ground the bound the search covered</td></tr>
 <tr><td><code>W_SOLVED</code></td><td>a `?` value was read as the question and solved: EARNED is the established answer to &#x27;which values satisfy the claim&#x27;, not a statement about the actual value — to ask whether the claim holds for a real input you do not know yet, give its range, e.g. [0,inf]</td></tr>
-<tr><td><code>W_SYSTEM_ALL</code></td><td>every unknown of the system carried a search region (? in [a, b]) and the region was exhausted: the answer lists ALL the solutions there, each the only one in its cube (none: the claim is refuted in the region); a cube may reach out of the region</td></tr>
+<tr><td><code>W_SYSTEM_ALL</code></td><td>every unknown (of the system, or the one unknown) carried a search region (? in [a, b]) and the region was exhausted: the answer lists ALL the solutions there, each the only one in its cube (none: the claim is refuted in the region); a cube may reach out of the region</td></tr>
 <tr><td><code>W_SYSTEM_LOCAL</code></td><td>several `?` values and a claim of as many equations were read as a SYSTEM and solved: each unknown&#x27;s interval is a cube holding a solution, the only one there (Krawczyk&#x27;s test, checked exactly); solutions outside the cube are not excluded — a system may have more than one</td></tr>
 <tr><td><code>W_UNIT_NO_VALUE</code></td><td>a unit with no value</td></tr>
 </table></div>
