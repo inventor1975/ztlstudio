@@ -175,6 +175,24 @@ CODE_HELP = {
                  "ответ на «какие значения подходят», а не утверждение о настоящем "
                  "значении — чтобы спросить, выполняется ли утверждение для реального "
                  "неизвестного входа, дайте его интервал, например [0,inf]"),
+    "W_SYSTEM_LOCAL": ("several `?` values and a claim of as many equations were read as a SYSTEM and solved: "
+                       "each unknown's interval is a cube holding a solution, the only one there (Krawczyk's "
+                       "test, checked exactly); solutions outside the cube are not excluded — a system may have "
+                       "more than one",
+                       "несколько величин `?` и утверждение из стольких же уравнений прочитаны как СИСТЕМА и "
+                       "решены: интервалы неизвестных — куб, в котором есть решение, и оно там единственное "
+                       "(тест Кравчика, проверен точно); решения вне куба не исключены — у системы их может быть "
+                       "несколько"),
+    "W_SYSTEM_ALL": ("every unknown of the system carried a search region (? in [a, b]) and the region was "
+                     "exhausted: the answer lists ALL the solutions there, each the only one in its cube (none: the "
+                     "claim is refuted in the region); a cube may reach out of the region",
+                     "у каждой неизвестной системы была область поиска (? in [a, b]), и область исчерпана: ответ "
+                     "перечисляет ВСЕ решения в ней, каждое единственное в своём кубе (ни одного — утверждение "
+                     "опровергнуто в области); куб может выходить за область"),
+    "W_REGION_UNUSED": ("a search region (? in [a, b]) is read for a system — two or more ? values and as many "
+                        "equations, every unknown with its region; here it was not used",
+                        "область поиска (? in [a, b]) читается для системы — двух и более величин ? и стольких же "
+                        "уравнений, у каждой неизвестной своя область; здесь она не использована"),
 }
 
 PROSE = {
@@ -459,6 +477,14 @@ OP_HELP = {
 # offers must appear here, checked below, so a fourth form cannot be added
 # without a word about what it does.
 VALUE_HELP = {
+    "? in [0,2]": ("the quantity the question asks for, SEARCHED in [0,2]. For a system (two or more such rows and "
+                   "as many equations in the claim) the whole region is examined and the answer is complete: every "
+                   "solution there, each the only one in its cube, or none (refuted); for one unknown the region is "
+                   "not used yet, and the answer says so",
+                   "искомая величина, которую ИЩУТ в [0,2]. Для системы (две и более такие строки и столько же "
+                   "уравнений в утверждении) осматривается вся область, и ответ полный: все решения в ней, каждое "
+                   "единственное в своём кубе, или ни одного (опровергнуто); для одной неизвестной область пока не "
+                   "используется, и ответ об этом говорит"),
     "1500": ("a number you have measured or read off a document",
              "число, которое вы измерили или прочли в документе"),
     "[0,10]": ("a box: somewhere in this range, and the machine keeps the "
