@@ -120,6 +120,7 @@
 <tr><td><code>E_VALUE_FORM</code></td><td>a value that is neither a number, an interval nor ?</td></tr>
 <tr><td><code>E_VALUE_SET</code></td><td>a choice between values, {0,10} — that is two rows, not one quantity</td></tr>
 <tr><td><code>W_EPOCH_NUMERIC</code></td><td>a clock beside a claim that compares numbers: the time layer reads statements only, so the claim is not read across the clock</td></tr>
+<tr><td><code>W_IMPLICIT</code></td><td>one unknown with its search region and real parameters, judged by the implicit judge (every reading checked exactly): for every parameter value in the box, exactly one solution in the region within the interval given; or, when existence or uniqueness is not shown, only that every solution lies in it</td></tr>
 <tr><td><code>W_NO_GLOSS</code></td><td>no gloss, so nobody can check the name means what it seems to</td></tr>
 <tr><td><code>W_REGION_FILTERED</code></td><td>one unknown with a search region (? in [a, b]) and an EXACT answer over all the reals: only its values in the region are kept; none — the claim is refuted in the region</td></tr>
 <tr><td><code>W_REGION_UNUSED</code></td><td>a search region (? in [a, b]) is read where the exact solver proved nothing — as many equations as ? values, every unknown with its region; here it was not used — or it was searched but not exhausted and no solution was certified in it (curves that only touch, or a whole curve of solutions: nothing is claimed)</td></tr>
@@ -236,6 +237,7 @@
 <tr><td><code>E_VALUE_FORM</code></td><td>величина, которая не число, не интервал и не ?</td></tr>
 <tr><td><code>E_VALUE_SET</code></td><td>выбор между величинами, {0,10} — это две строки, а не одна величина</td></tr>
 <tr><td><code>W_EPOCH_NUMERIC</code></td><td>часы рядом с утверждением, сравнивающим числа: слой времени читает только высказывания, поэтому утверждение через срок не прочитано</td></tr>
+<tr><td><code>W_IMPLICIT</code></td><td>одна неизвестная с областью поиска и вещественными параметрами, судья неявных законов (каждое чтение проверено точно): при каждом значении параметров из коробки ровно одно решение в области внутри данного отрезка; или, если существование либо единственность не показаны, только что все решения лежат в нём</td></tr>
 <tr><td><code>W_NO_GLOSS</code></td><td>нет пояснения — некому проверить, то ли значит имя</td></tr>
 <tr><td><code>W_REGION_FILTERED</code></td><td>одна неизвестная с областью поиска (? in [a, b]) и ТОЧНЫЙ ответ на всей прямой: оставлены только его значения в области; ни одного — утверждение опровергнуто в области</td></tr>
 <tr><td><code>W_REGION_UNUSED</code></td><td>область поиска (? in [a, b]) читается там, где точный решатель ничего не доказал, — столько же уравнений, сколько величин ?, у каждой своя область; здесь она не использована — или обыскана, но не исчерпана, и решения в ней не заверено (кривые лишь касаются или решений целая кривая: ничего не утверждается)</td></tr>
@@ -352,6 +354,7 @@
 <tr><td><code>E_VALUE_FORM</code></td><td>a value that is neither a number, an interval nor ?</td></tr>
 <tr><td><code>E_VALUE_SET</code></td><td>a choice between values, {0,10} — that is two rows, not one quantity</td></tr>
 <tr><td><code>W_EPOCH_NUMERIC</code></td><td>a clock beside a claim that compares numbers: the time layer reads statements only, so the claim is not read across the clock</td></tr>
+<tr><td><code>W_IMPLICIT</code></td><td>one unknown with its search region and real parameters, judged by the implicit judge (every reading checked exactly): for every parameter value in the box, exactly one solution in the region within the interval given; or, when existence or uniqueness is not shown, only that every solution lies in it</td></tr>
 <tr><td><code>W_NO_GLOSS</code></td><td>no gloss, so nobody can check the name means what it seems to</td></tr>
 <tr><td><code>W_REGION_FILTERED</code></td><td>one unknown with a search region (? in [a, b]) and an EXACT answer over all the reals: only its values in the region are kept; none — the claim is refuted in the region</td></tr>
 <tr><td><code>W_REGION_UNUSED</code></td><td>a search region (? in [a, b]) is read where the exact solver proved nothing — as many equations as ? values, every unknown with its region; here it was not used — or it was searched but not exhausted and no solution was certified in it (curves that only touch, or a whole curve of solutions: nothing is claimed)</td></tr>
@@ -468,6 +471,7 @@
 <tr><td><code>E_VALUE_FORM</code></td><td>a value that is neither a number, an interval nor ?</td></tr>
 <tr><td><code>E_VALUE_SET</code></td><td>a choice between values, {0,10} — that is two rows, not one quantity</td></tr>
 <tr><td><code>W_EPOCH_NUMERIC</code></td><td>a clock beside a claim that compares numbers: the time layer reads statements only, so the claim is not read across the clock</td></tr>
+<tr><td><code>W_IMPLICIT</code></td><td>one unknown with its search region and real parameters, judged by the implicit judge (every reading checked exactly): for every parameter value in the box, exactly one solution in the region within the interval given; or, when existence or uniqueness is not shown, only that every solution lies in it</td></tr>
 <tr><td><code>W_NO_GLOSS</code></td><td>no gloss, so nobody can check the name means what it seems to</td></tr>
 <tr><td><code>W_REGION_FILTERED</code></td><td>one unknown with a search region (? in [a, b]) and an EXACT answer over all the reals: only its values in the region are kept; none — the claim is refuted in the region</td></tr>
 <tr><td><code>W_REGION_UNUSED</code></td><td>a search region (? in [a, b]) is read where the exact solver proved nothing — as many equations as ? values, every unknown with its region; here it was not used — or it was searched but not exhausted and no solution was certified in it (curves that only touch, or a whole curve of solutions: nothing is claimed)</td></tr>
@@ -584,6 +588,7 @@
 <tr><td><code>E_VALUE_FORM</code></td><td>a value that is neither a number, an interval nor ?</td></tr>
 <tr><td><code>E_VALUE_SET</code></td><td>a choice between values, {0,10} — that is two rows, not one quantity</td></tr>
 <tr><td><code>W_EPOCH_NUMERIC</code></td><td>a clock beside a claim that compares numbers: the time layer reads statements only, so the claim is not read across the clock</td></tr>
+<tr><td><code>W_IMPLICIT</code></td><td>one unknown with its search region and real parameters, judged by the implicit judge (every reading checked exactly): for every parameter value in the box, exactly one solution in the region within the interval given; or, when existence or uniqueness is not shown, only that every solution lies in it</td></tr>
 <tr><td><code>W_NO_GLOSS</code></td><td>no gloss, so nobody can check the name means what it seems to</td></tr>
 <tr><td><code>W_REGION_FILTERED</code></td><td>one unknown with a search region (? in [a, b]) and an EXACT answer over all the reals: only its values in the region are kept; none — the claim is refuted in the region</td></tr>
 <tr><td><code>W_REGION_UNUSED</code></td><td>a search region (? in [a, b]) is read where the exact solver proved nothing — as many equations as ? values, every unknown with its region; here it was not used — or it was searched but not exhausted and no solution was certified in it (curves that only touch, or a whole curve of solutions: nothing is claimed)</td></tr>
@@ -700,6 +705,7 @@
 <tr><td><code>E_VALUE_FORM</code></td><td>a value that is neither a number, an interval nor ?</td></tr>
 <tr><td><code>E_VALUE_SET</code></td><td>a choice between values, {0,10} — that is two rows, not one quantity</td></tr>
 <tr><td><code>W_EPOCH_NUMERIC</code></td><td>a clock beside a claim that compares numbers: the time layer reads statements only, so the claim is not read across the clock</td></tr>
+<tr><td><code>W_IMPLICIT</code></td><td>one unknown with its search region and real parameters, judged by the implicit judge (every reading checked exactly): for every parameter value in the box, exactly one solution in the region within the interval given; or, when existence or uniqueness is not shown, only that every solution lies in it</td></tr>
 <tr><td><code>W_NO_GLOSS</code></td><td>no gloss, so nobody can check the name means what it seems to</td></tr>
 <tr><td><code>W_REGION_FILTERED</code></td><td>one unknown with a search region (? in [a, b]) and an EXACT answer over all the reals: only its values in the region are kept; none — the claim is refuted in the region</td></tr>
 <tr><td><code>W_REGION_UNUSED</code></td><td>a search region (? in [a, b]) is read where the exact solver proved nothing — as many equations as ? values, every unknown with its region; here it was not used — or it was searched but not exhausted and no solution was certified in it (curves that only touch, or a whole curve of solutions: nothing is claimed)</td></tr>
@@ -816,6 +822,7 @@
 <tr><td><code>E_VALUE_FORM</code></td><td>a value that is neither a number, an interval nor ?</td></tr>
 <tr><td><code>E_VALUE_SET</code></td><td>a choice between values, {0,10} — that is two rows, not one quantity</td></tr>
 <tr><td><code>W_EPOCH_NUMERIC</code></td><td>a clock beside a claim that compares numbers: the time layer reads statements only, so the claim is not read across the clock</td></tr>
+<tr><td><code>W_IMPLICIT</code></td><td>one unknown with its search region and real parameters, judged by the implicit judge (every reading checked exactly): for every parameter value in the box, exactly one solution in the region within the interval given; or, when existence or uniqueness is not shown, only that every solution lies in it</td></tr>
 <tr><td><code>W_NO_GLOSS</code></td><td>no gloss, so nobody can check the name means what it seems to</td></tr>
 <tr><td><code>W_REGION_FILTERED</code></td><td>one unknown with a search region (? in [a, b]) and an EXACT answer over all the reals: only its values in the region are kept; none — the claim is refuted in the region</td></tr>
 <tr><td><code>W_REGION_UNUSED</code></td><td>a search region (? in [a, b]) is read where the exact solver proved nothing — as many equations as ? values, every unknown with its region; here it was not used — or it was searched but not exhausted and no solution was certified in it (curves that only touch, or a whole curve of solutions: nothing is claimed)</td></tr>
