@@ -40,6 +40,7 @@ from itertools import product
 
 from ztl import T, F, Z, ev, atoms, NOT, OPS2, VALUES
 from zmodal import worlds, ztl_eval, global_super
+import zpy as _zpy  # a refusal raises here instead of reading as "no" (zpy, 2026-11-09)
 
 # marking: dict atom → T | F | 'M' (mark)
 
@@ -49,6 +50,35 @@ def verify(marking, atom, value):
     m2 = dict(marking)
     m2[atom] = value
     return m2
+
+
+def _has_z_literal(phi):
+    if isinstance(phi, str):
+        return phi == Z
+    return any(_has_z_literal(c) for c in phi[1:])
+
+
+def _reach_exact(phi, marking, v, mode):
+    """THE EXACT PASS WHERE THE BUDGET WOULD REFUSE (2026-11-09). `zreach` — the set of values over every completion
+    (mode "completion") or every refinement (mode "refinement"), atoms shared by two subtrees enumerated at their
+    lowest common node, past its cap a refusal (None here). `== {v}` is a theorem's consequence, not a measurement:
+    lean/ZReach.lean `only_value` (zero axioms) — the pass never misses a value; a value other than v comes with a
+    witness re-evaluated by `ev`. MEASURED before this: the budget check stood BEFORE `_only`, so a claim of 100
+    atoms answered "undetermined" though one pass decides it in milliseconds (the curator, 2026-11-09: «вниз почему-то
+    медленно»). It stands IN PLACE OF THE REFUSAL, not before the old exact path: on small claims that path is cheaper
+    (MEASURED: zreach first took test_judge_worst's grid 0.012 -> 0.170 s, ~0.1 ms of set-up per call x 1,419 calls).
+    Markings other than T / F / M (a clean Z constant) keep the refusal."""
+    if any(s not in (T, F, "M") for s in marking.values()):
+        return None
+    if any(a not in marking for a in atoms(phi)):
+        return None
+    if _has_z_literal(phi):
+        return None                       # a literal Z: outside lean/ZReach.lean's Fm (top/bot only) — the old path
+    import zreach
+    r = zreach.reach(phi, {a: (s if s in (T, F) else Z) for a, s in marking.items()}, mode)
+    if "refused" in r:
+        return None
+    return r["values"] == frozenset((v,))
 
 
 def stable_bit(phi, marking, budget=None):
@@ -77,7 +107,7 @@ def stable_bit(phi, marking, budget=None):
     # экспоненциальна, и когда она не считается — честнее сказать, что не
     # берёшься, чем молоть или отказывать во всём документе.
     if budget is not None and 2 ** len(marks) > budget:
-        return None
+        return _reach_exact(phi, marking, v, "completion")    # the exact pass instead of a refusal (None if it refuses)
     # EXACT, AND IN NO ORDER — see `_only`. The walk below is the definition;
     # it stays as the fallback and is what `_only` was checked against.
     fixed = {a: s for a, s in marking.items() if s in (T, F)}
@@ -227,7 +257,7 @@ def hereditary_bit(phi, marking, budget=None):
     # ОТКАЗ ВМЕСТО ПОМОЛА — см. stable_bit. Здесь основание перебора 3, а не
     # 2: уточнение может оставить метку меткой, завершение — не может.
     if budget is not None and 3 ** len(marks) > budget:
-        return None
+        return _reach_exact(phi, marking, v, "refinement")    # the exact pass instead of a refusal (None if it refuses)
     # EXACT, AND IN NO ORDER — see `_only`. The walk below is the definition;
     # it stays as the fallback and is what `_only` was checked against.
     fixed = {a: (s if s in (T, F) else Z) for a, s in marking.items() if s != "M"}
@@ -536,10 +566,10 @@ if __name__ == "__main__":
                 for val in (T, F):
                     m2v = verify(m, a, val)
                     changed = ztl_eval(phi, m2v) != ztl_eval(phi, m)
-                    if hereditary_bit(phi, m) and \
-                            (changed or not hereditary_bit(phi, m2v)):
+                    if _zpy.hereditary(phi, m) and \
+                            (changed or not _zpy.hereditary(phi, m2v)):
                         her_bad += 1
-                    if stable_bit(phi, m) and not hereditary_bit(phi, m) \
+                    if _zpy.stable(phi, m) and not _zpy.hereditary(phi, m) \
                             and changed:
                         sound_revoked += 1
     print(f"  hereditary: revocations or grade losses: {her_bad} (must be 0)")
@@ -566,7 +596,7 @@ if __name__ == "__main__":
     print(f"  invariant under EVERY single verification: {one_step}")
     print(f"  killed by the pair b:=F, d:=F → {two_step}")
     assert v4 == T and one_step and two_step != v4 \
-        and not hereditary_bit(phi4, m4)
+        and not _zpy.hereditary(phi4, m4)
     print("  → no depth-1 fence exists for the hereditary grade.")
 
     print("\n### 6. The fence depth is exactly m−1 (no constant-depth fence)")
