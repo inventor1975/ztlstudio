@@ -19,6 +19,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import ztl                                                     # noqa: E402
 import zverify as Z                                            # noqa: E402
+import zpy as _zpy  # a refusal raises here instead of reading as "no" (zpy, 2026-11-09)
 from zverify import T, F                                       # noqa: E402
 
 BUDGET = 59049          # 3**10 — нынешний предел студии, выраженный в переборе
@@ -37,9 +38,9 @@ def test_default_is_the_old_behaviour():
     def old(phi, marking):
         ats = ztl.atoms(phi)
         m = {a: v for a, v in marking.items() if a in ats}
-        if Z.hereditary_bit(phi, m):
+        if _zpy.hereditary(phi, m):
             return "hereditary"
-        if Z.stable_bit(phi, m):
+        if _zpy.stable(phi, m):
             return "sound"
         return "until-verification"
 
@@ -133,7 +134,7 @@ def test_budget_goes_through_the_front_door():
     """БЮДЖЕТ ЖИВЁТ ВО ВХОДЕ, и обходить вход нельзя.
 
     `zverify.grade` говорит на диалекте меток, где метка это 'M'.
-    `ztljudge` метит непроверенный атом значением 'Z' и переводит его в
+    `ztljudge` метит грязный атом значением 'Z' и переводит его в
     `_grade_marking`. Зовущий `grade` НАПРЯМУЮ перевод пропускает, меток
     не остаётся, множество уточнений вырождается в точку — и ВСЯКИЙ разряд
     читается `hereditary`.

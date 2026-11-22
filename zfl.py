@@ -566,6 +566,7 @@ from ztljudge import judge, formalize                            # noqa: E402
 from znumjudge import parse_quantities, judge_sheet_claim        # noqa: E402
 from znumjudge import extract_comparisons                       # noqa: E402
 from znumsolve import solve_claim                                # noqa: E402
+from zread import N
 import zpassport                                                 # noqa: E402
 import zbook                                                     # noqa: E402
 import zbackward                                                 # noqa: E402
@@ -1974,7 +1975,7 @@ def resolved_marking(rows):
     sentence rather than a mark. True — and it leaves the judge blind to
     every value the sentences DETERMINE: a claim over defined names came
     back `Z` however well grounded its parts were. The passport already
-    computes those values (the least fixed point of the lazy jump), so here
+    computes those values (the least fixed point of the stable step), so here
     they are simply added on top of the marks. The marks win where both
     speak: a row that was checked is not overruled by a computation."""
     m = dict(to_marking(rows))
@@ -1982,7 +1983,9 @@ def resolved_marking(rows):
     if system:
         lfp, _, _ = zpassport.passports(system)
         for name, v in lfp.items():
-            m.setdefault(name, v)
+            # a sentence the fixed point never determined (phase N) hardens into the quarantine MARK Z when it
+            # is handed to the judge (SPEC §N; pure branch 2026-11-22: N is never a mark of the judge's input)
+            m.setdefault(name, "Z" if v == N else v)
     return m
 
 
@@ -2324,7 +2327,8 @@ def run(doc, ground_registry=None):
         # What each ground holds, and how it came out.
         by_name = {x["name"]: x for x in rows}
         report["passport_rows"] = {
-            name: {"kind": kind, "value": lfp.get(name),
+            # outward, a never-resolved phase N is shown as the quarantine mark it hardens into (SPEC §N)
+            name: {"kind": kind, "value": ("Z" if lfp.get(name) == N else lfp.get(name)),
                    "reads": (sorted(names_in(by_name[name].get("ground")) & set(by_name))
                              if by_name.get(name, {}).get("status") == "defined" else [])}
             for name, (kind, _n) in sorted(comp_kind.items())}
@@ -2426,7 +2430,7 @@ def run(doc, ground_registry=None):
                 if filtered is not None and filtered[0] == 0:
                     r = dict(r, disposition="REFUTED")
             report["numeric"] = {"disposition": r["disposition"],
-                                 "lazy": r.get("lazy"),
+                                 "forced": r.get("forced"),
                                  "next_check": r.get("next_check", []),
                                  "solved": solved, "claim": claim,
                                  "sheet": sheet,
@@ -2556,7 +2560,7 @@ def run(doc, ground_registry=None):
             # it F/until-verification — a FALSE NEGATIVE it had been
             # reporting all along. Two chapters of eighteen move, both from
             # not-earned to earned. This is the architecture the draft
-            # already states: quarantine is the Z-set of the lazy jump's
+            # already states: quarantine is the Z-set of the stable step's
             # least fixed point, and ZTL is the greedy reading ON TOP of it.
             r = judge(claim, resolved_marking(rows))
         except Exception as exc:
