@@ -556,6 +556,7 @@ def form_spec(lang="en"):
 # ------------------------------------------------------- validation
 import json
 import os
+import itertools
 import re
 from collections import Counter
 import sys
@@ -2269,6 +2270,147 @@ def _system_answer(claim, q, unknowns, regions=None, budget=6000, search_budget=
     return answer([(cert, how)], False, how)
 
 
+
+def inline_definitions(claim, rows, max_len=20000):
+    """The claim with every `defined` row it reaches written out in place — or None, when that cannot be done
+    faithfully (then the judge reads the passport's values, as before).
+
+    WHY (2026-11-24, measured). Handing the judge a defined row as the passport's VALUE identifies the occurrences of
+    the dirty atoms inside it: the stable step reads each name once. So `safe := ~ok | ok` with `ok` unverified came
+    back EARNED "grounded outright", while the same formula as the claim is EARNED IF STABLE; `ok & ~ok` came back
+    REFUTED for REFUTED IF STABLE, and `~~ok` OPEN for ON CREDIT. An identification ZTL requires to be earned was
+    made by the document layer. Written out, each occurrence is read on its own and the judge decides.
+
+    Only where it is faithful: an acyclic chain of definitions (a self-referential system is the passport's own
+    business — the stable step is the point there), no `Tr(...)` in a reached ground (the claim language has no Tr:
+    it reads Z as F at each occurrence, so it is per-occurrence already), no comparison/numeric or integral row.
+    Measured on 11,448 ZFL documents on 2026-11-24: 1 verdict changed - the book's chapter 02, the three laws over
+    an unverified atom (identity & excluded_middle & noncontradiction), EARNED -> EARNED IF STABLE, which is what the
+    same formulas give as a claim (chapter 07)."""
+    by = {r.get("name"): r for r in rows if r.get("name")}
+    cmp_names = set(compare_rows(rows))
+    defs = {n: (r.get("ground") or "") for n, r in by.items() if r.get("status") == "defined"}
+    if not defs or not (names_in(claim) & set(defs)):
+        return None
+    seen, stack = set(), []
+
+    def ok(n):
+        if n in stack:
+            return False                               # a cycle: the passport's case
+        if n in seen:
+            return True
+        g = defs[n]
+        if not g.strip() or n in cmp_names or re.search(r"\bTr\s*\(", g) or _INTEGRAL_RE.search(g) \
+                or re.search(r"(<=|>=|==|<|>)", g.replace("<->", " ").replace("->", " ")):   # arrows are not comparisons
+            return False
+        stack.append(n)
+        good = all(ok(m) for m in names_in(g) & set(defs))
+        stack.pop()
+        seen.add(n)
+        return good
+
+    if not all(ok(n) for n in names_in(claim) & set(defs)):
+        return None
+    s = claim
+    while names_in(s) & set(defs):
+        for n in names_in(s) & set(defs):
+            s = re.sub(r"(?<![\wА-Яа-яЁё])" + re.escape(n) + r"(?![\wА-Яа-яЁё])", "(" + defs[n] + ")", s)
+        if len(s) > max_len:
+            return None
+    return s
+
+
+
+_CYCLE_STABLE_CAP = 10   # repeated dirty inputs enumerated in a self-referential system: 2^10 passport passes at most
+
+
+def cyclic_stable(claim, rows):
+    """The judge's reading of a claim that reaches a SELF-REFERENTIAL system in which a dirty input occurs more than
+    once — or None when there is no such input (then nothing was identified and the passport's values stand).
+
+    WHY (2026-11-24, measured; the curator: "if it touches the cyclic ones, maybe rightly so"). inline_definitions
+    cannot write a cycle out, and the passport's stable step reads every input once: `A := (ok | ~ok) | A` came back
+    EARNED, while with each occurrence of `ok` its own input it is OPEN; the honest verdict is EARNED IF STABLE. The
+    mirror loss exists too: `A := ok | B; B := ~ok | A` came back OPEN, and it is T in every completion of `ok`.
+    The passport itself is NOT changed (the paradox kinds are about the defined names' own self-reference, which IS
+    their definition, not an unearned identification); only the values the judge receives are.
+
+    The same rule as the judge's own: each occurrence of a dirty input read on its own decides EARNED / REFUTED;
+    otherwise every completion of the repeated dirty inputs (each fixed to one value) decides EARNED IF STABLE /
+    REFUTED IF STABLE; otherwise the per-occurrence verdict stands."""
+    defs = {r.get("name"): (r.get("ground") or "") for r in rows if r.get("status") == "defined" and r.get("name")}
+    if not defs or re.search(r"(<=|>=|==|<|>)", claim.replace("<->", " ").replace("->", " ")):
+        return None
+    marks = to_marking(rows)
+    dirty = {n for n, m in marks.items() if m == "Z"}
+    reached, todo = set(), [n for n in names_in(claim) if n in defs]
+    while todo:
+        n = todo.pop()
+        if n not in reached:
+            reached.add(n)
+            todo += [m for m in names_in(defs[n]) if m in defs]
+    if not reached:
+        return None
+    # only a SELF-REFERENTIAL system: an acyclic chain is written out by inline_definitions, or (with Tr) already reads
+    # each occurrence on its own
+    def cyclic(start):
+        st, seen = [start], set()
+        while st:
+            x = st.pop()
+            for m in names_in(defs.get(x, "")):
+                if m == start:
+                    return True
+                if m in defs and m not in seen:
+                    seen.add(m)
+                    st.append(m)
+        return False
+    if not any(cyclic(n) for n in reached):
+        return None
+    occ = {}
+    for n in reached:
+        for m in re.findall(r"[A-Za-zА-Яа-яЁё_][\wА-Яа-яЁё]*", re.sub(r"\bTr\s*\(\s*([^)]+?)\s*\)", r"\1", defs[n])):
+            if m in dirty:
+                occ[m] = occ.get(m, 0) + 1
+    repeated = sorted(m for m, k in occ.items() if k > 1)
+    if not repeated or len(repeated) > _CYCLE_STABLE_CAP:
+        return None
+    # each occurrence of a repeated dirty input inside the reached definitions becomes its own dirty input
+    by = {r.get("name"): r for r in rows}
+    fresh, extra, k = [], [], {}
+    for r in rows:
+        if r.get("name") in reached:
+            def sub(mt):
+                nm = mt.group(0)
+                if nm not in repeated:
+                    return nm
+                k[nm] = k.get(nm, 0) + 1
+                new = f"{nm}__occ{k[nm]}"
+                extra.append({**by[nm], "name": new})
+                return new
+            fresh.append({**r, "ground": re.sub(r"(?<![\wА-Яа-яЁё])[A-Za-zА-Яа-яЁё_][\wА-Яа-яЁё]*", sub, r["ground"])})
+        else:
+            fresh.append(r)
+    per_occ = judge(claim, resolved_marking(fresh + extra))
+    if per_occ["disposition"] in ("EARNED", "REFUTED"):
+        return per_occ
+    outs = set()
+    for vals in itertools.product((True, False), repeat=len(repeated)):
+        fixed = {n: v for n, v in zip(repeated, vals)}
+        rows_c = [({**r, "status": "verified" if fixed[r["name"]] else "refuted", "ground": "completion"}
+                   if r.get("name") in fixed else r) for r in rows]
+        d = judge(claim, resolved_marking(rows_c))["disposition"]
+        outs.add("T" if d == "EARNED" else "F" if d == "REFUTED" else "?")
+        if "?" in outs or len(outs) > 1:
+            break
+    if outs in ({"T"}, {"F"}):
+        what = "true" if outs == {"T"} else "false"
+        return {**per_occ, "disposition": "EARNED IF STABLE" if outs == {"T"} else "REFUTED IF STABLE",
+                "if_stable": repeated,
+                "why": (f"{what} in every completion of {repeated} (each read as one fact at all its occurrences in "
+                        f"the self-referential system); read each occurrence on its own and it is not established")}
+    return per_occ
+
+
 def run(doc, ground_registry=None):
     """Validate, then ask whichever instruments apply.
 
@@ -2562,7 +2704,9 @@ def run(doc, ground_registry=None):
             # not-earned to earned. This is the architecture the draft
             # already states: quarantine is the Z-set of the stable step's
             # least fixed point, and ZTL is the greedy reading ON TOP of it.
-            r = judge(claim, resolved_marking(rows))
+            # WRITTEN OUT, where that is faithful (2026-11-24): see inline_definitions.
+            inlined = inline_definitions(claim, rows)
+            r = judge(inlined, resolved_marking(rows)) if inlined else (cyclic_stable(claim, rows) or judge(claim, resolved_marking(rows)))
         except Exception as exc:
             issues.append(_issue("error", "E_UNREADABLE", "claim",
                                  f"the instruments could not read this "
@@ -2572,7 +2716,8 @@ def run(doc, ground_registry=None):
                            "disposition": r["disposition"],
                            "grade": r["grade"],
                            "unverified": sorted(r["unverified"]),
-                           "why": r.get("why")}
+                           "why": r.get("why"),
+                           **({"claim_inlined": inlined} if inlined else {})}
         # A DEFINED ROW CANNOT BE VERIFIED (29.09, blind cloud test): "verify
         # ['may_sign']" sent a reader to check a formula, and "verify ['L']"
         # sent one to check a paradox whose refusal is permanent. The list of
