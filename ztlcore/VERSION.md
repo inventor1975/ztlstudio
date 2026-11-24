@@ -3,6 +3,7 @@
 These 14 modules (plus three of its stands) are the ZTL logic kernel (the judge), vendored from the ZTL repository so introspect
 clones and runs self-contained. **Source of truth: https://github.com/inventor1975/ZTL**
 
+Vendored 2026-11-25 (night): znum.py from inventor1975/ZTL @ 0d9bc90 (an exact polynomial identity decides ==: the difference of the sides as a polynomial with rational coefficients, c^(linear) atoms; only the zero polynomial decides);
 Vendored 2026-11-25 (later): znum.py from inventor1975/ZTL @ e173830 (an undecided ifpos branch with no readings is a mark, not E);
 Vendored 2026-11-25: znum.py, zgap.py and NEW zlogexact.py from inventor1975/ZTL @ 2de6581 (exact logarithms of rationals at pinned points — log_8 64 + log_4 64 = 5 is decided; zgap's Lean note); zfl.py unchanged;
 Vendored 2026-11-24 (night): znum.py, znumjudge.py, zfunc.py from inventor1975/ZTL @ 365cfde (FloorLimit — a floor limit is a mark with its reason, never E — and tan's period; a power over an integer range of exponents; the integer words idiv mod dvd fact choose, the twin of VRCycle's Numbers/Division); the studio's zfl.py takes ZTL's one hunk (the integer words as function words);
