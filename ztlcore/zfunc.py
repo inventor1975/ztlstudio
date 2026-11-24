@@ -36,6 +36,14 @@ class NoReadings(Exception):
     pass
 
 
+class FloorLimit(NoReadings):
+    """THE FLOOR CANNOT READ IT — not "there is nothing to read" (2026-11-24, the curator's "1+2 делаем"). Until then
+    every limit of these series (exp past 50000, tan past 1.5, a failed sin/cos reduction) was raised as NoReadings and
+    the judge answered E, "no subject, repair the claim", for tan(46) and exp(60000), which exist (MEASURED: tan(46) >
+    -100 -> E). A SUBCLASS on purpose: the certificate checkers that stop on NoReadings stop on this too (they cannot
+    read it either); only the judge (znum) tells the two apart — a limit is a mark with its reason, never E."""
+
+
 # ---------------------------------------------------------------- rounding outward
 def _down(x: Fraction, bits=BITS) -> Fraction:
     """The largest dyadic m/2^k <= x, k chosen from x's size (keeps fractions small)."""
@@ -164,7 +172,7 @@ def exp_pt(x: Fraction):
     """[lo, hi] around e^x. Reduce: x = t·2^m with |t| <= 1/4, Taylor on t, then square m times."""
     x = Fraction(x)
     if abs(x) > 50_000:
-        raise NoReadings("exp of an argument past 50000: outside any physical range")
+        raise FloorLimit("exp of an argument past 50000 is not read by the floor")
     m = 0
     t = x
     while abs(t) > Fraction(1, 4):
@@ -228,7 +236,7 @@ def sincos_pt(x: Fraction):
     """([sin lo, hi], [cos lo, hi]) for |x| <= 2 by Taylor; the remainder is below the next term."""
     x = Fraction(x)
     if abs(x) > 2:
-        raise NoReadings("sin/cos outside |x| <= 2 not supported here")
+        raise FloorLimit("sin/cos outside |x| <= 2 not supported here")
     return _sc_series(x)
 
 
@@ -249,7 +257,7 @@ def _sc_series(x: Fraction):
     gcd per term. MEASURED: Fraction's gcd was ~60% of a ZFL system with cos (cProfile, 9.7 s of 11.8)."""
     x = Fraction(x)
     if abs(x) > 4:
-        raise NoReadings("sin/cos series only for |x| <= 4")
+        raise FloorLimit("sin/cos series only for |x| <= 4")
     n, d = x.numerator, x.denominator
     npow = [1] * 82
     for j in range(1, 82):
@@ -273,7 +281,7 @@ def _sc_series_fr(x: Fraction):
     """The reference: `_sc_series` in Fractions (the version before 2026-11-08)."""
     x = Fraction(x)
     if abs(x) > 4:
-        raise NoReadings("sin/cos series only for |x| <= 4")
+        raise FloorLimit("sin/cos series only for |x| <= 4")
     s, c = Fraction(0), Fraction(0)
     term_s, term_c = x, Fraction(1)
     for n in range(40):
@@ -303,7 +311,7 @@ def _sc_pt(x: Fraction, which: int):
     1-Lipschitz, so the reduction's own width (from pi's bracket) widens the bracket by exactly that width."""
     r1, r2 = _reduced(x)
     if abs(r1) > 4 or abs(r2) > 4:
-        raise NoReadings("sin/cos: argument reduction failed")
+        raise FloorLimit("sin/cos: argument reduction failed")
     w = r2 - r1
     lo, hi = _sc_series(r1)[which]
     return _down(max(Fraction(-1), lo - w)), _up(min(Fraction(1), hi + w))
@@ -320,7 +328,7 @@ def cos_pt(x: Fraction):
 def tan_pt(x: Fraction):
     (slo, shi), (clo, chi) = sincos_pt(x)
     if clo <= 0:
-        raise NoReadings("tan near or past pi/2")
+        raise FloorLimit("tan near pi/2 is not read by the floor")
     cands = [a / b for a in (slo, shi) for b in (clo, chi)]
     return _down(min(cands)), _up(max(cands))
 
@@ -467,8 +475,16 @@ TAN_EDGE = Fraction(3, 2)        # below pi/2 = 1.5707...: tan is read only on |
 def iv_tan(a):
     if _inf(a[0]) or _inf(a[1]):
         return None
+    # TAN'S PERIOD (2026-11-24, with FloorLimit): tan(x) = tan(x - k pi), k = round(mid / pi), the shift taken with pi's
+    # own bracket (the reduced interval is wider by k times its width). Until then tan was read on |x| <= 1.5 only and
+    # tan(46) was E. The period is a Python reading; the Lean witnesses below cover tan on the REDUCED interval.
+    k = round(float((Fraction(a[0]) + Fraction(a[1])) / 2) / math.pi)
+    if k:
+        a = (a[0] - k * PI[1], a[1] - k * PI[0]) if k > 0 else (a[0] - k * PI[0], a[1] - k * PI[1])
+    if a[1] - a[0] >= PI[0]:
+        return None                       # a whole period inside: a pole is a reading, undefined there — a mark
     if a[0] > TAN_EDGE or a[1] < -TAN_EDGE:
-        raise NoReadings("tan read only on |x| <= 1.5 (below pi/2)")
+        raise FloorLimit("tan is read only at a distance >= pi/2 - 1.5 from its poles")
     if a[0] < -TAN_EDGE or a[1] > TAN_EDGE:
         return None
     r = _iv_mono(tan_pt, a)
@@ -580,6 +596,46 @@ def iv_pow(a, b):
     return iv_exp((min(cands), max(cands)))     # -inf * y (y > 0) -> exp reads 0 at -inf: the 0 of a closed base
 
 
+def iv_pow_intrange(a, n):
+    """a^n for EVERY integer n in [n0, n1] (2026-11-24, step 2 of the Lean reading: `x ^ n` with n a natural variable;
+    VR's vpow is repeated multiplication). n0 >= 0 only (a negative range is a mark here). A Python reading: no Lean twin.
+      base >= 0: x^n is monotone in x and in n, so the extremes sit at the corners; with n1 = inf the top is inf for a
+                 base above 1 and the bottom runs down to 0 for a base below 1 (0 is kept as a closed end: wider, sound);
+                 0 ** 0 = 1, as in Lean and in algebra;
+      a base that may be negative: the sign follows n's parity, which an interval does not carry — [-M, M] by the
+                 magnitude M = max |x|^n, never a guess of the parity."""
+    n0, n1 = n
+    if n0 == -INF or n0 < 0:
+        return None
+    n0 = int(math.ceil(n0))
+    n1 = INF if _inf(n1) else int(math.floor(n1))
+    if n1 != INF and n1 < n0:
+        raise NoReadings("an empty range of integer exponents")
+    if any(_inf(x) for x in a) and not (a[1] == INF and a[0] >= 0):
+        return None
+    if a[0] >= 0:
+        a0, a1 = Fraction(a[0]), a[1]
+        if n1 == INF:
+            # the bottom: a0^n0 when the smallest base is >= 1 (x^n grows with n); below 1, x^n runs down to 0
+            lo = a0 ** n0 if a0 >= 1 else Fraction(0)
+            # the top: unbounded above 1; exactly 1 at a top base of 1; below 1 the largest is at n0 (x^n falls with n)
+            if a1 == INF or a1 > 1:
+                hi = INF
+            elif a1 == 1:
+                hi = Fraction(1)
+            else:
+                hi = Fraction(a1) ** n0              # n0 = 0 gives 1 (0 ** 0 = 1 too)
+            return lo, hi
+        ends = [a0 ** n0, a0 ** n1] + ([INF] if a1 == INF else [Fraction(a1) ** n0, Fraction(a1) ** n1])
+        fin = [e for e in ends if not _inf(e)]
+        return min(fin), (INF if a1 == INF and n1 > 0 else max(fin))
+    if n1 == INF:
+        return None
+    m = max(abs(Fraction(a[0])), abs(Fraction(a[1])))
+    mag = max(m ** n0, m ** n1)
+    return -mag, mag
+
+
 def iv_min(a, b):
     return min(a[0], b[0]), min(a[1], b[1])
 
@@ -630,4 +686,106 @@ for _b in _ZS.FAMILIES:
         UNARY[_nm] = _ZS.unary(_nm)
 for _a in _ZS.ALIASES:
     UNARY[_a] = _ZS.unary(_a)
-FUNC_OPS = set(UNARY) | set(BINARY) | set(TERNARY)
+# THE INTEGER WORDS (2026-11-24, step 3: the twin of VR/Numbers/Division.lean, every object there on []):
+# idiv, mod (Euclidean, divisor >= 1), dvd (1 when a | b: some k with a*k = b, else 0), fact, choose. Read on the
+# INTEGER LATTICE only (znum checks it); no convention value: a divisor 0 is not a value that was chosen — VR cannot
+# even write it (the divisor is succ d by construction) — so idiv/mod by a pinned 0 has NO reading (E). 0 | 0 holds and
+# 0 | b (b != 0) fails BY THE DEFINITION (a witness k), and choose(n, k) = 0 for k > n is the count of k-subsets
+# (proved in VR: vchoose_eq_base_of_lt). VR's words are on the naturals: a negative argument of idiv/mod/fact/choose
+# exists in Z but is not read by this twin (FloorLimit, a mark); dvd reads Z by magnitudes (a | b iff |a| | |b|).
+INTWORDS = {"idiv": 2, "mod": 2, "dvd": 2, "fact": 1, "choose": 2}
+INT_ENUM_CAP = 4096          # a range of integer arguments is read point by point up to this many points
+FACT_CAP = 2000              # n! past this n is not read by the floor (FloorLimit): it exists, it is just huge
+
+
+def _ipts(a):
+    """the integers of an interval [a0, a1] (finite ends), as a range"""
+    return range(int(math.ceil(a[0])), int(math.floor(a[1])) + 1)
+
+
+def _enum(f, *ivs):
+    """min/max of f over every integer point of the boxes, when there are few enough; else None (a mark)"""
+    if any(_inf(x) for iv in ivs for x in iv):
+        return None
+    n = 1
+    for iv in ivs:
+        n *= max(0, int(math.floor(iv[1])) - int(math.ceil(iv[0])) + 1)
+    if n == 0:
+        raise NoReadings("no integer reading in the range")
+    if n > INT_ENUM_CAP:
+        return None
+    import itertools
+    vals = [f(*pt) for pt in itertools.product(*[_ipts(iv) for iv in ivs])]
+    return Fraction(min(vals)), Fraction(max(vals))
+
+
+def _nat_args(name, *ivs):
+    for iv in ivs:
+        if iv[1] < 0:
+            raise FloorLimit(f"{name} of a negative integer: it exists in Z, the VR twin reads the naturals")
+        if iv[0] < 0:
+            return False
+    return True
+
+
+def iv_idiv(a, b):
+    if b[0] == 0 and b[1] == 0:
+        raise NoReadings("idiv by 0: no value (VR's divisor is succ d — the division cannot be written)")
+    if not _nat_args("idiv", a, b):
+        return None
+    if b[0] == 0:
+        return None                                          # 0 is a reading of the divisor: undefined there — a mark
+    lo = Fraction(0) if _inf(b[1]) else Fraction(int(math.floor(a[0])) // int(math.floor(b[1])))
+    hi = INF if _inf(a[1]) else Fraction(int(math.floor(a[1])) // int(math.ceil(b[0])))
+    return lo, hi                                            # monotone: up in a, down in b (a >= 0, b >= 1)
+
+
+def iv_mod(a, b):
+    if b[0] == 0 and b[1] == 0:
+        raise NoReadings("mod by 0: no value (VR's divisor is succ d — the division cannot be written)")
+    if not _nat_args("mod", a, b):
+        return None
+    if b[0] == 0:
+        return None
+    r = _enum(lambda x, y: x % y, a, b)
+    if r is not None:
+        return r
+    top = (b[1] - 1) if not _inf(b[1]) else INF
+    top = a[1] if (_inf(top) or (not _inf(a[1]) and a[1] < top)) else top
+    return Fraction(0), (top if _inf(top) else Fraction(int(math.floor(top))))
+
+
+def _dvd_pt(x, y):
+    x, y = abs(x), abs(y)
+    return 1 if (y == 0 if x == 0 else y % x == 0) else 0
+
+
+def iv_dvd(a, b):
+    r = _enum(_dvd_pt, a, b)
+    return r if r is not None else (Fraction(0), Fraction(1))
+
+
+def iv_fact(n):
+    if not _nat_args("fact", n):
+        return None
+    if _inf(n[1]):
+        return Fraction(math.factorial(int(math.ceil(n[0])))), INF
+    if n[1] > FACT_CAP:
+        raise FloorLimit(f"fact of n > {FACT_CAP} is not read by the floor")
+    return (Fraction(math.factorial(int(math.ceil(n[0])))), Fraction(math.factorial(int(math.floor(n[1])))))
+
+
+def _choose_pt(n, k):
+    return math.comb(n, k) if 0 <= k <= n else 0
+
+
+def iv_choose(n, k):
+    if not _nat_args("choose", n, k):
+        return None
+    if not _inf(n[1]) and n[1] > FACT_CAP:
+        raise FloorLimit(f"choose of n > {FACT_CAP} is not read by the floor")
+    return _enum(_choose_pt, n, k)
+
+
+INTFUNCS = {"idiv": iv_idiv, "mod": iv_mod, "dvd": iv_dvd, "fact": iv_fact, "choose": iv_choose}
+FUNC_OPS = set(UNARY) | set(BINARY) | set(TERNARY) | set(INTWORDS)
